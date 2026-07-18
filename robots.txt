@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://xm2514-svg.github.io/sites/sitemap.xml
