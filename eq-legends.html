@@ -40,6 +40,12 @@
   body{margin:0;background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:13.5px;line-height:1.5}
   a{color:var(--gold2)} a:hover{text-decoration:underline}
   .wrap{max-width:1000px;margin:0 auto;padding:16px 20px 60px}
+  @media(min-width:1600px){
+    .wrap{max-width:1500px}
+    .card,.note,.named,section>p,section>ul,section>ol{max-width:1060px}
+    .illus{max-width:1200px}
+  }
+
   .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
   @media(max-width:700px){.tw table{min-width:520px}}
   svg.mapz{cursor:zoom-in}
