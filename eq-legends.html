@@ -54,6 +54,7 @@
   .tag{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--line)}
   .t-monk{color:#f0c98a;background:#2a2113}.t-sha{color:var(--green);background:#16220f}.t-pal{color:var(--blue);background:#0f1c26}
   nav{position:sticky;top:0;background:rgba(14,12,10,.97);backdrop-filter:blur(4px);border-bottom:1px solid var(--line);padding:8px 0;margin:0 0 14px;z-index:5;display:flex;gap:9px;flex-wrap:wrap;font-size:12px}
+  [id]{scroll-margin-top:var(--navh,90px)}
   nav a{color:var(--dim)} nav a:hover{color:var(--gold2)}
   h2{font-size:17px;color:var(--gold2);background:var(--panel2);border-left:4px solid var(--gold);border-radius:8px;padding:8px 12px;margin:26px 0 10px}
   h3{font-size:14px;margin:14px 0 5px;color:var(--gold)}
@@ -758,5 +759,10 @@ document.querySelectorAll('#loops svg').forEach(function(svg){
 })();
 </script>
 <a id="kofiBtn" href="https://ko-fi.com/keplerdust" target="_blank" rel="noopener" style="position:fixed;top:9px;right:112px;z-index:9999;background:#1a1206;color:#f4d585;border:1px solid #c8a83a;border-radius:6px;padding:6px 13px;font:600 13px Segoe UI,Arial;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.5)">&#9749; Support</a>
+<script>
+(function(){var n=document.querySelector('nav');if(!n)return;
+var f=function(){document.documentElement.style.setProperty('--navh',(n.offsetHeight+18)+'px')};
+f();addEventListener('resize',f);addEventListener('load',f);})();
+</script>
 </body>
 </html>
