@@ -43,6 +43,11 @@
   .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
   @media(max-width:700px){.tw table{min-width:520px}}
   svg.mapz{cursor:zoom-in}
+  @media(max-width:760px){
+    nav{flex-wrap:nowrap!important;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:13px}
+    nav a,nav b{white-space:nowrap;flex:0 0 auto}
+    #kofiBtn,#langToggle{top:auto!important;bottom:12px!important}
+  }
   #mv{display:none;position:fixed;inset:0;z-index:10000;background:rgba(6,5,4,.985)}
   #mv.on{display:flex;flex-direction:column}
   #mvbar{flex:0 0 auto;display:flex;gap:8px;justify-content:center;align-items:center;
@@ -787,12 +792,20 @@ f();addEventListener('resize',f);addEventListener('load',f);})();
 var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=null,w=0;
 function fit(){if(!cur)return;w=box.clientWidth-20;cur.style.width=w+'px';}
 function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.width=w+'px';}
-function open(svg){box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
-  box.appendChild(cur);mv.classList.add('on');document.body.style.overflow='hidden';fit();}
+function show(svg){box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
+  cur.classList.remove('mapz');box.appendChild(cur);mv.classList.add('on');
+  document.body.style.overflow='hidden';fit();}
 function close(){mv.classList.remove('on');box.innerHTML='';cur=null;
   document.body.style.overflow='';}
-document.querySelectorAll('svg').forEach(function(s){s.classList.add('mapz');
-  s.addEventListener('click',function(){open(s);});});
+document.querySelectorAll('svg').forEach(function(s){
+  var bar=s.previousElementSibling;
+  if(bar&&bar.classList&&bar.classList.contains('zoombar')){
+    var b=document.createElement('button');b.type='button';b.textContent='\u26F6';
+    b.title='Fullscreen';b.addEventListener('click',function(){show(s);});bar.appendChild(b);
+  }else{
+    s.classList.add('mapz');s.addEventListener('click',function(){show(s);});
+  }
+});
 document.getElementById('mvin').onclick=function(){zoom(1.4);};
 document.getElementById('mvout').onclick=function(){zoom(1/1.4);};
 document.getElementById('mvfit').onclick=fit;
