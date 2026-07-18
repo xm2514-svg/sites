@@ -42,6 +42,9 @@
   .wrap{max-width:1000px;margin:0 auto;padding:16px 20px 60px}
   @media(min-width:1600px){
     .wrap{max-width:1500px}
+    /* le diagramme de voyage n'a aucun plafond (contrairement aux cartes de #loops,
+       limitees a 660px de haut) : sans cela il remplit tout l'ecran */
+    #travel svg{max-width:1050px;display:block;margin:0 auto}
     header.top{margin-left:calc(50% - var(--vw,100%)/2);
       margin-right:calc(50% - var(--vw,100%)/2);border-radius:0;padding-left:24px;
       padding-right:24px;background-position:center 45%}
