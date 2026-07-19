@@ -56,14 +56,14 @@
   @media(max-width:760px){
     nav{flex-wrap:nowrap!important;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:13px}
     nav a,nav b{white-space:nowrap;flex:0 0 auto}
-    #kofiBtn,#langToggle{top:auto!important;bottom:12px!important}
   }
-  /* Sur desktop les deux boutons flottants sont ancres en haut a droite de la fenetre.
-     Des que le cadre approche du bord de l'ecran ils recouvrent la fin de la premiere
-     ligne du menu : on leur reserve la place plutot que de laisser les liens passer dessous.
+  /* Un seul bouton en haut a droite (Languages) : on lui reserve sa largeur dans le menu
+     pour que les liens ne passent jamais dessous, a toute resolution.
      !important OBLIGATOIRE : la regle nav{...padding:8px 0} du golden apparait ~114 000
      caracteres plus loin dans la feuille et son raccourci ecrase sinon ce padding-right. */
-  @media(min-width:761px){ nav{padding-right:250px!important} }
+  nav{padding-right:135px!important}
+  /* Support descend en bas a droite : bouton flottant classique, loin du menu et du contenu. */
+  #kofiBtn{top:auto!important;bottom:16px!important;right:16px!important}
   #mv{display:none;position:fixed;inset:0;z-index:10000;background:rgba(6,5,4,.985)}
   #mv.on{display:flex;flex-direction:column}
   #mvbar{flex:0 0 auto;display:flex;gap:8px;justify-content:center;align-items:center;
