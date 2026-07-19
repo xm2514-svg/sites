@@ -56,14 +56,26 @@
   @media(max-width:760px){
     nav{flex-wrap:nowrap!important;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:13px}
     nav a,nav b{white-space:nowrap;flex:0 0 auto}
+    /* Le menu defile horizontalement : un padding-right ne protege rien, il se retrouve
+       a la fin du contenu defilant et les liens passent sous le bouton. Il faut retrecir
+       la barre elle-meme pour qu'elle s'arrete avant Languages. */
+    nav{margin-right:126px!important;padding-right:0!important}
   }
   /* Un seul bouton en haut a droite (Languages) : on lui reserve sa largeur dans le menu
      pour que les liens ne passent jamais dessous, a toute resolution.
      !important OBLIGATOIRE : la regle nav{...padding:8px 0} du golden apparait ~114 000
      caracteres plus loin dans la feuille et son raccourci ecrase sinon ce padding-right. */
   nav{padding-right:135px!important}
-  /* Support descend en bas a droite : bouton flottant classique, loin du menu et du contenu. */
-  #kofiBtn{top:auto!important;bottom:16px!important;right:16px!important}
+  /* Desktop : Support s'empile JUSTE SOUS Languages, meme bord droit. Les 135px reserves
+     dans le menu couvrent les deux puisqu'ils partagent le meme alignement a droite. */
+  @media(min-width:761px){
+    #kofiBtn{top:45px!important;bottom:auto!important;right:14px!important}
+  }
+  /* Mobile : la hauteur est trop precieuse pour empiler deux boutons en haut — Support
+     redescend en bas a droite, ou un bouton flottant est attendu et ne cache qu'un coin. */
+  @media(max-width:760px){
+    #kofiBtn{top:auto!important;bottom:16px!important;right:16px!important}
+  }
   #mv{display:none;position:fixed;inset:0;z-index:10000;background:rgba(6,5,4,.985)}
   #mv.on{display:flex;flex-direction:column}
   #mvbar{flex:0 0 auto;display:flex;gap:8px;justify-content:center;align-items:center;
