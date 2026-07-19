@@ -56,25 +56,24 @@
   @media(max-width:760px){
     nav{flex-wrap:nowrap!important;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:13px}
     nav a,nav b{white-space:nowrap;flex:0 0 auto}
-    /* Le menu defile horizontalement : un padding-right ne protege rien, il se retrouve
-       a la fin du contenu defilant et les liens passent sous le bouton. Il faut retrecir
-       la barre elle-meme pour qu'elle s'arrete avant Languages. */
-    nav{margin-right:126px!important;padding-right:0!important}
-  }
-  /* Un seul bouton en haut a droite (Languages) : on lui reserve sa largeur dans le menu
-     pour que les liens ne passent jamais dessous, a toute resolution.
-     !important OBLIGATOIRE : la regle nav{...padding:8px 0} du golden apparait ~114 000
-     caracteres plus loin dans la feuille et son raccourci ecrase sinon ce padding-right. */
-  nav{padding-right:135px!important}
-  /* Desktop : Support s'empile JUSTE SOUS Languages, meme bord droit. Les 135px reserves
-     dans le menu couvrent les deux puisqu'ils partagent le meme alignement a droite. */
-  @media(min-width:761px){
-    #kofiBtn{top:45px!important;bottom:auto!important;right:14px!important}
-  }
-  /* Mobile : la hauteur est trop precieuse pour empiler deux boutons en haut — Support
-     redescend en bas a droite, ou un bouton flottant est attendu et ne cache qu'un coin. */
-  @media(max-width:760px){
+    /* Barre laissee pleine largeur : la retrecir cassait son fond colle en haut.
+       Les deux boutons descendent dans les coins opposes, le menu reste entier. */
+    nav{padding-right:0!important;margin-right:0!important}
+    #langToggle{top:auto!important;bottom:16px!important;right:auto!important;left:16px!important}
     #kofiBtn{top:auto!important;bottom:16px!important;right:16px!important}
+  }
+
+  /* Desktop : les boutons sont ancres sur le BORD DE LA COLONNE de contenu, pas sur le bord
+     de la fenetre — sinon a 3440 ils flottent a 900px du menu. max() les empeche de sortir
+     de l'ecran quand la fenetre devient plus etroite que la colonne. */
+  @media(min-width:761px){
+    nav{padding-right:135px!important}
+    #langToggle{right:max(14px, calc(50% - 486px))!important;top:9px!important;left:auto!important}
+    #kofiBtn{right:max(14px, calc(50% - 486px))!important;top:45px!important;bottom:auto!important}
+  }
+  @media(min-width:1600px){
+    #langToggle{right:max(14px, calc(50% - 736px))!important}
+    #kofiBtn{right:max(14px, calc(50% - 736px))!important}
   }
   #mv{display:none;position:fixed;inset:0;z-index:10000;background:rgba(6,5,4,.985)}
   #mv.on{display:flex;flex-direction:column}
