@@ -60,8 +60,10 @@
   }
   /* Sur desktop les deux boutons flottants sont ancres en haut a droite de la fenetre.
      Des que le cadre approche du bord de l'ecran ils recouvrent la fin de la premiere
-     ligne du menu : on leur reserve la place plutot que de laisser les liens passer dessous. */
-  @media(min-width:761px){ nav{padding-right:250px} }
+     ligne du menu : on leur reserve la place plutot que de laisser les liens passer dessous.
+     !important OBLIGATOIRE : la regle nav{...padding:8px 0} du golden apparait ~114 000
+     caracteres plus loin dans la feuille et son raccourci ecrase sinon ce padding-right. */
+  @media(min-width:761px){ nav{padding-right:250px!important} }
   #mv{display:none;position:fixed;inset:0;z-index:10000;background:rgba(6,5,4,.985)}
   #mv.on{display:flex;flex-direction:column}
   #mvbar{flex:0 0 auto;display:flex;gap:8px;justify-content:center;align-items:center;
