@@ -63,17 +63,12 @@
     #kofiBtn{top:auto!important;bottom:16px!important;right:16px!important}
   }
 
-  /* Desktop : les boutons sont ancres sur le BORD DE LA COLONNE de contenu, pas sur le bord
-     de la fenetre — sinon a 3440 ils flottent a 900px du menu. max() les empeche de sortir
-     de l'ecran quand la fenetre devient plus etroite que la colonne. */
+  /* Desktop : ancrage au BORD DE LA FENETRE (etat valide en 1920 et 3440).
+     Ne pas les ancrer sur la colonne de contenu : ca les ramene par-dessus le texte. */
   @media(min-width:761px){
     nav{padding-right:135px!important}
-    #langToggle{right:max(14px, calc(50% - 486px))!important;top:9px!important;left:auto!important}
-    #kofiBtn{right:max(14px, calc(50% - 486px))!important;top:45px!important;bottom:auto!important}
-  }
-  @media(min-width:1600px){
-    #langToggle{right:max(14px, calc(50% - 736px))!important}
-    #kofiBtn{right:max(14px, calc(50% - 736px))!important}
+    #langToggle{right:14px!important;top:9px!important;left:auto!important}
+    #kofiBtn{right:14px!important;top:45px!important;bottom:auto!important}
   }
   #mv{display:none;position:fixed;inset:0;z-index:10000;background:rgba(6,5,4,.985)}
   #mv.on{display:flex;flex-direction:column}
