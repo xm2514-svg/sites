@@ -156,14 +156,6 @@
 
 <!-- THE PATH (level by level) -->
 
-<div class="alertbox" data-i18n="900">
-  <b>New to EQ Legends? Read Chapter 11 first.</b> This is not classic EverQuest with new maps.
-  Gear and spells are <b>upgraded with motes</b>, higher difficulty drops <b>pre-merged +1 to +4</b>
-  items, <b>dying costs no experience</b>, and you can open <b>private instances</b> to farm.
-  Four rules that change what you keep, what you sell and how hard you push —
-  <a href="#c13">go there now</a>.
-</div>
-
 <!-- STARTING ZONES -->
 <section id="startzones">
   <h2 data-i18n="1040">Starting zones</h2>
@@ -1159,28 +1151,35 @@ document.querySelectorAll('#loops svg').forEach(function(svg){
   var vb=(svg.getAttribute('viewBox')||'0 0 100 100').split(/[ ,]+/).map(Number);
   var base=vb.slice(), st={x:vb[0],y:vb[1],w:vb[2],h:vb[3]};
   function apply(){svg.setAttribute('viewBox',st.x+' '+st.y+' '+st.w+' '+st.h);}
-  function cW(v){return Math.max(base[2]*0.04,Math.min(base[2]*3,v));}
-  function cH(v){return Math.max(base[3]*0.04,Math.min(base[3]*3,v));}
+  function cW(v){return Math.max(base[2]*0.06,Math.min(base[2],v));}
+  function cH(v){return Math.max(base[3]*0.06,Math.min(base[3],v));}
+  function clamp(){
+    st.w=cW(st.w); st.h=cH(st.h);
+    st.x=(st.w>=base[2])?base[0]+(base[2]-st.w)/2:Math.min(Math.max(st.x,base[0]),base[0]+base[2]-st.w);
+    st.y=(st.h>=base[3])?base[1]+(base[3]-st.h)/2:Math.min(Math.max(st.y,base[1]),base[1]+base[3]-st.h);
+  }
+  function reset(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();}
   var bar=document.createElement('div'); bar.className='zoombar';
   bar.innerHTML='<button type="button" data-z="in">+</button><button type="button" data-z="out">-</button><button type="button" data-z="reset">reset</button>';
   svg.parentNode.insertBefore(bar,svg);
   bar.addEventListener('click',function(e){
     var a=e.target.getAttribute('data-z'); if(!a)return;
-    if(a==='reset'){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];}
-    else{var f=(a==='in')?0.7:1.4, cx=st.x+st.w/2, cy=st.y+st.h/2; st.w=cW(st.w*f); st.h=cH(st.h*f); st.x=cx-st.w/2; st.y=cy-st.h/2;}
-    apply();
+    if(a==='reset'){reset();return;}
+    var f=(a==='in')?0.7:1.4, cx=st.x+st.w/2, cy=st.y+st.h/2;
+    st.w=st.w*f; st.h=st.h*f; st.x=cx-st.w/2; st.y=cy-st.h/2; clamp(); apply();
   });
   svg.addEventListener('wheel',function(e){
     e.preventDefault(); var r=svg.getBoundingClientRect();
     var mx=st.x+(e.clientX-r.left)/r.width*st.w, my=st.y+(e.clientY-r.top)/r.height*st.h;
-    var f=e.deltaY<0?0.85:1.18, nw=cW(st.w*f), nh=cH(st.h*f);
-    st.x=mx-(e.clientX-r.left)/r.width*nw; st.y=my-(e.clientY-r.top)/r.height*nh; st.w=nw; st.h=nh; apply();
+    var f=e.deltaY<0?0.85:1.18, nw=st.w*f, nh=st.h*f;
+    st.x=mx-(e.clientX-r.left)/r.width*nw; st.y=my-(e.clientY-r.top)/r.height*nh;
+    st.w=nw; st.h=nh; clamp(); apply();
   },{passive:false});
-  var pan=false,px,py;
+  var pan=false,px,py; svg.style.cursor='grab';
   svg.addEventListener('mousedown',function(e){pan=true;px=e.clientX;py=e.clientY;svg.style.cursor='grabbing';e.preventDefault();});
   window.addEventListener('mouseup',function(){if(pan){pan=false;svg.style.cursor='grab';}});
-  window.addEventListener('mousemove',function(e){ if(!pan)return; var r=svg.getBoundingClientRect(); st.x-=(e.clientX-px)/r.width*st.w; st.y-=(e.clientY-py)/r.height*st.h; px=e.clientX;py=e.clientY; apply(); });
-  svg.addEventListener('dblclick',function(){st.x=base[0];st.y=base[1];st.w=base[2];st.h=base[3];apply();});
+  window.addEventListener('mousemove',function(e){ if(!pan)return; var r=svg.getBoundingClientRect(); st.x-=(e.clientX-px)/r.width*st.w; st.y-=(e.clientY-py)/r.height*st.h; px=e.clientX;py=e.clientY; clamp(); apply(); });
+  svg.addEventListener('dblclick',reset);
 });
 </script>
 
@@ -1322,7 +1321,7 @@ f();addEventListener('resize',f);addEventListener('load',f);})();
 <script>
 (function(){
 var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=null,w=0;
-function fit(){if(!cur)return;w=box.clientWidth-20;cur.style.width=w+'px';}
+function fit(){if(!cur)return;w=box.clientWidth-20;cur.style.width=w+'px';box.scrollTop=0;box.scrollLeft=0;}
 function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.width=w+'px';}
 function show(svg){box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
   cur.classList.remove('mapz');box.appendChild(cur);mv.classList.add('on');
@@ -1349,6 +1348,28 @@ addEventListener('keydown',function(e){if(e.key==='Escape')close();});
 <script>
 (function(){var f=function(){document.documentElement.style.setProperty(
 '--vw',document.documentElement.clientWidth+'px')};f();addEventListener('resize',f);})();
+</script>
+<style>/* anim.py */
+@media(prefers-reduced-motion:no-preference){
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease;will-change:opacity,transform}
+  .reveal.in{opacity:1;transform:none}
+}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  nav a{transition:color .15s ease}
+  .card{transition:transform .2s ease,box-shadow .2s ease}
+  .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.35)}
+}
+</style>
+<script>
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(!('IntersectionObserver' in window)) return;
+  var sel='section h2, .card, .note, .alertbox, section > p';
+  var els=[].slice.call(document.querySelectorAll(sel)).filter(function(e){return e.offsetParent!==null;});
+  els.forEach(function(e){e.classList.add('reveal')});
+  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{rootMargin:'0px 0px -8% 0px',threshold:0.05});
+  els.forEach(function(e){io.observe(e)});
+})();
 </script>
 <script data-goatcounter="https://keplerdust.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
