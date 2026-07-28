@@ -1165,7 +1165,8 @@ document.querySelectorAll('#loops svg').forEach(function(svg){
     st.w=nw; st.h=nh; clamp(); apply();
   },{passive:false});
   var pan=false,px,py; svg.style.cursor='grab';
-  svg.addEventListener('mousedown',function(e){pan=true;px=e.clientX;py=e.clientY;svg.style.cursor='grabbing';e.preventDefault();});
+  var hasMouse = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  svg.addEventListener('mousedown',function(e){if(!hasMouse)return;pan=true;px=e.clientX;py=e.clientY;svg.style.cursor='grabbing';e.preventDefault();});
   window.addEventListener('mouseup',function(){if(pan){pan=false;svg.style.cursor='grab';}});
   window.addEventListener('mousemove',function(e){ if(!pan)return; var r=svg.getBoundingClientRect(); st.x-=(e.clientX-px)/r.width*st.w; st.y-=(e.clientY-py)/r.height*st.h; px=e.clientX;py=e.clientY; clamp(); apply(); });
   svg.addEventListener('dblclick',reset);
