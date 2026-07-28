@@ -1335,6 +1335,46 @@ document.getElementById('mvfit').onclick=fit;
 document.getElementById('mvcls').onclick=close;
 mv.addEventListener('click',function(e){if(e.target===mv||e.target===box)close();});
 addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+// --- zoom dans la visionneuse : molette (PC), pincement (mobile), glisser pour deplacer
+box.style.touchAction='none';
+function zoomAt(f,cx,cy){
+  if(!cur)return;
+  var r=box.getBoundingClientRect();
+  var hOld=cur.clientHeight||1;
+  var ox=(box.scrollLeft+(cx-r.left))/(w||1);
+  var oy=(box.scrollTop+(cy-r.top))/hOld;
+  w=Math.max(120,Math.min(12000,(w||box.clientWidth)*f));
+  cur.style.width=w+'px';
+  var hNew=cur.clientHeight||hOld;
+  box.scrollLeft=ox*w-(cx-r.left);
+  box.scrollTop=oy*hNew-(cy-r.top);
+}
+box.addEventListener('wheel',function(e){
+  e.preventDefault();
+  zoomAt(e.deltaY<0?1.15:1/1.15,e.clientX,e.clientY);
+},{passive:false});
+var _tp=null,_td=0;
+box.addEventListener('touchstart',function(e){
+  if(e.touches.length===1){_tp={x:e.touches[0].clientX,y:e.touches[0].clientY};_td=0;}
+  else if(e.touches.length===2){
+    var a=e.touches[0],b=e.touches[1];
+    _td=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);_tp=null;
+  }
+},{passive:true});
+box.addEventListener('touchmove',function(e){
+  if(e.touches.length===1&&_tp){
+    var t=e.touches[0];
+    box.scrollLeft-=(t.clientX-_tp.x); box.scrollTop-=(t.clientY-_tp.y);
+    _tp={x:t.clientX,y:t.clientY}; e.preventDefault();
+  } else if(e.touches.length===2&&_td>0){
+    var a=e.touches[0],b=e.touches[1];
+    var d=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
+    if(d>0){ zoomAt(d/_td,(a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2); _td=d; }
+    e.preventDefault();
+  }
+},{passive:false});
+box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_td=0;}},{passive:true});
+
 })();
 </script>
 <script>
