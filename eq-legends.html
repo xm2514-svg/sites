@@ -1311,14 +1311,16 @@ f();addEventListener('resize',f);addEventListener('load',f);})();
 <script>
 (function(){
 var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=null,w=0;
-function fit(){if(!cur)return;w=box.clientWidth-20;cur.style.width=w+'px';box.scrollTop=0;box.scrollLeft=0;}
+function fit(){if(!cur)return;if(cur.dataset&&cur.dataset.vb0)cur.setAttribute('viewBox',cur.dataset.vb0);var vb=(cur.getAttribute('viewBox')||'0 0 1 1').split(/[ ,]+/).map(Number);var ratio=(vb[2]&&vb[3])?vb[2]/vb[3]:1;var aw=box.clientWidth-20, ah=box.clientHeight-20;w=Math.max(80,Math.min(aw,ah*ratio));cur.style.width=w+'px';box.scrollTop=0;box.scrollLeft=0;}
 function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.width=w+'px';}
 function show(svg){box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
+  if(svg.dataset&&svg.dataset.vb0){cur.dataset.vb0=svg.dataset.vb0;cur.setAttribute('viewBox',svg.dataset.vb0);}
   cur.classList.remove('mapz');box.appendChild(cur);mv.classList.add('on');
   document.body.style.overflow='hidden';fit();}
 function close(){mv.classList.remove('on');box.innerHTML='';cur=null;
   document.body.style.overflow='';}
 document.querySelectorAll('svg').forEach(function(s){
+  if(s.dataset && !s.dataset.vb0 && s.getAttribute('viewBox')) s.dataset.vb0=s.getAttribute('viewBox');
   var bar=s.previousElementSibling;
   if(bar&&bar.classList&&bar.classList.contains('zoombar')){
     var b=document.createElement('button');b.type='button';b.textContent='\u26F6';
