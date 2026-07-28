@@ -85,6 +85,7 @@
   #mvbar button{background:#1a1206;color:#f4d585;border:1px solid #c8a83a;border-radius:6px;
     padding:7px 15px;font:600 15px Segoe UI,Arial;cursor:pointer;line-height:1}
   #mvbox{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px}
+#mvlg{flex:0 0 auto;display:none;max-height:24vh;overflow:auto;padding:7px 11px;border-top:1px solid var(--line);background:rgba(14,12,10,.97);font-size:11px;line-height:1.55;color:#d6c8a8}
   #mvbox svg{display:block;margin:0 auto;height:auto;max-width:none}
 
   .illus{display:block;width:100%;height:auto;margin:10px 0 14px;border-radius:8px;border:1px solid var(--line)}
@@ -1311,13 +1312,20 @@ f();addEventListener('resize',f);addEventListener('load',f);})();
 <script>
 (function(){
 var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=null,w=0;
+var lgbox=document.createElement('div');lgbox.id='mvlg';mv.appendChild(lgbox);
 function fit(){if(!cur)return;if(cur.dataset&&cur.dataset.vb0)cur.setAttribute('viewBox',cur.dataset.vb0);var vb=(cur.getAttribute('viewBox')||'0 0 1 1').split(/[ ,]+/).map(Number);var ratio=(vb[2]&&vb[3])?vb[2]/vb[3]:1;var aw=box.clientWidth-20, ah=box.clientHeight-20;w=Math.max(80,Math.min(aw,ah*ratio));cur.style.width=w+'px';box.scrollTop=0;box.scrollLeft=0;}
 function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.width=w+'px';}
 function show(svg){box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
   if(svg.dataset&&svg.dataset.vb0){cur.dataset.vb0=svg.dataset.vb0;cur.setAttribute('viewBox',svg.dataset.vb0);}
-  cur.classList.remove('mapz');box.appendChild(cur);mv.classList.add('on');
+  cur.classList.remove('mapz');box.appendChild(cur);
+  var lg=svg.nextElementSibling;
+  while(lg && !(lg.classList && lg.classList.contains('maplegend'))) lg=lg.nextElementSibling;
+  lgbox.innerHTML=''; lgbox.style.display='none';
+  if(lg){var c=lg.cloneNode(true);c.style.margin='0';c.style.border='0';c.style.background='none';
+    lgbox.appendChild(c); lgbox.style.display='block';}
+  mv.classList.add('on');
   document.body.style.overflow='hidden';fit();}
-function close(){mv.classList.remove('on');box.innerHTML='';cur=null;
+function close(){mv.classList.remove('on');box.innerHTML='';lgbox.innerHTML='';lgbox.style.display='none';cur=null;
   document.body.style.overflow='';}
 document.querySelectorAll('svg').forEach(function(s){
   if(s.dataset && !s.dataset.vb0 && s.getAttribute('viewBox')) s.dataset.vb0=s.getAttribute('viewBox');
