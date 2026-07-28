@@ -1131,7 +1131,9 @@
 
 <style>
 #loops svg,body>svg{max-height:660px;width:100%;cursor:grab;background:#13100c;display:block}
-body>svg{max-width:1000px;margin:6px auto}
+/* contenu place directement dans <body> (Crushbone, Splitpaw, Unrest) : meme cadre que .wrap */
+body>*:not(.wrap):not(script):not(style):not(#mv):not(#langToggle):not(#langMenu):not(#kofiBtn){max-width:1000px;margin-left:auto;margin-right:auto;padding-left:20px;padding-right:20px;box-sizing:border-box}
+@media(min-width:1600px){body>*:not(.wrap):not(script):not(style):not(#mv):not(#langToggle):not(#langMenu):not(#kofiBtn){max-width:1500px}}
 .zoomhint{font-size:12px;color:#a89a86;margin:2px 0 6px}
 .zoombar{display:flex;gap:6px;margin:6px 0 2px}
 .zoombar button{background:#211b14;color:#f4d585;border:1px solid #3a2f22;border-radius:6px;min-width:30px;height:26px;font-size:14px;font-weight:bold;cursor:pointer;line-height:1;padding:0 6px}
