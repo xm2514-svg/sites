@@ -1,0 +1,126 @@
+# -*- coding: utf-8 -*-
+"""
+Met a jour items.json a partir d'eqlwiki. Concu pour tourner chez GitHub (Actions),
+donc sans aucune dependance et sans toucher au HTML du site.
+
+Fonctionnement :
+  1. recupere la liste des titres de Category:Items (~22 requetes, titres seuls)
+  2. garde uniquement les noms d'objets reellement cites dans index.html
+  3. telecharge la fiche de ces objets-la (~3 requetes)
+  4. ecrit items.json seulement si les garde-fous passent
+
+GARDE-FOUS (le site ne doit jamais casser a cause d'une mise a jour de donnees) :
+  - la categorie doit renvoyer au moins 5000 titres, sinon on abandonne
+  - le nouveau fichier doit garder au moins 80 % des objets du precedent, sinon on abandonne
+  - ecriture atomique
+  - index.html et eq-legends.html ne sont JAMAIS modifies
+"""
+import json
+import os
+import re
+import sys
+import time
+import urllib.parse
+import urllib.request
+from datetime import date
+
+API = "https://eqlwiki.com/api.php"
+RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PAGE = os.path.join(RACINE, "index.html")
+OUT = os.path.join(RACINE, "items.json")
+UA = {"User-Agent": "EQLegendsGuide/1.0 (+https://xm2514-svg.github.io/sites/)"}
+SEUIL_TITRES = 5000
+
+ALIAS = {
+    "FBSS": "Flowing Black Silk Sash",
+    "Sword of Ykesha": "Short Sword of the Ykesha",
+    "Executioner's Axe": "An Executioners Axe",
+    "Executioner's Hood": "Executioners Hood",
+    "Dark Reaver": "A Dark Reaver",
+}
+
+
+def api(params):
+    url = API + "?" + urllib.parse.urlencode(params)
+    for essai in range(4):
+        try:
+            return json.load(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40))
+        except Exception:
+            if essai == 3:
+                raise
+            time.sleep(3 * (essai + 1))
+
+
+def titres():
+    out, cont = [], None
+    while True:
+        p = {"action": "query", "list": "categorymembers", "cmtitle": "Category:Items",
+             "cmlimit": "500", "format": "json"}
+        if cont:
+            p["cmcontinue"] = cont
+        d = api(p)
+        out += [m["title"] for m in d["query"]["categorymembers"]]
+        cont = d.get("continue", {}).get("cmcontinue")
+        if not cont:
+            return [t for t in out if not t.startswith("Category:")]
+
+
+def champ(w, nom):
+    m = re.search(r"\|\s*" + nom + r"\s*=([\s\S]*?)(?=\n\|[a-zA-Z_]+\s*=|\}\})", w)
+    return m.group(1).strip() if m else ""
+
+
+def nettoie(s):
+    s = re.sub(r"<br\s*/?>", "\n", s)
+    s = re.sub(r"\[\[([^\]|]*\|)?([^\]]*)\]\]", r"\2", s)
+    s = re.sub(r"'''?", "", s)
+    s = re.sub(r"[ \t]+", " ", s)
+    return re.sub(r"\n{2,}", "\n", s).strip()
+
+
+def main():
+    page = open(PAGE, encoding="utf-8").read()
+    texte = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ",
+                   re.sub(r"<script.*?</script>", "", page, flags=re.S)))
+
+    tous = titres()
+    if len(tous) < SEUIL_TITRES:
+        sys.exit("ABANDON : seulement %d titres recuperes" % len(tous))
+    print("titres dans la categorie Items : %d" % len(tous))
+
+    vises = [t for t in tous if len(t) >= 6 and t in texte]
+    for a, vrai in ALIAS.items():
+        if (a in texte or vrai in texte) and vrai in tous and vrai not in vises:
+            vises.append(vrai)
+    print("objets cites dans le guide : %d" % len(vises))
+
+    items = {}
+    for i in range(0, len(vises), 50):
+        d = api({"action": "query", "prop": "revisions", "rvprop": "content", "rvslots": "main",
+                 "format": "json", "titles": "|".join(vises[i:i + 50])})
+        for p in d["query"]["pages"].values():
+            if "revisions" not in p:
+                continue
+            w = p["revisions"][0]["slots"]["main"].get("*", "")
+            s = nettoie(champ(w, "statsblock"))
+            if s:
+                items[p["title"]] = {"s": s, "d": nettoie(champ(w, "dropsfrom"))[:200]}
+
+    if os.path.exists(OUT):
+        try:
+            ancien = json.load(open(OUT, encoding="utf-8")).get("items", {})
+            if ancien and len(items) < len(ancien) * 0.8:
+                sys.exit("ABANDON : %d objets contre %d avant, fichier conserve" % (len(items), len(ancien)))
+        except Exception:
+            pass
+
+    data = {"source": "eqlwiki.com", "updated": date.today().isoformat(),
+            "alias": ALIAS, "items": items}
+    tmp = OUT + ".tmp"
+    json.dump(data, open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
+    os.replace(tmp, OUT)
+    print("items.json : %d objets, %.1f Ko, %s" % (len(items), os.path.getsize(OUT) / 1024, data["updated"]))
+
+
+if __name__ == "__main__":
+    main()
