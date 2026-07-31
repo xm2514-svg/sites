@@ -2,7 +2,7 @@ name: Update item stats from eqlwiki
 
 on:
   schedule:
-    - cron: "17 4 * * 1"
+    - cron: "17 4 * * *"
   workflow_dispatch:
 
 permissions:
