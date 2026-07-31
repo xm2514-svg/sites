@@ -1416,7 +1416,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         async src="//gc.zgo.at/count.js"></script>
 
 <style>/* infobulles objets (donnees eqlwiki) */
-.eqi{border-bottom:1px dotted #c8a83a;cursor:help}
+.eqi{border-bottom:1px dotted #c8a83a;cursor:pointer;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #eqpop{position:fixed;z-index:10002;display:none;max-width:330px;background:#0d0b07;color:#e8dcc0;
   border:1px solid #c8a83a;border-radius:6px;padding:9px 12px;font:13px/1.5 Segoe UI,Arial;
   box-shadow:0 6px 20px rgba(0,0,0,.6);white-space:pre-line}
@@ -1447,17 +1448,34 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   function cache(){ if(pop) pop.style.display='none'; }
   function marque(){
     var noms=Object.keys(data.items).sort(function(a,b){return b.length-a.length;});
-    document.querySelectorAll('.item').forEach(function(el){
-      if(el.dataset.eqdone) return; el.dataset.eqdone='1';
-      var html=el.innerHTML, touche=false;
-      noms.forEach(function(n){
-        if(touche && html.indexOf(n)<0) return;
-        if(html.indexOf(n)>=0 && html.indexOf('class="eqi"')<0){
-          html=html.replace(n,'<span class="eqi" data-eq="'+n.replace(/"/g,'&quot;')+'">'+n+'</span>');
-          touche=true;
+    var re=new RegExp('('+noms.map(function(n){return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','g');
+    // zones ou l'on cherche des noms d'objets (jamais dans les cartes SVG ni les scripts)
+    var zones=document.querySelectorAll('#must table, #c4 table, #c5 table, #c6 table, .maplegend, .note, .alertbox, td.item, span.item, #loops table');
+    zones.forEach(function(zone){
+      if(zone.dataset.eqdone) return; zone.dataset.eqdone='1';
+      var w=document.createTreeWalker(zone, NodeFilter.SHOW_TEXT, {
+        acceptNode:function(n){
+          var p=n.parentNode, tag=(p.nodeName||'').toLowerCase();
+          if(tag==='script'||tag==='style'||tag==='a') return NodeFilter.FILTER_REJECT;
+          if(p.closest && p.closest('svg')) return NodeFilter.FILTER_REJECT;
+          if(p.classList && p.classList.contains('eqi')) return NodeFilter.FILTER_REJECT;
+          return re.test(n.nodeValue)? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
         }
       });
-      if(touche) el.innerHTML=html;
+      var cibles=[],n;
+      while((n=w.nextNode())) cibles.push(n);
+      cibles.forEach(function(node){
+        var txt=node.nodeValue, frag=document.createDocumentFragment(), pos=0, m;
+        re.lastIndex=0;
+        while((m=re.exec(txt))){
+          if(m.index>pos) frag.appendChild(document.createTextNode(txt.slice(pos,m.index)));
+          var s=document.createElement('span');
+          s.className='eqi'; s.setAttribute('data-eq',m[1]); s.textContent=m[1];
+          frag.appendChild(s); pos=m.index+m[1].length;
+        }
+        if(pos<txt.length) frag.appendChild(document.createTextNode(txt.slice(pos)));
+        node.parentNode.replaceChild(frag,node);
+      });
     });
     document.addEventListener('mouseover',function(e){
       var t=e.target.closest? e.target.closest('.eqi'):null;
@@ -1468,9 +1486,10 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     });
     document.addEventListener('click',function(e){
       var t=e.target.closest? e.target.closest('.eqi'):null;
-      if(t){ montre(t,t.getAttribute('data-eq')); e.stopPropagation(); } else cache();
+      if(t){ montre(t,t.getAttribute('data-eq')); e.preventDefault(); e.stopPropagation(); } else cache();
     });
   }
+
   fetch('items.json').then(function(r){return r.json();}).then(function(d){
     data=d; if(data&&data.items) marque();
   }).catch(function(){ /* pas de donnees : la page reste inchangee */ });
