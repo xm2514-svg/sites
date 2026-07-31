@@ -1564,7 +1564,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   var ALIAS={"Ghoul Cavalier":"Cavalier","Sentinel":"Ghoul Sentinel",
              "Lesser Blade Fiend":"Blade Fiend","Reclusive Ghoul Magus":"Ghoul Magus",
              "Baron Telyx":"Baron Telyx V`Zher","Garanel Rucksif":"Garanel",
-             "Undead Knight of Unrest":"Undead Knight"};
+             "Undead Knight of Unrest":"Undead Knight","orc warlord":"orc warlord (in water)",
+             "the froglok king":"Froglok King","Lower Guk Frenzied":"Frenzied Ghoul"};
   // "Sentinel" seul est trop courant pour etre cherche dans du texte libre
   var HORS_TEXTE={"Sentinel":1};
   function connus(){
@@ -1591,12 +1592,14 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   });
   // chapitre 3 : les noms sont noyes dans le texte, on les repere un par un
   function lierTexte(){
-    var s=connus(), cles=[], k;
-    for(k in s) cles.push(k);
-    for(k in ALIAS) if(s[ALIAS[k]] && !HORS_TEXTE[k]) cles.push(k);
+    // comparaison insensible a la casse : le guide ecrit "the froglok king", la pastille "Froglok King"
+    var s=connus(), corresp={}, k;
+    for(k in s) corresp[k.toLowerCase()]=k;
+    for(k in ALIAS) if(s[ALIAS[k]] && !HORS_TEXTE[k]) corresp[k.toLowerCase()]=ALIAS[k];
+    var cles=Object.keys(corresp);
     if(!cles.length) return;
     cles.sort(function(a,b){return b.length-a.length;});
-    var re=new RegExp('('+cles.map(function(n){return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','g');
+    var re=new RegExp('('+cles.map(function(n){return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','gi');
     var racines=document.querySelectorAll('section');   // tout le guide, chaque chapitre est une <section>
     racines.forEach(function(r){
       var w=document.createTreeWalker(r, NodeFilter.SHOW_TEXT, {
@@ -1616,7 +1619,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         re.lastIndex=0;
         while((m=re.exec(txt))){
           if(m.index>pos) frag.appendChild(document.createTextNode(txt.slice(pos,m.index)));
-          var cle=ALIAS[m[1]]||m[1];
+          var cle=corresp[m[1].toLowerCase()];
+          if(!cle){ frag.appendChild(document.createTextNode(m[1])); pos=m.index+m[1].length; continue; }
           var sp=document.createElement('span');
           sp.className='eqgo'; sp.setAttribute('data-goto',cle); sp.textContent=m[1];
           sp.title='Show on map';
