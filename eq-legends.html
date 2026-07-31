@@ -1488,7 +1488,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         acceptNode:function(n){
           var p=n.parentNode, tag=(p.nodeName||'').toLowerCase();
           if(tag==='script'||tag==='style'||tag==='code'||tag==='button') return NodeFilter.FILTER_REJECT;
-          if(p.closest && (p.closest('a')||p.closest('svg')||p.closest('.eqi')||p.closest('#mv')))
+          if(p.closest && (p.closest('a')||p.closest('svg')||p.closest('.eqi')||p.closest('.eqgo')||p.closest('#mv')))
             return NodeFilter.FILTER_REJECT;
           re.lastIndex=0;   // la regex est globale : sans remise a zero elle saute des noms
           return re.test(n.nodeValue)? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
@@ -1562,7 +1562,11 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
 // clic sur un named d'une route -> ouvre la carte en plein ecran et fait pulser sa pastille
 (function(){
   var ALIAS={"Ghoul Cavalier":"Cavalier","Sentinel":"Ghoul Sentinel",
-             "Lesser Blade Fiend":"Blade Fiend","Reclusive Ghoul Magus":"Ghoul Magus"};
+             "Lesser Blade Fiend":"Blade Fiend","Reclusive Ghoul Magus":"Ghoul Magus",
+             "Baron Telyx":"Baron Telyx V`Zher","Garanel Rucksif":"Garanel",
+             "Undead Knight of Unrest":"Undead Knight"};
+  // "Sentinel" seul est trop courant pour etre cherche dans du texte libre
+  var HORS_TEXTE={"Sentinel":1};
   function connus(){
     var s={};
     document.querySelectorAll('.np[data-named]').forEach(function(g){ s[g.getAttribute('data-named')]=1; });
@@ -1585,8 +1589,47 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     e.preventDefault();
     if(window.eqShowNamed) window.eqShowNamed(b.getAttribute('data-goto'));
   });
+  // chapitre 3 : les noms sont noyes dans le texte, on les repere un par un
+  function lierTexte(){
+    var s=connus(), cles=[], k;
+    for(k in s) cles.push(k);
+    for(k in ALIAS) if(s[ALIAS[k]] && !HORS_TEXTE[k]) cles.push(k);
+    if(!cles.length) return;
+    cles.sort(function(a,b){return b.length-a.length;});
+    var re=new RegExp('('+cles.map(function(n){return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','g');
+    var racines=document.querySelectorAll('#c3');
+    racines.forEach(function(r){
+      var w=document.createTreeWalker(r, NodeFilter.SHOW_TEXT, {
+        acceptNode:function(n){
+          var p=n.parentNode, tag=(p.nodeName||'').toLowerCase();
+          if(tag==='script'||tag==='style'||tag==='code'||tag==='button') return NodeFilter.FILTER_REJECT;
+          if(p.closest && (p.closest('a')||p.closest('svg')||p.closest('.eqgo')||p.closest('.eqi')))
+            return NodeFilter.FILTER_REJECT;
+          re.lastIndex=0;
+          return re.test(n.nodeValue)? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      var cibles=[],n;
+      while((n=w.nextNode())) cibles.push(n);
+      cibles.forEach(function(node){
+        var txt=node.nodeValue, frag=document.createDocumentFragment(), pos=0, m;
+        re.lastIndex=0;
+        while((m=re.exec(txt))){
+          if(m.index>pos) frag.appendChild(document.createTextNode(txt.slice(pos,m.index)));
+          var cle=ALIAS[m[1]]||m[1];
+          var sp=document.createElement('span');
+          sp.className='eqgo'; sp.setAttribute('data-goto',cle); sp.textContent=m[1];
+          sp.title='Show on map';
+          frag.appendChild(sp); pos=m.index+m[1].length;
+        }
+        if(pos<txt.length) frag.appendChild(document.createTextNode(txt.slice(pos)));
+        node.parentNode.replaceChild(frag,node);
+      });
+    });
+  }
   function go(){
     lier();
+    lierTexte();
     if(window.eqMarque) window.eqMarque();
     var p=window.__applyBlocks;
     if(p && !p.__eqwrap){ var f=function(l){ p(l); lier(); }; f.__eqwrap=1; window.__applyBlocks=f; }
