@@ -1427,7 +1427,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
 </style>
 <script>
 (function(){
-  var pop=null, data=null;
+  var pop=null, data=null, cur=null;
   function panneau(){
     if(!pop){pop=document.createElement('div');pop.id='eqpop';document.body.appendChild(pop);}
     return pop;
@@ -1444,8 +1444,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var top=r.bottom+8; if(top+h>innerHeight-8) top=Math.max(8,r.top-h-8);
     var left=Math.min(Math.max(8,r.left), innerWidth-w-8);
     p.style.top=top+'px'; p.style.left=left+'px';
+    cur=el;
   }
-  function cache(){ if(pop) pop.style.display='none'; }
+  function cache(){ if(pop) pop.style.display='none'; cur=null; }
   function marque(){
     var noms=Object.keys(data.items).sort(function(a,b){return b.length-a.length;});
     var re=new RegExp('('+noms.map(function(n){return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','g');
@@ -1477,16 +1478,25 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         node.parentNode.replaceChild(frag,node);
       });
     });
-    document.addEventListener('mouseover',function(e){
-      var t=e.target.closest? e.target.closest('.eqi'):null;
-      if(t) montre(t,t.getAttribute('data-eq'));
-    });
-    document.addEventListener('mouseout',function(e){
-      if(e.target.closest && e.target.closest('.eqi')) cache();
-    });
+    // souris : survol comme avant. tactile : 1er tap ouvre, 2e tap ferme, defilement ferme.
+    var survol = !!(window.matchMedia && matchMedia('(hover:hover)').matches);
+    if(survol){
+      document.addEventListener('mouseover',function(e){
+        var t=e.target.closest? e.target.closest('.eqi'):null;
+        if(t) montre(t,t.getAttribute('data-eq'));
+      });
+      document.addEventListener('mouseout',function(e){
+        if(e.target.closest && e.target.closest('.eqi')) cache();
+      });
+    } else {
+      addEventListener('scroll',cache,{passive:true});
+    }
     document.addEventListener('click',function(e){
       var t=e.target.closest? e.target.closest('.eqi'):null;
-      if(t){ montre(t,t.getAttribute('data-eq')); e.preventDefault(); e.stopPropagation(); } else cache();
+      if(!t){ cache(); return; }
+      e.preventDefault(); e.stopPropagation();
+      if(!survol && t===cur && pop && pop.style.display==='block'){ cache(); return; }
+      montre(t,t.getAttribute('data-eq'));
     });
   }
 
