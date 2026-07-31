@@ -1476,16 +1476,17 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var noms=Object.keys(data.items).concat(Object.keys(data.alias||{}))
               .sort(function(a,b){return b.length-a.length;});
     var re=new RegExp('('+noms.map(function(n){return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','g');
-    // zones ou l'on cherche des noms d'objets (jamais dans les cartes SVG ni les scripts)
-    var zones=document.querySelectorAll('#must table, #c4 table, #c5 table, #c6 table, .maplegend, .note, .alertbox, td.item, span.item, #loops table, #loops .card');
+    // tout le contenu du guide : chaque chapitre est une <section>. Jamais les cartes SVG ni les scripts.
+    var zones=document.querySelectorAll('section');
     zones.forEach(function(zone){
       if(zone.dataset.eqdone) return; zone.dataset.eqdone='1';
       var w=document.createTreeWalker(zone, NodeFilter.SHOW_TEXT, {
         acceptNode:function(n){
           var p=n.parentNode, tag=(p.nodeName||'').toLowerCase();
-          if(tag==='script'||tag==='style'||tag==='a') return NodeFilter.FILTER_REJECT;
-          if(p.closest && p.closest('svg')) return NodeFilter.FILTER_REJECT;
-          if(p.classList && p.classList.contains('eqi')) return NodeFilter.FILTER_REJECT;
+          if(tag==='script'||tag==='style'||tag==='code'||tag==='button') return NodeFilter.FILTER_REJECT;
+          if(p.closest && (p.closest('a')||p.closest('svg')||p.closest('.eqi')||p.closest('#mv')))
+            return NodeFilter.FILTER_REJECT;
+          re.lastIndex=0;   // la regex est globale : sans remise a zero elle saute des noms
           return re.test(n.nodeValue)? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
         }
       });
