@@ -1597,7 +1597,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     if(!cles.length) return;
     cles.sort(function(a,b){return b.length-a.length;});
     var re=new RegExp('('+cles.map(function(n){return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','g');
-    var racines=document.querySelectorAll('#c3');
+    var racines=document.querySelectorAll('section');   // tout le guide, chaque chapitre est une <section>
     racines.forEach(function(r){
       var w=document.createTreeWalker(r, NodeFilter.SHOW_TEXT, {
         acceptNode:function(n){
