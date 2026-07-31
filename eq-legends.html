@@ -1473,7 +1473,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   }
   function cache(){ if(pop) pop.style.display='none'; cur=null; }
   function marque(){
-    var noms=Object.keys(data.items).sort(function(a,b){return b.length-a.length;});
+    var noms=Object.keys(data.items).concat(Object.keys(data.alias||{}))
+              .sort(function(a,b){return b.length-a.length;});
     var re=new RegExp('('+noms.map(function(n){return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','g');
     // zones ou l'on cherche des noms d'objets (jamais dans les cartes SVG ni les scripts)
     var zones=document.querySelectorAll('#must table, #c4 table, #c5 table, #c6 table, .maplegend, .note, .alertbox, td.item, span.item, #loops table, #loops .card');
@@ -1495,9 +1496,14 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         re.lastIndex=0;
         while((m=re.exec(txt))){
           if(m.index>pos) frag.appendChild(document.createTextNode(txt.slice(pos,m.index)));
-          var s=document.createElement('span');
-          s.className='eqi'; s.setAttribute('data-eq',m[1]); s.textContent=m[1];
-          frag.appendChild(s); pos=m.index+m[1].length;
+          // un alias (FBSS, Dark Reaver...) pointe vers le vrai nom de la fiche eqlwiki
+          var vrai=(data.alias&&data.alias[m[1]])||m[1];
+          if(data.items[vrai]){
+            var s=document.createElement('span');
+            s.className='eqi'; s.setAttribute('data-eq',vrai); s.textContent=m[1];
+            frag.appendChild(s);
+          } else { frag.appendChild(document.createTextNode(m[1])); }
+          pos=m.index+m[1].length;
         }
         if(pos<txt.length) frag.appendChild(document.createTextNode(txt.slice(pos)));
         node.parentNode.replaceChild(frag,node);
@@ -1559,7 +1565,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   }
   function lier(){
     var s=connus();
-    document.querySelectorAll('#loops .card b').forEach(function(b){
+    document.querySelectorAll('#loops b').forEach(function(b){
       if(b.getAttribute('data-goto')) return;
       var t=(b.textContent||'').trim(), k=ALIAS[t]||t;
       if(!s[k]) return;

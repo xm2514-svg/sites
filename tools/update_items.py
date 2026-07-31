@@ -37,6 +37,7 @@ ALIAS = {
     "Executioner's Axe": "An Executioners Axe",
     "Executioner's Hood": "Executioners Hood",
     "Dark Reaver": "A Dark Reaver",
+    "Clawed Knuckle Ring": "Clawed Knuckle-Ring",
 }
 
 
