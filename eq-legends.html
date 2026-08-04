@@ -1371,7 +1371,7 @@ function show(svg){box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute(
   var lg=svg.nextElementSibling;
   while(lg && !(lg.classList && lg.classList.contains('maplegend'))) lg=lg.nextElementSibling;
   lgbox.innerHTML=''; lgbox.style.display='none';
-  if(lg){var c=lg.cloneNode(true);c.querySelectorAll('.tip[data-tip]').forEach(function(t){t.title=t.getAttribute('data-tip');});c.style.margin='0';c.style.border='0';c.style.background='none';
+  if(lg){var c=lg.cloneNode(true);c.classList.remove('reveal');c.style.opacity='1';c.style.transform='none';c.querySelectorAll('.tip[data-tip]').forEach(function(t){t.title=t.getAttribute('data-tip');});c.style.margin='0';c.style.border='0';c.style.background='none';
     lgbox.appendChild(c); lgbox.style.display='block';}
   mv.classList.add('on');
   document.body.style.overflow='hidden';fit();}
