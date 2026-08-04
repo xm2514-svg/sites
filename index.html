@@ -1309,6 +1309,7 @@ document.querySelectorAll('#loops svg').forEach(function(svg){
     if (window.__applyBlocks) window.__applyBlocks(l);
     lang = l;
     mark();
+    if (window.__eqPlaceholder) window.__eqPlaceholder(l);
   }
   function close(){ menu.style.display = 'none'; }
   function open(){
@@ -1765,6 +1766,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();aller(r.dataset.n);}});
   document.addEventListener('click',function(e){ if(!box.contains(e.target)) res.style.display='none'; });
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') res.style.display='none'; });
+  var LBL={en:'\u{1F50E} Find an item\u2026', fr:'\u{1F50E} Chercher un objet\u2026',es:'\u{1F50E} Buscar un objeto\u2026', de:'\u{1F50E} Gegenstand suchen\u2026'};
+  window.__eqPlaceholder=function(l){ inp.placeholder = LBL[l] || LBL.en; };
   fetch('items.json').then(function(r){return r.json();}).then(function(d){data=d;cherche();});
 })();
 </script>
