@@ -141,6 +141,21 @@
   b.warn{color:var(--red)}.good{color:var(--green)}
 
   .tip[data-tip]{position:relative;border-bottom:1px dotted #a88a4a}
+  #eqfind{position:relative;flex:0 0 auto;margin-left:auto}
+  #eqfind input{width:180px;max-width:42vw;background:#1a1206;color:#f4d585;border:1px solid #5a4a33;border-radius:7px;padding:5px 10px;font:13px "Segoe UI",Arial}
+  #eqfind input::placeholder{color:#8a7a5a}
+  #eqfind input:focus{outline:none;border-color:#c8a83a}
+  #eqres{position:absolute;top:34px;right:0;width:min(88vw,420px);max-height:60vh;overflow:auto;background:#12100b;border:1px solid #5a4a33;border-radius:9px;box-shadow:0 10px 30px rgba(0,0,0,.7);z-index:9999;display:none}
+  #eqres .r{padding:8px 11px;border-bottom:1px solid #2a2318;cursor:pointer}
+  #eqres .r:last-child{border-bottom:0}
+  #eqres .r:hover,#eqres .r:focus{background:#1e1810;outline:none}
+  #eqres .n{color:#f4d585;font-weight:700;font-size:13px}
+  #eqres .s{color:#a89a86;font-size:11px;line-height:1.35;margin-top:2px}
+  #eqres .z{color:#8fd0c0;font-size:11px;margin-top:1px}
+  #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
+  @keyframes eqf{0%,100%{background:transparent}30%{background:#5a4a12}}
+  .eqhit{animation:eqf 1.6s ease}
+
   /* infobulles en plein ecran : #mvlg a overflow:auto et les rognait ; on ouvre vers le haut et on laisse deborder sur la carte */
   #mvlg{overflow:visible}
   #mvlg .tip[data-tip]:hover::after{display:none}
@@ -1685,6 +1700,72 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   }
   document.addEventListener('DOMContentLoaded',go);
   if(document.readyState!=='loading') go();
+})();
+</script>
+
+<script>
+(function(){
+  var nav=document.querySelector('nav'); if(!nav) return;
+  var box=document.createElement('span'); box.id='eqfind';
+  box.innerHTML='<input type="search" placeholder="\u{1F50E} Find an item…" autocomplete="off" aria-label="Find an item"><div id="eqres" role="listbox"></div>';
+  nav.appendChild(box);
+  var inp=box.querySelector('input'), res=box.querySelector('#eqres'), data=null;
+  var ZONES={'Befallen':'fl-befallen','Najena':'fl-najena','Upper Guk':'fl-uguk',
+             'Lower Guk':'fl-lguk','Crushbone':'fl-cb','Splitpaw':'fl-splitpaw','Unrest':'fl-unrest'};
+  function l1(s){var a=(s||'').split('\n').filter(function(x){return x.trim();});return a[0]||'';}
+  function src(s){return (s||'').split('\n').filter(function(x){return x.trim();})
+    .map(function(x){return x.replace(/^\*\s*/,'');}).join(' · ');}
+  function visible(el){return el.offsetParent!==null && el.getBoundingClientRect().height>0;}
+  function aller(nom){
+    res.style.display='none'; inp.blur();
+    // la 1re occurrence est souvent dans un tableau de race masque : on prend la 1re VISIBLE
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+      var p=n.parentNode,t=(p.nodeName||'').toLowerCase();
+      if(['script','style','svg','text','title','input'].indexOf(t)>=0) return NodeFilter.FILTER_REJECT;
+      if(p.closest&&p.closest('#eqres,#eqfind,nav')) return NodeFilter.FILTER_REJECT;
+      return n.nodeValue.indexOf(nom)>=0?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;}});
+    var n,el=null;
+    while((n=w.nextNode())){var e=n.parentElement; if(e&&visible(e)){el=e;break;}}
+    if(el){
+      document.querySelectorAll('.eqhit').forEach(function(x){x.classList.remove('eqhit');});
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      void el.offsetWidth; el.classList.add('eqhit'); return;
+    }
+    var d=(data.items[nom]&&data.items[nom].d)||'';
+    for(var z in ZONES){ if(d.indexOf(z)>=0){location.hash='#'+ZONES[z];return;} }
+  }
+  function cherche(){
+    if(!data) return;
+    var q=inp.value.trim().toLowerCase();
+    if(q.length<2){res.style.display='none';return;}
+    var noms=Object.keys(data.items);
+    var hits=noms.filter(function(n){
+      return n.toLowerCase().indexOf(q)>=0 || src(data.items[n].d).toLowerCase().indexOf(q)>=0;
+    }).sort(function(a,b){
+      var ia=a.toLowerCase().indexOf(q), ib=b.toLowerCase().indexOf(q);
+      if(ia<0)ia=99; if(ib<0)ib=99; return ia-ib || a.localeCompare(b);
+    }).slice(0,25);
+    if(!hits.length){
+      res.innerHTML='<div class="vide">Nothing — this searches the '+noms.length+
+        ' items the guide actually covers.</div>';
+    }else{
+      res.innerHTML=hits.map(function(n){
+        var e=n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+        return '<div class="r" role="option" tabindex="0" data-n="'+e+'"><div class="n">'+e+'</div>'+
+          '<div class="s">'+l1(data.items[n].s).replace(/</g,'&lt;')+'</div>'+
+          '<div class="z">'+src(data.items[n].d).replace(/</g,'&lt;')+'</div></div>';
+      }).join('');
+    }
+    res.style.display='block';
+  }
+  inp.addEventListener('input',cherche);
+  inp.addEventListener('focus',function(){ if(res.innerHTML&&inp.value.trim().length>1) res.style.display='block'; });
+  res.addEventListener('click',function(e){var r=e.target.closest('.r'); if(r) aller(r.dataset.n);});
+  res.addEventListener('keydown',function(e){var r=e.target.closest('.r');
+    if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();aller(r.dataset.n);}});
+  document.addEventListener('click',function(e){ if(!box.contains(e.target)) res.style.display='none'; });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') res.style.display='none'; });
+  fetch('items.json').then(function(r){return r.json();}).then(function(d){data=d;cherche();});
 })();
 </script>
 </body>
