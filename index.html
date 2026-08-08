@@ -1660,9 +1660,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     cache(); marque();
   };
   // base des effets : fichier independant, 3 Ko aujourd'hui
-  fetch('effects.json').then(function(r){return r.json();})
+  fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
     .then(function(e){ window.__eqEffets=e.effects||{}; }).catch(function(){});
-  fetch('items.json').then(function(r){return r.json();}).then(function(d){
+  fetch('items.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
     data=d; if(data&&data.items) marque();
   }).catch(function(){ /* pas de donnees : la page reste inchangee */ });
 })();
@@ -1859,11 +1859,11 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   var tout=null, charge=false;
   function chargeTout(){
     if(charge) return; charge=true;
-    fetch('items-all.json').then(function(r){return r.json();}).then(function(d){
+    fetch('items-all.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
       tout=d.items; window.__eqTout=tout; cherche();
     }).catch(function(){ tout=null; });
   }
-  fetch('items.json').then(function(r){return r.json();}).then(function(d){data=d;cherche();});
+  fetch('items.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){data=d;cherche();});
 })();
 </script>
 </body>
