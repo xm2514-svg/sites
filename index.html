@@ -168,6 +168,14 @@
   #eqres .r.eff{background:#141a18;border-left:2px solid #6fd6c4;cursor:default}
   #eqres .r.eff .n{color:#8fd6c4}
   #eqres .r.eff .tag{background:#6fd6c4}
+  /* Mobile : le champ vivait dans la nav, qui defile horizontalement — il partait donc
+     hors ecran a droite, sa liste de resultats avec lui. On le sort sur sa propre ligne. */
+  @media(max-width:760px){
+    #eqfind.eqfind-mobile{display:block;margin:0 0 10px;position:relative}
+    #eqfind.eqfind-mobile input{width:100%;max-width:none;font-size:16px;padding:9px 12px}
+    #eqfind.eqfind-mobile #eqres{width:100%;left:0;right:auto;top:44px;max-height:55vh}
+    #eqpop,#eqeff{max-width:calc(100vw - 24px)}
+  }
   @keyframes eqf{0%,100%{background:transparent}30%{background:#5a4a12}}
   .eqhit{animation:eqf 1.6s ease}
 
@@ -1578,9 +1586,15 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var _pe=document.getElementById('eqeff');
     if(_pe && _pe.style.display==='block'){
       var ew=_pe.offsetWidth, eh=_pe.offsetHeight;
-      var el2=(left-ew-12>=8)? left-ew-12 : Math.min(left+w+12, innerWidth-ew-8);
-      _pe.style.left=el2+'px';
-      _pe.style.top=Math.max(8, Math.min(top, innerHeight-eh-8))+'px';
+      if(innerWidth<=760){
+        // pas la place de cotoyer : on empile sous la fiche objet, ou au-dessus
+        _pe.style.left=Math.max(8, Math.min(left, innerWidth-ew-8))+'px';
+        _pe.style.top=(top+h+10+eh<=innerHeight-8 ? top+h+10 : Math.max(8, top-eh-10))+'px';
+      } else {
+        var el2=(left-ew-12>=8)? left-ew-12 : Math.min(left+w+12, innerWidth-ew-8);
+        _pe.style.left=el2+'px';
+        _pe.style.top=Math.max(8, Math.min(top, innerHeight-eh-8))+'px';
+      }
     }
     cur=el;
   }
@@ -1660,6 +1674,13 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     cache(); marque();
   };
   // base des effets : fichier independant, 3 Ko aujourd'hui
+  // sous 760 px, le champ sort de la nav et se pose juste en dessous, pleine largeur
+  function place(){
+    var petit=innerWidth<=760;
+    if(petit && box.parentNode===nav){ nav.parentNode.insertBefore(box,nav.nextSibling); box.classList.add('eqfind-mobile'); }
+    else if(!petit && box.parentNode!==nav){ nav.appendChild(box); box.classList.remove('eqfind-mobile'); }
+  }
+  place(); addEventListener('resize',place);
   fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
     .then(function(e){ window.__eqEffets=e.effects||{}; }).catch(function(){});
   fetch('items.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
