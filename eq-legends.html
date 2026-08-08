@@ -1423,6 +1423,15 @@ document.querySelectorAll('svg').forEach(function(s){
     s.classList.add('mapz');s.addEventListener('click',function(){show(s);});
   }
 });
+// arrivee depuis une page satellite : #named=<cle> ouvre la carte et fait pulser la pastille
+function eqDepuisHash(){
+  var m=/^#named=(.+)$/.exec(location.hash||'');
+  if(!m) return;
+  var k=decodeURIComponent(m[1].replace(/\+/g,' '));
+  if(window.eqShowNamed) window.eqShowNamed(k);
+}
+addEventListener('load', function(){ setTimeout(eqDepuisHash, 350); });
+addEventListener('hashchange', eqDepuisHash);
 // ouvre la carte contenant un named et fait pulser sa pastille
 window.eqShowNamed=function(key){
   var svgs=document.querySelectorAll('svg'), src=null, i;
