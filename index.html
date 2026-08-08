@@ -159,6 +159,8 @@
   #eqres .s{color:#a89a86;font-size:11px;line-height:1.35;margin-top:2px}
   #eqres .z{color:#8fd0c0;font-size:11px;margin-top:1px}
   #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
+  #eqres .tag{font-size:9.5px;color:#0e0c0a;background:#8a7a5a;border-radius:3px;padding:1px 4px;vertical-align:1px}
+  #eqres .hors .n{color:#d6c8a8}
   @keyframes eqf{0%,100%{background:transparent}30%{background:#5a4a12}}
   .eqhit{animation:eqf 1.6s ease}
 
@@ -1760,22 +1762,30 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     if(!data) return;
     var q=inp.value.trim().toLowerCase();
     if(q.length<2){res.style.display='none';return;}
-    var noms=Object.keys(data.items);
+    chargeTout();
+    var base=data.items, horsGuide={};
+    if(tout){ for(var k in tout){ if(!(k in base)) horsGuide[k]=tout[k]; } }
+    var noms=Object.keys(base).concat(Object.keys(horsGuide));
+    function fiche(n){ return base[n] || horsGuide[n]; }
     var hits=noms.filter(function(n){
-      return n.toLowerCase().indexOf(q)>=0 || src(data.items[n].d).toLowerCase().indexOf(q)>=0;
+      return n.toLowerCase().indexOf(q)>=0 || src(fiche(n).d).toLowerCase().indexOf(q)>=0;
     }).sort(function(a,b){
+      var ga=(a in base)?0:1, gb=(b in base)?0:1;      // ceux du guide en tete
+      if(ga!==gb) return ga-gb;
       var ia=a.toLowerCase().indexOf(q), ib=b.toLowerCase().indexOf(q);
       if(ia<0)ia=99; if(ib<0)ib=99; return ia-ib || a.localeCompare(b);
-    }).slice(0,25);
+    }).slice(0,30);
     if(!hits.length){
-      res.innerHTML='<div class="vide">Nothing — this searches the '+noms.length+
-        ' items the guide actually covers.</div>';
+      res.innerHTML='<div class="vide">'+(tout? 'Nothing found in '+noms.length+' items.'
+        : 'Loading the full item database\u2026')+'</div>';
     }else{
       res.innerHTML=hits.map(function(n){
         var e=n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-        return '<div class="r" role="option" tabindex="0" data-n="'+e+'"><div class="n">'+e+'</div>'+
-          '<div class="s">'+l1(data.items[n].s).replace(/</g,'&lt;')+'</div>'+
-          '<div class="z">'+src(data.items[n].d).replace(/</g,'&lt;')+'</div></div>';
+        var hors=!(n in base);
+        return '<div class="r'+(hors?' hors':'')+'" role="option" tabindex="0" data-n="'+e+'">'+
+          '<div class="n">'+e+(hors?' <span class="tag">not in guide</span>':'')+'</div>'+
+          '<div class="s">'+l1(fiche(n).s).replace(/</g,'&lt;')+'</div>'+
+          '<div class="z">'+src(fiche(n).d).replace(/</g,'&lt;')+'</div></div>';
       }).join('');
     }
     res.style.display='block';
@@ -1789,6 +1799,13 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') res.style.display='none'; });
   var LBL={en:'\u{1F50E} Find an item\u2026', fr:'\u{1F50E} Chercher un objet\u2026',es:'\u{1F50E} Buscar un objeto\u2026', de:'\u{1F50E} Gegenstand suchen\u2026'};
   window.__eqPlaceholder=function(l){ inp.placeholder = LBL[l] || LBL.en; };
+  var tout=null, charge=false;
+  function chargeTout(){
+    if(charge) return; charge=true;
+    fetch('items-all.json').then(function(r){return r.json();}).then(function(d){
+      tout=d.items; cherche();
+    }).catch(function(){ tout=null; });
+  }
   fetch('items.json').then(function(r){return r.json();}).then(function(d){data=d;cherche();});
 })();
 </script>
