@@ -1541,7 +1541,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     p.querySelector('.corps').textContent=it.s;
     // fiche du proc : la ligne "Effect: X (" de l'objet renvoie a data.effects[X]
     var me=/Effect:\s*([^(\n]+?)\s*\(/.exec(it.s||'');
-    var _tables=[data.effects, window.__eqToutEff];
+    var _tables=[window.__eqEffets];
     var fe=null; if(me){ var _k=me[1].trim();
       for(var _i=0;_i<_tables.length;_i++){ if(_tables[_i] && _tables[_i][_k]){ fe=_tables[_i][_k]; break; } } }
     var be=p.querySelector('.eff');
@@ -1640,6 +1640,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     document.querySelectorAll('[data-eqdone]').forEach(function(z){ z.removeAttribute('data-eqdone'); });
     cache(); marque();
   };
+  // base des effets : fichier independant, 3 Ko aujourd'hui
+  fetch('effects.json').then(function(r){return r.json();})
+    .then(function(e){ window.__eqEffets=e.effects||{}; }).catch(function(){});
   fetch('items.json').then(function(r){return r.json();}).then(function(d){
     data=d; if(data&&data.items) marque();
   }).catch(function(){ /* pas de donnees : la page reste inchangee */ });
@@ -1822,7 +1825,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   function chargeTout(){
     if(charge) return; charge=true;
     fetch('items-all.json').then(function(r){return r.json();}).then(function(d){
-      tout=d.items; window.__eqTout=tout; window.__eqToutEff=d.effects||null; cherche();
+      tout=d.items; window.__eqTout=tout; cherche();
     }).catch(function(){ tout=null; });
   }
   fetch('items.json').then(function(r){return r.json();}).then(function(d){data=d;cherche();});

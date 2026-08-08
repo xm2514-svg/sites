@@ -47,6 +47,8 @@ OUT = os.path.join(RACINE, "items.json")
 # chargee au demarrage : la page ne la telecharge que si le lecteur tape une recherche.
 # 331 Ko compresses, mis en cache par le navigateur ensuite.
 OUT_ALL = os.path.join(RACINE, "items-all.json")
+# Les effets ont leur propre base, independante des objets : un fichier, une chose.
+OUT_EFF = os.path.join(RACINE, "effects.json")
 SEUIL_ALL = 5000
 UA = {"User-Agent": "EQLegendsGuide/1.0 (+https://xm2514-svg.github.io/sites/)"}
 SEUIL_TITRES = 5000
@@ -221,40 +223,37 @@ def main():
                   % (len(tous_items), anc_all))
         else:
             tmp = OUT_ALL + ".tmp"
-            anc_eff_all = {}
-            if os.path.exists(OUT_ALL):
-                try:
-                    anc_eff_all = json.load(open(OUT_ALL, encoding="utf-8")).get("effects", {})
-                except Exception:
-                    pass
-            try:
-                eff_all = effets(tous_items, anc_eff_all)
-            except Exception as e:
-                print("  effets de la base complete : echec (%s)" % e)
-                eff_all = anc_eff_all
             json.dump({"source": "eqlwiki.com", "updated": date.today().isoformat(),
-                       "items": tous_items, "effects": eff_all},
-                      open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
+                       "items": tous_items}, open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
             os.replace(tmp, OUT_ALL)
-            print("items-all.json : %d objets, %d effets, %.0f Ko"
-                  % (len(tous_items), len(eff_all), os.path.getsize(OUT_ALL) / 1024))
+            print("items-all.json : %d objets, %.0f Ko"
+                  % (len(tous_items), os.path.getsize(OUT_ALL) / 1024))
     else:
         print("base complete : seulement %d objets, fichier precedent conserve" % len(tous_items))
 
+    # --- base des effets, independante (couvre les objets du guide ET la base complete)
     anciens_eff = {}
-    if os.path.exists(OUT):
+    if os.path.exists(OUT_EFF):
         try:
-            anciens_eff = json.load(open(OUT, encoding="utf-8")).get("effects", {})
+            anciens_eff = json.load(open(OUT_EFF, encoding="utf-8")).get("effects", {})
         except Exception:
             pass
+    source_eff = dict(items)
+    source_eff.update(tous_items)
     try:
-        eff = effets(items, anciens_eff)
+        eff = effets(source_eff, anciens_eff)
     except Exception as e:
         print("effets : echec, on garde les precedents (%s)" % e)
         eff = anciens_eff
+    if eff:
+        tmp_e = OUT_EFF + ".tmp"
+        json.dump({"source": "eqlwiki.com", "updated": date.today().isoformat(), "effects": eff},
+                  open(tmp_e, "w", encoding="utf-8"), ensure_ascii=False)
+        os.replace(tmp_e, OUT_EFF)
+        print("effects.json : %d effets, %.0f Ko" % (eff and len(eff), os.path.getsize(OUT_EFF) / 1024))
 
     data = {"source": "eqlwiki.com", "updated": date.today().isoformat(),
-            "alias": ALIAS, "items": items, "effects": eff}
+            "alias": ALIAS, "items": items}
     tmp = OUT + ".tmp"
     json.dump(data, open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
     os.replace(tmp, OUT)
