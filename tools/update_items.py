@@ -24,6 +24,14 @@ import urllib.parse
 import urllib.request
 from datetime import date
 
+def _nettoie(t):
+    """Retire le HTML du wiki. Sans ca, l'infobulle affichait en clair
+    "Effect: <span class='itemeff'>Ykesha</span>" au lieu de "Effect: Ykesha"."""
+    t = re.sub(r"<[Bb][Rr]\s*/?>", " ", t)
+    t = re.sub(r"<[^>]+>", "", t)
+    return re.sub(r"[ \t]{2,}", " ", t).strip()
+
+
 API = "https://eqlwiki.com/api.php"
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGE = os.path.join(RACINE, "index.html")
@@ -105,7 +113,7 @@ def main():
             w = p["revisions"][0]["slots"]["main"].get("*", "")
             s = nettoie(champ(w, "statsblock"))
             if s:
-                items[p["title"]] = {"s": s, "d": nettoie(champ(w, "dropsfrom"))[:200]}
+                items[p["title"]] = {"s": _nettoie(s), "d": _nettoie(nettoie(champ(w, "dropsfrom")))[:200]}
 
     if os.path.exists(OUT):
         try:
