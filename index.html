@@ -1616,6 +1616,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       addEventListener('scroll',cache,{passive:true});
     }
     document.addEventListener('click',function(e){
+      if(e.target.closest && e.target.closest('#eqres')) return;   // la recherche gere son propre clic
       var t=e.target.closest? e.target.closest('.eqi'):null;
       if(!t){ cache(); return; }
       e.preventDefault(); e.stopPropagation();
