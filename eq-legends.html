@@ -165,9 +165,6 @@
   #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
   #eqres .tag{font-size:9.5px;color:#0e0c0a;background:#8a7a5a;border-radius:3px;padding:1px 4px;vertical-align:1px}
   #eqres .hors .n{color:#d6c8a8}
-  #eqres .r.eff{background:#141a18;border-left:2px solid #6fd6c4;cursor:default}
-  #eqres .r.eff .n{color:#8fd6c4}
-  #eqres .r.eff .tag{background:#6fd6c4}
   /* Mobile : le champ vivait dans la nav, qui defile horizontalement — il partait donc
      hors ecran a droite, sa liste de resultats avec lui. On le sort sur sa propre ligne. */
   @media(max-width:760px){
@@ -1846,22 +1843,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       res.innerHTML='<div class="vide">'+(tout? 'Nothing found in '+noms.length+' items.'
         : 'Loading the full item database\u2026')+'</div>';
     }else{
-      var EF=window.__eqEffets||{};
-      var effHits=Object.keys(EF).filter(function(n){
-        return n.toLowerCase().indexOf(q)>=0 || (EF[n].d||'').toLowerCase().indexOf(q)>=0;
-      }).sort(function(a,b){
-        var ia=a.toLowerCase().indexOf(q), ib=b.toLowerCase().indexOf(q);
-        if(ia<0)ia=99; if(ib<0)ib=99; return ia-ib || a.localeCompare(b);
-      }).slice(0,6);
-      var htmlEff=effHits.map(function(n){
-        var f=EF[n], e=n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-        var det=[]; if(f.r) det.push('recast '+f.r); if(f.t) det.push(f.t); if(f.s) det.push('resist '+f.s);
-        return '<div class="r eff" data-eff="'+e+'"><div class="n">\u26A1 '+e+
-          ' <span class="tag">effect</span></div>'+
-          '<div class="s">'+(f.d||'').replace(/</g,'&lt;').slice(0,150)+'</div>'+
-          '<div class="z">'+((f.e&&f.e.length? f.e.join(' \u00b7 ')+' \u00b7 ':'')+det.join(' \u00b7 ')).replace(/</g,'&lt;')+'</div></div>';
-      }).join('');
-      res.innerHTML=htmlEff+hits.map(function(n){
+      res.innerHTML=hits.map(function(n){
         var e=n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
         var hors=!(n in base);
         return '<div class="r'+(hors?' hors':'')+'" role="option" tabindex="0" data-n="'+e+'">'+
@@ -1876,7 +1858,6 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   inp.addEventListener('focus',function(){ if(res.innerHTML&&inp.value.trim().length>1) res.style.display='block'; });
   res.addEventListener('click',function(e){var r=e.target.closest('.r'); if(r) ouvre(r);});
   function ouvre(r){
-    if(r.dataset.eff) return;           // une ligne d'effet porte deja toute sa fiche
     var n=r.dataset.n;
     // objet traite par le guide : on saute a l'endroit qui en parle
     if(data.items[n]) { aller(n); return; }
