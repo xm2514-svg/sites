@@ -1531,8 +1531,10 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     if(!pop){pop=document.createElement('div');pop.id='eqpop';document.body.appendChild(pop);}
     return pop;
   }
+  window.eqFiche=function(nom,el){ montre(el,nom); };
   function montre(el,nom){
-    var it=data.items[nom]; if(!it) return;
+    // la recherche peut demander un objet hors guide : on regarde aussi la base complete
+    var it=data.items[nom] || (window.__eqTout && window.__eqTout[nom]); if(!it) return;
     var p=panneau();
     p.innerHTML='<b></b>'+'<span class="corps"></span><span class="eff"></span><span class="src"></span>';
     p.querySelector('b').textContent=nom;
@@ -1792,9 +1794,16 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   }
   inp.addEventListener('input',cherche);
   inp.addEventListener('focus',function(){ if(res.innerHTML&&inp.value.trim().length>1) res.style.display='block'; });
-  res.addEventListener('click',function(e){var r=e.target.closest('.r'); if(r) aller(r.dataset.n);});
+  res.addEventListener('click',function(e){var r=e.target.closest('.r'); if(r) ouvre(r);});
+  function ouvre(r){
+    var n=r.dataset.n;
+    // objet traite par le guide : on saute a l'endroit qui en parle
+    if(data.items[n]) { aller(n); return; }
+    // objet hors guide : rien ou aller, on montre sa fiche complete a cote du resultat
+    if(window.eqFiche) window.eqFiche(n, r);
+  }
   res.addEventListener('keydown',function(e){var r=e.target.closest('.r');
-    if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();aller(r.dataset.n);}});
+    if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();ouvre(r);}});
   document.addEventListener('click',function(e){ if(!box.contains(e.target)) res.style.display='none'; });
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') res.style.display='none'; });
   var LBL={en:'\u{1F50E} Find an item\u2026', fr:'\u{1F50E} Chercher un objet\u2026',es:'\u{1F50E} Buscar un objeto\u2026', de:'\u{1F50E} Gegenstand suchen\u2026'};
@@ -1803,7 +1812,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   function chargeTout(){
     if(charge) return; charge=true;
     fetch('items-all.json').then(function(r){return r.json();}).then(function(d){
-      tout=d.items; cherche();
+      tout=d.items; window.__eqTout=tout; cherche();
     }).catch(function(){ tout=null; });
   }
   fetch('items.json').then(function(r){return r.json();}).then(function(d){data=d;cherche();});
