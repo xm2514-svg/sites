@@ -1512,7 +1512,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         async src="//gc.zgo.at/count.js"></script>
 
 <style>/* infobulles objets (donnees eqlwiki) */
-.eqi{border-bottom:1px dotted #c8a83a;cursor:pointer;
+.eqi.proc{border-bottom:1px solid #6fd6c4}
+  .eqi{border-bottom:1px dotted #c8a83a;cursor:pointer;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #eqpop{position:fixed;z-index:10002;display:none;max-width:330px;background:#0d0b07;color:#e8dcc0;
   border:1px solid #c8a83a;border-radius:6px;padding:9px 12px;font:13px/1.5 Segoe UI,Arial;
@@ -1584,6 +1585,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
           if(data.items[vrai]){
             var s=document.createElement('span');
             s.className='eqi'; s.setAttribute('data-eq',vrai); s.textContent=m[1];
+        // liseré cyan si l'objet porte un proc documenté dans data.effects
+        var _o=data.items[vrai], _m=_o && /Effect:\s*([^(\n]+?)\s*\(/.exec(_o.s||'');
+        if(_m && data.effects && data.effects[_m[1].trim()]) s.className='eqi proc';
             frag.appendChild(s);
           } else { frag.appendChild(document.createTextNode(m[1])); }
           pos=m.index+m[1].length;
