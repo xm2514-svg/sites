@@ -7,7 +7,14 @@ Fonctionnement :
   1. recupere la liste des titres de Category:Items (~22 requetes, titres seuls)
   2. garde uniquement les noms d'objets reellement cites dans index.html
   3. telecharge la fiche de ces objets-la (~3 requetes)
-  4. ecrit items.json seulement si les garde-fous passent
+  4. recupere la fiche des EFFETS cites par ces objets (pages Spellpage du wiki)
+  5. ecrit items.json seulement si les garde-fous passent
+
+Les effets : la fiche objet ne donne que le NOM du proc ("Effect: Ykesha"), jamais ce
+qu'il fait. La description vit sur une page a part. On la recupere pour pouvoir afficher
+"Ykesha - DD proc, interrompt les sorts, 475 de haine" au lieu d'un nom seul.
+Cette partie ne doit JAMAIS faire echouer la mise a jour des objets : en cas de pepin
+on garde les effets precedents.
 
 GARDE-FOUS (le site ne doit jamais casser a cause d'une mise a jour de donnees) :
   - la categorie doit renvoyer au moins 5000 titres, sinon on abandonne
@@ -87,6 +94,60 @@ def nettoie(s):
     return re.sub(r"\n{2,}", "\n", s).strip()
 
 
+
+def champ_sort(w, nom):
+    """Champ d'une page Spellpage. Le separateur y est "\n| nom = " AVEC espaces,
+    que champ() ne reconnait pas : elle capturait alors toute la fin de la page."""
+    m = re.search(r"\n\|\s*" + nom + r"\s*=([\s\S]*?)(?=\n\|\s*[a-zA-Z_]+\s*=|\n\}\})", w)
+    return m.group(1).strip() if m else ""
+
+
+
+def effets(items, anciens):
+    """Fiches des effets cites par les objets. Le wiki les publie sur des pages
+    Spellpage separees : la fiche objet ne porte que le nom du proc."""
+    noms = set()
+    for v in items.values():
+        for m in re.finditer(r"Effect:\s*([^(\n]+?)\s*\(", v["s"]):
+            n = m.group(1).strip()
+            if 2 < len(n) < 60:
+                noms.add(n)
+    if not noms:
+        return anciens
+    print("effets cites par les objets : %d" % len(noms))
+    out = {}
+    noms = sorted(noms)
+    for i in range(0, len(noms), 50):
+        try:
+            d = api({"action": "query", "prop": "revisions", "rvprop": "content",
+                     "rvslots": "main", "format": "json", "titles": "|".join(noms[i:i + 50])})
+        except Exception as e:
+            print("  effets : lot ignore (%s)" % e)
+            continue
+        for p in d["query"]["pages"].values():
+            if "revisions" not in p:
+                continue
+            w = p["revisions"][0]["slots"]["main"].get("*", "")
+            if "Spellpage" not in w:
+                continue
+            desc = _nettoie(nettoie(champ_sort(w, "description")))
+            slots = [_nettoie(nettoie(m.group(1))) for m in
+                     re.finditer(r"\{\{SpellSlotRow\s*\|\s*\d+\s*\|([^}]*)\}\}", w)]
+            fiche = {"d": desc, "e": [x for x in slots if x]}
+            for cle, champ_wiki in (("r", "recast_time"), ("t", "duration"), ("s", "resist")):
+                v = _nettoie(nettoie(champ_sort(w, champ_wiki)))
+                if v:
+                    fiche[cle] = v
+            if desc or fiche["e"]:
+                out[p["title"]] = fiche
+    if len(out) < len(anciens) * 0.8:
+        print("  effets : chute suspecte (%d contre %d), on garde les precedents"
+              % (len(out), len(anciens)))
+        return anciens
+    print("effets recuperes : %d" % len(out))
+    return out
+
+
 def main():
     page = open(PAGE, encoding="utf-8").read()
     texte = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ",
@@ -123,12 +184,25 @@ def main():
         except Exception:
             pass
 
+    anciens_eff = {}
+    if os.path.exists(OUT):
+        try:
+            anciens_eff = json.load(open(OUT, encoding="utf-8")).get("effects", {})
+        except Exception:
+            pass
+    try:
+        eff = effets(items, anciens_eff)
+    except Exception as e:
+        print("effets : echec, on garde les precedents (%s)" % e)
+        eff = anciens_eff
+
     data = {"source": "eqlwiki.com", "updated": date.today().isoformat(),
-            "alias": ALIAS, "items": items}
+            "alias": ALIAS, "items": items, "effects": eff}
     tmp = OUT + ".tmp"
     json.dump(data, open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
     os.replace(tmp, OUT)
-    print("items.json : %d objets, %.1f Ko, %s" % (len(items), os.path.getsize(OUT) / 1024, data["updated"]))
+    print("items.json : %d objets, %d effets, %.1f Ko, %s"
+          % (len(items), len(eff), os.path.getsize(OUT) / 1024, data["updated"]))
 
 
 if __name__ == "__main__":
