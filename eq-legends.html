@@ -1667,17 +1667,28 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     });
   }
 
+  // liseré vert-eau sur les objets dont l'effet figure dans la base des effets
+  function liseres(){
+    var EF=window.__eqEffets;
+    if(!EF||!data||!data.items) return;
+    document.querySelectorAll('.eqi').forEach(function(s){
+      var it=data.items[s.getAttribute('data-eq')];
+      if(!it) return;
+      var m=/Effect:\s*([^(\n]+?)\s*\(/.exec(it.s||'');
+      if(m && EF[m[1].trim()]) s.classList.add('proc');
+    });
+  }
   // rejoue le marquage apres un changement de langue (les blocs traduits effacent les reperes)
   window.eqMarque=function(){
     if(!data||!data.items) return;
     document.querySelectorAll('[data-eqdone]').forEach(function(z){ z.removeAttribute('data-eqdone'); });
-    cache(); marque();
+    cache(); marque(); liseres();
   };
   // base des effets : fichier independant, 3 Ko aujourd'hui
   fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
-    .then(function(e){ window.__eqEffets=e.effects||{}; }).catch(function(){});
+    .then(function(e){ window.__eqEffets=e.effects||{}; liseres(); }).catch(function(){});
   fetch('items.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
-    data=d; if(data&&data.items) marque();
+    data=d; if(data&&data.items){ marque(); liseres(); }
   }).catch(function(){ /* pas de donnees : la page reste inchangee */ });
 })();
 </script>
