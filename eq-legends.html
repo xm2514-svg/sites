@@ -1674,13 +1674,6 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     cache(); marque();
   };
   // base des effets : fichier independant, 3 Ko aujourd'hui
-  // sous 760 px, le champ sort de la nav et se pose juste en dessous, pleine largeur
-  function place(){
-    var petit=innerWidth<=760;
-    if(petit && box.parentNode===nav){ nav.parentNode.insertBefore(box,nav.nextSibling); box.classList.add('eqfind-mobile'); }
-    else if(!petit && box.parentNode!==nav){ nav.appendChild(box); box.classList.remove('eqfind-mobile'); }
-  }
-  place(); addEventListener('resize',place);
   fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
     .then(function(e){ window.__eqEffets=e.effects||{}; }).catch(function(){});
   fetch('items.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
@@ -1789,6 +1782,14 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   box.innerHTML='<input type="search" placeholder="\u{1F50E} Find an item…" autocomplete="off" aria-label="Find an item"><div id="eqres" role="listbox"></div>';
   nav.appendChild(box);
   var inp=box.querySelector('input'), res=box.querySelector('#eqres'), data=null;
+  // sous 760 px, le champ sort de la nav et se pose juste en dessous, pleine largeur
+  function place(){
+    var petit=innerWidth<=760;
+    if(petit && box.parentNode===nav){ nav.parentNode.insertBefore(box,nav.nextSibling); box.classList.add('eqfind-mobile'); }
+    else if(!petit && box.parentNode!==nav){ nav.appendChild(box); box.classList.remove('eqfind-mobile'); }
+  }
+  place(); addEventListener('resize',place);
+
   var ZONES={'Befallen':'fl-befallen','Najena':'fl-najena','Upper Guk':'fl-uguk',
              'Lower Guk':'fl-lguk','Crushbone':'fl-cb','Splitpaw':'fl-splitpaw','Unrest':'fl-unrest'};
   function l1(s){var a=(s||'').split('\n').filter(function(x){return x.trim();});return a[0]||'';}
