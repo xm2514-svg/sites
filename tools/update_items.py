@@ -123,11 +123,30 @@ def effets(items, anciens):
         return anciens
     print("effets cites par les objets : %d" % len(noms))
     out = {}
-    noms = sorted(noms)
+    _recolte(sorted(noms), out, "")
+    # certains procs portent le nom d'une arme (Screaming Mace) : le nom nu mene a
+    # la page de l'OBJET, sans Spellpage. Le sort vit sous "<nom> (Spell)".
+    restes = [n for n in sorted(noms) if n not in out]
+    if restes:
+        print("effets sans page directe : %d, second essai en (Spell)" % len(restes))
+        _recolte(restes, out, " (Spell)")
+    if len(out) < len(anciens) * 0.8:
+        print("  effets : chute suspecte (%d contre %d), on garde les precedents"
+              % (len(out), len(anciens)))
+        return anciens
+    print("effets recuperes : %d" % len(out))
+    return out
+
+
+def _recolte(noms, out, suffixe):
+    """Interroge le wiki par lots de 50 et range les fiches Spellpage dans out.
+    Le suffixe eventuel est retire de la cle : elle doit correspondre au nom que
+    la ligne "Effect:" de l'objet cite."""
     for i in range(0, len(noms), 50):
+        lot = [n + suffixe for n in noms[i:i + 50]]
         try:
             d = api({"action": "query", "prop": "revisions", "rvprop": "content",
-                     "rvslots": "main", "format": "json", "titles": "|".join(noms[i:i + 50])})
+                     "rvslots": "main", "format": "json", "titles": "|".join(lot)})
         except Exception as e:
             print("  effets : lot ignore (%s)" % e)
             continue
@@ -146,13 +165,10 @@ def effets(items, anciens):
                 if v:
                     fiche[cle] = v
             if desc or fiche["e"]:
-                out[p["title"]] = fiche
-    if len(out) < len(anciens) * 0.8:
-        print("  effets : chute suspecte (%d contre %d), on garde les precedents"
-              % (len(out), len(anciens)))
-        return anciens
-    print("effets recuperes : %d" % len(out))
-    return out
+                cle = p["title"]
+                if suffixe and cle.endswith(suffixe):
+                    cle = cle[:-len(suffixe)]
+                out[cle] = fiche
 
 
 def main():
