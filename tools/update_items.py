@@ -43,6 +43,11 @@ API = "https://eqlwiki.com/api.php"
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGE = os.path.join(RACINE, "index.html")
 OUT = os.path.join(RACINE, "items.json")
+# Base complete (~10 900 objets) pour la barre de recherche du site. Elle n'est PAS
+# chargee au demarrage : la page ne la telecharge que si le lecteur tape une recherche.
+# 331 Ko compresses, mis en cache par le navigateur ensuite.
+OUT_ALL = os.path.join(RACINE, "items-all.json")
+SEUIL_ALL = 5000
 UA = {"User-Agent": "EQLegendsGuide/1.0 (+https://xm2514-svg.github.io/sites/)"}
 SEUIL_TITRES = 5000
 
@@ -183,6 +188,46 @@ def main():
                 sys.exit("ABANDON : %d objets contre %d avant, fichier conserve" % (len(items), len(ancien)))
         except Exception:
             pass
+
+    # --- base complete pour la recherche du site
+    tous_items = {}
+    for i in range(0, len(tous), 50):
+        try:
+            d = api({"action": "query", "prop": "revisions", "rvprop": "content",
+                     "rvslots": "main", "format": "json", "titles": "|".join(tous[i:i + 50])})
+        except Exception as e:
+            print("  base complete : lot ignore (%s)" % e)
+            continue
+        for p in d["query"]["pages"].values():
+            if "revisions" not in p:
+                continue
+            w = p["revisions"][0]["slots"]["main"].get("*", "")
+            st = nettoie(champ(w, "statsblock"))
+            if st:
+                tous_items[p["title"]] = {"s": _nettoie(st),
+                                          "d": _nettoie(nettoie(champ(w, "dropsfrom")))[:200]}
+        if (i // 50) % 20 == 0:
+            print("  base complete : %d/%d" % (i, len(tous)))
+
+    if len(tous_items) >= SEUIL_ALL:
+        anc_all = 0
+        if os.path.exists(OUT_ALL):
+            try:
+                anc_all = len(json.load(open(OUT_ALL, encoding="utf-8")).get("items", {}))
+            except Exception:
+                pass
+        if anc_all and len(tous_items) < anc_all * 0.8:
+            print("base complete : chute suspecte (%d contre %d), fichier conserve"
+                  % (len(tous_items), anc_all))
+        else:
+            tmp = OUT_ALL + ".tmp"
+            json.dump({"source": "eqlwiki.com", "updated": date.today().isoformat(),
+                       "items": tous_items}, open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
+            os.replace(tmp, OUT_ALL)
+            print("items-all.json : %d objets, %.0f Ko"
+                  % (len(tous_items), os.path.getsize(OUT_ALL) / 1024))
+    else:
+        print("base complete : seulement %d objets, fichier precedent conserve" % len(tous_items))
 
     anciens_eff = {}
     if os.path.exists(OUT):
