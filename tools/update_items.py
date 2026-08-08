@@ -221,11 +221,23 @@ def main():
                   % (len(tous_items), anc_all))
         else:
             tmp = OUT_ALL + ".tmp"
+            anc_eff_all = {}
+            if os.path.exists(OUT_ALL):
+                try:
+                    anc_eff_all = json.load(open(OUT_ALL, encoding="utf-8")).get("effects", {})
+                except Exception:
+                    pass
+            try:
+                eff_all = effets(tous_items, anc_eff_all)
+            except Exception as e:
+                print("  effets de la base complete : echec (%s)" % e)
+                eff_all = anc_eff_all
             json.dump({"source": "eqlwiki.com", "updated": date.today().isoformat(),
-                       "items": tous_items}, open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
+                       "items": tous_items, "effects": eff_all},
+                      open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
             os.replace(tmp, OUT_ALL)
-            print("items-all.json : %d objets, %.0f Ko"
-                  % (len(tous_items), os.path.getsize(OUT_ALL) / 1024))
+            print("items-all.json : %d objets, %d effets, %.0f Ko"
+                  % (len(tous_items), len(eff_all), os.path.getsize(OUT_ALL) / 1024))
     else:
         print("base complete : seulement %d objets, fichier precedent conserve" % len(tous_items))
 

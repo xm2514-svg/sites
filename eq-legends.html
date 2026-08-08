@@ -1541,7 +1541,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     p.querySelector('.corps').textContent=it.s;
     // fiche du proc : la ligne "Effect: X (" de l'objet renvoie a data.effects[X]
     var me=/Effect:\s*([^(\n]+?)\s*\(/.exec(it.s||'');
-    var fe=me && data.effects && data.effects[me[1].trim()];
+    var _tables=[data.effects, window.__eqToutEff];
+    var fe=null; if(me){ var _k=me[1].trim();
+      for(var _i=0;_i<_tables.length;_i++){ if(_tables[_i] && _tables[_i][_k]){ fe=_tables[_i][_k]; break; } } }
     var be=p.querySelector('.eff');
     if(fe){
       var t=document.createElement('b'); t.textContent='\u26A1 '+me[1].trim(); be.appendChild(t);
@@ -1555,6 +1557,13 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var r=el.getBoundingClientRect(), h=p.offsetHeight, w=p.offsetWidth;
     var top=r.bottom+8; if(top+h>innerHeight-8) top=Math.max(8,r.top-h-8);
     var left=Math.min(Math.max(8,r.left), innerWidth-w-8);
+    // ouvert depuis la recherche : on se pose A COTE de la liste, jamais dessus
+    var liste=el.closest && el.closest('#eqres');
+    if(liste){
+      var lr=liste.getBoundingClientRect();
+      top=Math.max(8, Math.min(r.top, innerHeight-h-8));
+      left=(lr.left-w-12 >= 8) ? lr.left-w-12 : Math.min(lr.right+12, innerWidth-w-8);
+    }
     p.style.top=top+'px'; p.style.left=left+'px';
     cur=el;
   }
@@ -1813,7 +1822,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   function chargeTout(){
     if(charge) return; charge=true;
     fetch('items-all.json').then(function(r){return r.json();}).then(function(d){
-      tout=d.items; window.__eqTout=tout; cherche();
+      tout=d.items; window.__eqTout=tout; window.__eqToutEff=d.effects||null; cherche();
     }).catch(function(){ tout=null; });
   }
   fetch('items.json').then(function(r){return r.json();}).then(function(d){data=d;cherche();});
