@@ -1541,6 +1541,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
 
 <style>/* infobulles objets (donnees eqlwiki) */
 .eqi.proc{border-bottom:1px solid #6fd6c4}
+#eqpop .usage{display:block;margin-top:7px;padding-top:6px;border-top:1px solid #3a2f22;color:#8fd6c4;font-size:12px;white-space:pre-line}
   .eqi{border-bottom:1px dotted #c8a83a;cursor:pointer;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #eqpop{position:fixed;z-index:10002;display:none;max-width:330px;background:#0d0b07;color:#e8dcc0;
@@ -1565,6 +1566,17 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     p.innerHTML='<b></b>'+'<span class="corps"></span><span class="src"></span>';
     p.querySelector('b').textContent=nom;
     p.querySelector('.corps').textContent=it.s;
+    // usage : un quart des objets du guide n'ont aucune stat exploitable — cles,
+    // composants de quete, pages de recherche. Sans cette ligne l'infobulle ne dit rien.
+    var us=(window.__eqUsages||{})[nom];
+    if(us){
+      var l=[];
+      if(us.q) l.push('Quest: '+us.q.join(' · '));
+      if(us.r) l.push('Recipe: '+us.r.join(' · '));
+      var du=document.createElement('span'); du.className='usage';
+      du.textContent=l.join('\n');
+      p.querySelector('.corps').after(du);
+    }
     // fiche du proc : la ligne "Effect: X (" de l'objet renvoie a data.effects[X]
     var me=/Effect:\s*([^(\n]+?)\s*\(/.exec(it.s||'');
     var EF=window.__eqEffets||{};
@@ -1698,6 +1710,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   // base des effets : fichier independant, 3 Ko aujourd'hui
   fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
     .then(function(e){ window.__eqEffets=e.effects||{}; liseres(); }).catch(function(){});
+  // base des usages : a quoi sert un objet sans stat (quete, recherche, craft)
+  fetch('quests.json',{cache:'no-cache'}).then(function(r){return r.json();})
+    .then(function(u){ window.__eqUsages=u.uses||{}; }).catch(function(){});
   fetch('items.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
     data=d; if(data&&data.items){ marque(); liseres(); }
   }).catch(function(){ /* pas de donnees : la page reste inchangee */ });

@@ -49,6 +49,7 @@ OUT = os.path.join(RACINE, "items.json")
 OUT_ALL = os.path.join(RACINE, "items-all.json")
 # Les effets ont leur propre base, independante des objets : un fichier, une chose.
 OUT_EFF = os.path.join(RACINE, "effects.json")
+OUT_QST = os.path.join(os.path.dirname(OUT), "quests.json")
 SEUIL_ALL = 5000
 UA = {"User-Agent": "EQLegendsGuide/1.0 (+https://xm2514-svg.github.io/sites/)"}
 SEUIL_TITRES = 5000
@@ -171,6 +172,23 @@ def _recolte(noms, out, suffixe):
                 out[cle] = fiche
 
 
+
+def usages(w):
+    """A quoi sert l'objet : quetes liees et recettes. Deux champs que le wiki remplit
+    sur la fiche objet et que l'on ignorait — c'est la seule information utile pour les
+    35 % d'objets sans aucune stat (cles, composants, pages de recherche)."""
+    out = {}
+    q = [re.sub(r"\s+", " ", x).strip(" *")
+         for x in _nettoie(nettoie(champ(w, "relatedquests"))).split("\n") if x.strip(" *")]
+    r = [re.sub(r"\s+", " ", x).strip(" *")
+         for x in _nettoie(nettoie(champ(w, "recipes"))).split("\n") if x.strip(" *")]
+    if q:
+        out["q"] = q[:6]
+    if r:
+        out["r"] = r[:6]
+    return out
+
+
 def main():
     page = open(PAGE, encoding="utf-8").read()
     texte = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ",
@@ -209,6 +227,7 @@ def main():
 
     # --- base complete pour la recherche du site
     tous_items = {}
+    tous_quetes = {}
     for i in range(0, len(tous), 50):
         try:
             d = api({"action": "query", "prop": "revisions", "rvprop": "content",
@@ -224,6 +243,12 @@ def main():
             if st:
                 tous_items[p["title"]] = {"s": _nettoie(st),
                                           "d": _nettoie(nettoie(champ(w, "dropsfrom")))[:200]}
+            # base des usages : a quoi sert un objet qui n'a aucune stat (composant de
+            # quete, de recherche ou de craft). Meme page deja telechargee, zero requete
+            # de plus. Base independante, comme effects.json.
+            us = usages(w)
+            if us:
+                tous_quetes[p["title"]] = us
         if (i // 50) % 20 == 0:
             print("  base complete : %d/%d" % (i, len(tous)))
 
@@ -248,6 +273,24 @@ def main():
         print("base complete : seulement %d objets, fichier precedent conserve" % len(tous_items))
 
     # --- base des effets, independante (couvre les objets du guide ET la base complete)
+    if tous_quetes:
+        anc_q = 0
+        if os.path.exists(OUT_QST):
+            try:
+                anc_q = len(json.load(open(OUT_QST, encoding="utf-8")).get("uses", {}))
+            except Exception:
+                pass
+        if anc_q and len(tous_quetes) < anc_q * 0.8:
+            print("quests.json : chute suspecte (%d contre %d), fichier conserve"
+                  % (len(tous_quetes), anc_q))
+        else:
+            tmp_q = OUT_QST + ".tmp"
+            json.dump({"source": "eqlwiki.com", "updated": date.today().isoformat(),
+                       "uses": tous_quetes}, open(tmp_q, "w", encoding="utf-8"), ensure_ascii=False)
+            os.replace(tmp_q, OUT_QST)
+            print("quests.json : %d objets avec un usage, %.0f Ko"
+                  % (len(tous_quetes), os.path.getsize(OUT_QST) / 1024))
+
     anciens_eff = {}
     if os.path.exists(OUT_EFF):
         try:
