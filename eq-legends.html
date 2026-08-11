@@ -1720,7 +1720,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if(!('IntersectionObserver' in window)) return;
   var sel='section h2, .card, .note, .alertbox, section > p';
-  var els=[].slice.call(document.querySelectorAll(sel)).filter(function(e){return e.offsetParent!==null&&e.getBoundingClientRect().top>innerHeight;});
+  var els=[].slice.call(document.querySelectorAll(sel)).filter(function(e){return e.offsetParent!==null&&e.getBoundingClientRect().top>innerHeight&&!e.querySelector('img')&&e.tagName!=='IMG';});
   els.forEach(function(e){e.classList.add('reveal')});
   var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{rootMargin:'0px 0px -8% 0px',threshold:0.05});
   els.forEach(function(e){io.observe(e)});
