@@ -1858,8 +1858,19 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   // base des usages : a quoi sert un objet sans stat (quete, recherche, craft)
   fetch('quests.json',{cache:'no-cache'}).then(function(r){return r.json();})
     .then(function(u){ window.__eqUsages=u.uses||{}; liseres(); }).catch(function(){});
+  // Le marquage doit attendre que TOUT le document soit analyse. items.json fait 43 Ko,
+  // la page 4,3 Mo : la reponse arrivait presque toujours avant la fin de l'analyse, et
+  // marque() ne voyait que les premieres sections. Le garde-fou data-eqdone interdisait
+  // ensuite tout rattrapage — les derniers chapitres n'etaient jamais marques.
+  function demarre(){
+    if(!data||!data.items) return;
+    document.querySelectorAll('[data-eqdone]').forEach(function(z){ z.removeAttribute('data-eqdone'); });
+    marque(); liseres();
+  }
   fetch('items.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
-    data=d; if(data&&data.items){ marque(); liseres(); }
+    data=d;
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', demarre);
+    else demarre();
   }).catch(function(){ /* pas de donnees : la page reste inchangee */ });
 })();
 </script>
