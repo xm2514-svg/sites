@@ -179,6 +179,11 @@
   #eqres .r:last-child{border-bottom:0}
   #eqres .r:hover,#eqres .r:focus{background:#1e1810;outline:none}
   #eqres .n{color:#f4d585;font-weight:700;font-size:13px}
+  /* memes liseres que dans le texte du guide : cyan = effet, violet = quete */
+  #eqres .nn{display:inline-block;padding-bottom:1px}
+  #eqres .nn.proc{border-bottom:1px solid #6fd6c4}
+  #eqres .nn.quete{border-bottom:3px double #b48ae0}
+  #eqres .nn.proc.quete{border-bottom:3px double #6fd6c4}
   #eqres .s{color:#a89a86;font-size:11px;line-height:1.35;margin-top:2px}
   #eqres .z{color:#8fd0c0;font-size:11px;margin-top:1px}
   .eqlink{color:#8fd0c0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
@@ -1963,7 +1968,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   };
   // base des effets : fichier independant, 3 Ko aujourd'hui
   fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
-    .then(function(e){ window.__eqEffets=e.effects||{}; liseres(); }).catch(function(){});
+    .then(function(e){ window.__eqEffets=e.effects||{}; liseres(); if(window.__eqRecherche) window.__eqRecherche(); }).catch(function(){});
   // base des usages : a quoi sert un objet sans stat (quete, recherche, craft)
   fetch('quests.json',{cache:'no-cache'}).then(function(r){return r.json();})
     .then(function(u){ window.__eqUsages=u.uses||{}; liseres(); }).catch(function(){});
@@ -2141,14 +2146,20 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       res.innerHTML=hits.map(function(n){
         var e=n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
         var hors=!(n in base);
+        // meme calcul que liseres() : effet documente -> proc, objet de quete -> quete
+        var _it=fiche(n), _c='';
+        var _m=/Effect:\s*([^(\n]+?)\s*\(/.exec((_it&&_it.s)||'');
+        if(_m && (window.__eqEffets||{})[_m[1].trim()]) _c+=' proc';
+        if((window.__eqUsages||{})[n]) _c+=' quete';
         return '<div class="r'+(hors?' hors':'')+'" role="option" tabindex="0" data-n="'+e+'">'+
-          '<div class="n">'+e+(hors?' <span class="tag">not in guide</span>':'')+'</div>'+
+          '<div class="n"><span class="nn'+_c+'">'+e+'</span>'+(hors?' <span class="tag">not in guide</span>':'')+'</div>'+
           '<div class="s">'+l1(fiche(n).s).replace(/</g,'&lt;')+'</div>'+
           '<div class="z">'+src(fiche(n).d).replace(/</g,'&lt;')+'</div></div>';
       }).join('');
     }
     res.style.display='block';
   }
+  window.__eqRecherche=cherche;
   inp.addEventListener('input',cherche);
   inp.addEventListener('focus',function(){ if(res.innerHTML&&inp.value.trim().length>1) res.style.display='block'; });
   res.addEventListener('click',function(e){var r=e.target.closest('.r'); if(r) ouvre(r);});
