@@ -2080,7 +2080,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     while((n=w.nextNode())){var e=n.parentElement; if(e&&visible(e)){el=e;break;}}
     if(el){
       document.querySelectorAll('.eqhit').forEach(function(x){x.classList.remove('eqhit');});
-      el.scrollIntoView({behavior:'smooth',block:'center'});
+      el.scrollIntoView({block:'center'}); /* 'smooth' ne defile pas sur ce document de 4,9 Mo : mesure a 0 px apres 4 s, alors que le mode instantane saute bien a la cible (12/08/2026) */
       void el.offsetWidth; el.classList.add('eqhit'); return;
     }
     var d=(data.items[nom]&&data.items[nom].d)||'';
