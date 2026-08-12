@@ -1859,7 +1859,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var liste=el.closest && el.closest('#eqres');
     if(liste){
       var lr=liste.getBoundingClientRect();
-      top=Math.max(8, Math.min(r.top, innerHeight-h-8));
+      top=8;   // en haut : l'effet vient se poser dessous sans sortir de l'ecran
       left=(lr.left-w-12 >= 8) ? lr.left-w-12 : Math.min(lr.right+12, innerWidth-w-8);
     }
     p.style.top=top+'px'; p.style.left=left+'px';
@@ -1867,8 +1867,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var _pe=document.getElementById('eqeff');
     if(_pe && _pe.style.display==='block'){
       var ew=_pe.offsetWidth, eh=_pe.offsetHeight;
-      if(innerWidth<=760){
-        // pas la place de cotoyer : on empile sous la fiche objet, ou au-dessus
+      // ouvert depuis la recherche : a droite de la fiche objet on recouvrirait la liste
+      // de resultats (constate en 1920x1080). On empile, comme en mobile.
+      if(innerWidth<=760 || liste){
         _pe.style.left=Math.max(8, Math.min(left, innerWidth-ew-8))+'px';
         _pe.style.top=(top+h+10+eh<=innerHeight-8 ? top+h+10 : Math.max(8, top-eh-10))+'px';
       } else {
