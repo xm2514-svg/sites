@@ -181,6 +181,8 @@
   #eqres .n{color:#f4d585;font-weight:700;font-size:13px}
   #eqres .s{color:#a89a86;font-size:11px;line-height:1.35;margin-top:2px}
   #eqres .z{color:#8fd0c0;font-size:11px;margin-top:1px}
+  .eqlink{color:#8fd0c0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+  .eqlink:hover{color:#b9e6da}
   #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
   #eqres .tag{font-size:9.5px;color:#0e0c0a;background:#8a7a5a;border-radius:3px;padding:1px 4px;vertical-align:1px}
   #eqres .hors .n{color:#d6c8a8}
@@ -1797,6 +1799,15 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       if(us.r) l.push('Recipe: '+us.r.join(' · '));
       var du=document.createElement('span'); du.className='usage';
       du.textContent=l.join('\n');
+      // une quete epique a son chapitre dans le guide : on y renvoie depuis la fiche
+      if(us.q && us.q.join(' ').indexOf('Epic Quest')>=0 && document.getElementById('c14')){
+        du.textContent=l.join('\n')+'\n';
+        var qa=document.createElement('span'); qa.className='eqlink';
+        qa.textContent='\u2192 read the epic chapter';
+        qa.onclick=function(ev){ ev.stopPropagation();
+          document.getElementById('c14').scrollIntoView({block:'start'}); };
+        du.appendChild(qa);
+      }
       p.querySelector('.corps').after(du);
     }
     // fiche du proc : la ligne "Effect: X (" de l'objet renvoie a data.effects[X]
@@ -1814,7 +1825,27 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       if(det.length){var u=document.createElement('u'); u.textContent=det.join(' \u00b7 '); pe.appendChild(u);}
       pe.style.display='block';
     } else { pe.style.display='none'; }
-    p.querySelector('.src').textContent='eqlwiki · '+(it.d? it.d.replace(/\n/g,' ')+' · ':'')+'maj '+data.updated;
+    // source : les named qui ont une pastille sur une carte deviennent cliquables
+    var sp=p.querySelector('.src');
+    sp.textContent='eqlwiki · ';
+    if(it.d){
+      it.d.split('\n').forEach(function(ligne){
+        var nm=ligne.replace(/^\s*\*\s*/,'').trim();
+        if(!nm) return;
+        var pastille=document.querySelector('[data-named="'+nm.replace(/"/g,'')+'"]');
+        if(pastille){
+          var a=document.createElement('span'); a.className='eqlink'; a.textContent=nm;
+          a.title='Show on map';
+          a.onclick=function(ev){ ev.stopPropagation();
+            if(window.eqShowNamed) window.eqShowNamed(nm); };
+          sp.appendChild(a);
+        } else {
+          sp.appendChild(document.createTextNode(nm));
+        }
+        sp.appendChild(document.createTextNode(' · '));
+      });
+    }
+    sp.appendChild(document.createTextNode('maj '+data.updated));
     p.style.display='block';
     var r=el.getBoundingClientRect(), h=p.offsetHeight, w=p.offsetWidth;
     var top=r.bottom+8; if(top+h>innerHeight-8) top=Math.max(8,r.top-h-8);
@@ -2126,7 +2157,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     // objet traite par le guide : on saute a l'endroit qui en parle
     // on saute a l'objet PUIS on ouvre sa fiche (et son effet) a cote de lui :
     // sans ca le clic fermait la liste et le lecteur perdait les stats de vue.
-    if(data.items[n]) { var cible=aller(n); if(window.eqFiche) window.eqFiche(n, cible||r); return; }
+    // la fiche d'abord, sur place : c'est elle qui porte les liens vers
+    // le chapitre de la quete et vers la carte du named.
+    if(window.eqFiche) window.eqFiche(n, r);
     // objet hors guide : rien ou aller, on montre sa fiche complete a cote du resultat
     if(window.eqFiche) window.eqFiche(n, r);
   }
