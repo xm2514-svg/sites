@@ -189,9 +189,19 @@
   .eqlink{color:#8fd0c0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
   /* ouvert depuis la recherche : l'effet vit DANS la fiche objet. Deux panneaux
      flottants finissaient toujours par se recouvrir sur un ecran donne. */
+  /* PALIER <= 1920 : l'effet est integre dans la fiche (pas la place a cote).
+     Au-dessus (3440) : bloc separe a gauche, style d'origine. */
+  @media (min-width: 761px) and (max-width: 1920px){
   #eqpop #eqeff{position:static!important;left:auto!important;top:auto!important;
-    display:block!important;max-width:none;width:auto;margin:8px 0 0;border:0;
-    border-top:1px solid #2f4a44;box-shadow:none;padding:8px 0 0}
+    display:block!important;max-width:none;width:auto;margin:9px 0 0;
+    box-shadow:none;border:1px solid #3f6b62;border-radius:7px;
+    background:rgba(111,214,196,.06);padding:8px 10px}
+    #eqpop #eqeff b{color:#8fd6c4!important;font-size:13.5px}
+    #eqpop #eqeff i{color:#8fd0c0;font-style:normal;display:block;margin-top:5px}
+    #eqpop #eqeff u{color:#7f9a92;text-decoration:none;display:block;margin-top:6px;
+      padding-top:5px;border-top:1px solid #2f4a44;font-size:11px}
+    #eqpop{max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain}
+  }
   .eqlink:hover{color:#b9e6da}
   #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
   #eqres .tag{font-size:9.5px;color:#0e0c0a;background:#8a7a5a;border-radius:3px;padding:1px 4px;vertical-align:1px}
@@ -1860,7 +1870,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var _liste0=el.closest && el.closest('#eqres');
     var _pe0=document.getElementById('eqeff');
     if(_pe0){
-      if(_liste0 && _pe0.style.display!=='none'){ p.appendChild(_pe0); }
+      // FUSION RESERVEE AU 1920x1080 : ailleurs, on ne touche a rien.
+      if(_liste0 && _pe0.style.display!=='none' && innerWidth>760 && innerWidth<=1920){ p.appendChild(_pe0); }
       else if(_pe0.parentNode===p){ document.body.appendChild(_pe0); }
     }
     p.style.display='block';
@@ -1871,7 +1882,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var liste=el.closest && el.closest('#eqres');
     if(liste){
       var lr=liste.getBoundingClientRect();
-      top=8;   // en haut : l'effet vient se poser dessous sans sortir de l'ecran
+      // 1920x1080 : on colle en haut pour que le bloc effet integre tienne dans l'ecran.
+      // Toute autre resolution garde le placement d'origine, aligne sur le resultat.
+      top=(innerWidth>760 && innerWidth<=1920) ? 8 : Math.max(8, Math.min(r.top, innerHeight-h-8));
       left=(lr.left-w-12 >= 8) ? lr.left-w-12 : Math.min(lr.right+12, innerWidth-w-8);
     }
     p.style.top=top+'px'; p.style.left=left+'px';
@@ -1883,22 +1896,12 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       // On cherche donc, DANS CET ORDRE : a gauche de la fiche objet, puis dessous,
       // puis dessus. Empiler d'abord menait a superposer les deux fiches quand la
       // hauteur manquait (constate en 1920x1080 sur un objet a longue description).
-      if(liste){ /* integre dans la fiche : rien a positionner */ }
-      else if(innerWidth<=760){
-        if(left-ew-12 >= 8){
-          _pe.style.left=(left-ew-12)+'px';
-          _pe.style.top=Math.max(8, Math.min(top, innerHeight-eh-8))+'px';
-        } else if(top+h+10+eh <= innerHeight-8){
-          _pe.style.left=Math.max(8, Math.min(left, innerWidth-ew-8))+'px';
-          _pe.style.top=(top+h+10)+'px';
-        } else if(top-eh-10 >= 8){
-          _pe.style.left=Math.max(8, Math.min(left, innerWidth-ew-8))+'px';
-          _pe.style.top=(top-eh-10)+'px';
-        } else {
-          // derniere chance : on colle a gauche de l'ecran, jamais par-dessus l'objet
-          _pe.style.left='8px';
-          _pe.style.top=Math.max(8, Math.min(top, innerHeight-eh-8))+'px';
-        }
+      if(liste && innerWidth>760 && innerWidth<=1920){
+        /* 1920x1080 : l'effet est integre dans la fiche, rien a positionner */
+      } else if(innerWidth<=760){
+        // pas la place de cotoyer : on empile sous la fiche objet, ou au-dessus
+        _pe.style.left=Math.max(8, Math.min(left, innerWidth-ew-8))+'px';
+        _pe.style.top=(top+h+10+eh<=innerHeight-8 ? top+h+10 : Math.max(8, top-eh-10))+'px';
       } else {
         var el2=(left-ew-12>=8)? left-ew-12 : Math.min(left+w+12, innerWidth-ew-8);
         _pe.style.left=el2+'px';
