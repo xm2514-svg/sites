@@ -50,6 +50,7 @@ OUT_ALL = os.path.join(RACINE, "items-all.json")
 # Les effets ont leur propre base, independante des objets : un fichier, une chose.
 OUT_EFF = os.path.join(RACINE, "effects.json")
 OUT_QST = os.path.join(os.path.dirname(OUT), "quests.json")
+OUT_DROP = os.path.join(os.path.dirname(OUT), "drops.json")
 SEUIL_ALL = 5000
 UA = {"User-Agent": "EQLegendsGuide/1.0 (+https://xm2514-svg.github.io/sites/)"}
 SEUIL_TITRES = 5000
@@ -75,10 +76,10 @@ def api(params):
             time.sleep(3 * (essai + 1))
 
 
-def titres():
+def titres(categorie="Category:Items"):
     out, cont = [], None
     while True:
-        p = {"action": "query", "list": "categorymembers", "cmtitle": "Category:Items",
+        p = {"action": "query", "list": "categorymembers", "cmtitle": categorie,
              "cmlimit": "500", "format": "json"}
         if cont:
             p["cmcontinue"] = cont
@@ -171,6 +172,46 @@ def _recolte(noms, out, suffixe):
                     cle = cle[:-len(suffixe)]
                 out[cle] = fiche
 
+
+
+def loot_du_mob(w):
+    """Le champ |known_loot d'une page de mob porte l'objet, sa rarete et le taux exact :
+
+        <li> {{:Blackened Alloy Coif}} <span class='drare'>(Rare)</span>
+             <span class='ddb'>[Overall: 15.0%]</span>
+
+    12/08/2026 : on a d'abord voulu prendre ces taux sur eqltools.com, qui les republie.
+    Ce site refuse les clients non-navigateur (403) et renvoie lui-meme vers eqlwiki :
+    "mobs, drops, and everything else the client can't legitimately give us". Autant lire
+    la source directement — c'est la meme API que le reste de ce script, sans blocage.
+    """
+    m = re.search(r"\|\s*known_loot\s*=(.*?)(?=\n\s*\|\s*[a-z_]+\s*=)", w, re.S)
+    if not m:
+        return []
+    out = []
+    for li in m.group(1).split("</li>"):
+        obj = re.search(r"\{\{:([^}|]+)", li)
+        if not obj:
+            continue
+        rar = re.search(r"'drare'>\(([^)]+)\)", li)
+        pct = re.search(r"Overall:\s*([\d.]+)%", li)
+        e = {"o": obj.group(1).strip()}
+        if rar:
+            e["r"] = rar.group(1)
+        if pct:
+            e["dr"] = pct.group(1) + "%"
+        out.append(e)
+    return out
+
+
+def niveau_et_loc(w):
+    """|level et |location d'une page de mob. location liste des couples (x, y)."""
+    # champ() ne s'arrete pas au champ suivant : on coupe a la premiere fin de ligne
+    lvl = (champ(w, "level").split("\n")[0].split("|")[0].strip() or None)
+    if lvl:
+        lvl = lvl[:12]
+    loc = re.findall(r"\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)", champ(w, "location"))
+    return lvl, [[int(x), int(y)] for x, y in loc[:4]]
 
 
 def usages(w):
@@ -303,6 +344,71 @@ def main():
             os.replace(tmp_q, OUT_QST)
             print("quests.json : %d objets avec un usage, %.0f Ko"
                   % (len(tous_quetes), os.path.getsize(OUT_QST) / 1024))
+
+    # --- base des taux de drop : QUI droppe QUOI, a quel taux (Category:NPCs, 8 184 pages)
+    try:
+        npcs = titres("Category:NPCs")
+        print("NPCs a balayer : %d" % len(npcs))
+    except Exception as e:
+        npcs = []
+        print("drops : liste des NPCs indisponible (%s)" % type(e).__name__)
+
+    par_objet = {}
+    for i in range(0, len(npcs), 50):
+        try:
+            d = api({"action": "query", "prop": "revisions", "rvprop": "content",
+                     "rvslots": "main", "format": "json", "titles": "|".join(npcs[i:i + 50])})
+        except Exception as e:
+            print("  drops : lot ignore (%s)" % e)
+            continue
+        for p in d["query"]["pages"].values():
+            if "revisions" not in p:
+                continue
+            w = p["revisions"][0]["slots"]["main"].get("*", "")
+            butin = loot_du_mob(w)
+            if not butin:
+                continue
+            lvl, loc = niveau_et_loc(w)
+            for e in butin:
+                ligne = {"m": p["title"]}
+                if lvl:
+                    ligne["lvl"] = lvl
+                if loc:
+                    ligne["loc"] = loc[0]
+                if e.get("dr"):
+                    ligne["dr"] = e["dr"]
+                if e.get("r"):
+                    ligne["r"] = e["r"]
+                par_objet.setdefault(e["o"], []).append(ligne)
+        if (i // 50) % 20 == 0:
+            print("  drops : %d/%d  ->  %d objets" % (i, len(npcs), len(par_objet)))
+
+    if par_objet:
+        # le meilleur taux connu d'abord : c'est ce que le lecteur veut voir
+        def cle(x):
+            try:
+                return -float(x.get("dr", "0").rstrip("%"))
+            except ValueError:
+                return 0.0
+        for o in par_objet:
+            par_objet[o] = sorted(par_objet[o], key=cle)[:8]
+        anc_d = 0
+        if os.path.exists(OUT_DROP):
+            try:
+                anc_d = len(json.load(open(OUT_DROP, encoding="utf-8")).get("drops", {}))
+            except Exception:
+                pass
+        if anc_d and len(par_objet) < anc_d * 0.8:
+            print("drops.json : chute suspecte (%d contre %d), fichier conserve"
+                  % (len(par_objet), anc_d))
+        else:
+            tmp_d = OUT_DROP + ".tmp"
+            json.dump({"source": "eqlwiki.com", "updated": date.today().isoformat(),
+                       "npcs": len(npcs), "drops": par_objet},
+                      open(tmp_d, "w", encoding="utf-8"), ensure_ascii=False)
+            os.replace(tmp_d, OUT_DROP)
+            print("drops.json : %d objets, %.0f Ko"
+                  % (len(par_objet), os.path.getsize(OUT_DROP) / 1024))
 
     anciens_eff = {}
     if os.path.exists(OUT_EFF):
