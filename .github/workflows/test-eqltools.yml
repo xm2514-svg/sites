@@ -1,0 +1,32 @@
+name: Test eqltools depuis un runner GitHub
+
+# Une seule question : un runner GitHub peut-il joindre eqltools.com, ou prend-il un 403
+# comme le sandbox de Claude ? La reponse decide de tout le montage des taux de drop :
+#   - si OUI  -> workflow nocturne comme update-items.yml, le Pixel ne sert a rien
+#   - si NON  -> le scraping doit tourner sur une connexion domestique (Termux ou PC)
+#
+# Lancement a la main depuis l'onglet Actions. Ne touche a aucun fichier du depot.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Index des 122 zones
+        run: |
+          echo "=== /atlas/zones/index.json ==="
+          curl -s -o /tmp/index.json -w "HTTP %{http_code}\n" \
+            -A "EQLegendsGuide/1.0 (+https://xm2514-svg.github.io/sites/)" \
+            https://eqltools.com/atlas/zones/index.json
+          echo "taille recue : $(wc -c < /tmp/index.json) octets"
+
+      - name: Une zone au hasard
+        run: |
+          echo "=== /atlas/wiki/runnyeye.json ==="
+          curl -s -o /tmp/zone.json -w "HTTP %{http_code}\n" \
+            -A "EQLegendsGuide/1.0 (+https://xm2514-svg.github.io/sites/)" \
+            https://eqltools.com/atlas/wiki/runnyeye.json
+          echo "taille recue : $(wc -c < /tmp/zone.json) octets"
+          head -c 200 /tmp/zone.json || true
