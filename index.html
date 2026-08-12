@@ -189,19 +189,17 @@
   .eqlink{color:#8fd0c0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
   /* ouvert depuis la recherche : l'effet vit DANS la fiche objet. Deux panneaux
      flottants finissaient toujours par se recouvrir sur un ecran donne. */
-  /* PALIER <= 1920 : l'effet est integre dans la fiche (pas la place a cote).
-     Au-dessus (3440) : bloc separe a gauche, style d'origine. */
-  @media (min-width: 761px) and (max-width: 1920px){
-  #eqpop #eqeff{position:static!important;left:auto!important;top:auto!important;
+  /* PALIER PAR RESOLUTION D'ECRAN (data-res pose au chargement) :
+       mobile <=760 · hd 761-1920 (effet integre, cadre bleu) · ultra >1920 (bloc a gauche) */
+  html[data-res="hd"] #eqpop #eqeff{position:static!important;left:auto!important;top:auto!important;
     display:block!important;max-width:none;width:auto;margin:9px 0 0;
     box-shadow:none;border:1px solid #3f6b62;border-radius:7px;
     background:rgba(111,214,196,.06);padding:8px 10px}
-    #eqpop #eqeff b{color:#8fd6c4!important;font-size:13.5px}
-    #eqpop #eqeff i{color:#8fd0c0;font-style:normal;display:block;margin-top:5px}
-    #eqpop #eqeff u{color:#7f9a92;text-decoration:none;display:block;margin-top:6px;
-      padding-top:5px;border-top:1px solid #2f4a44;font-size:11px}
-    #eqpop{max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain}
-  }
+  html[data-res="hd"] #eqpop #eqeff b{color:#8fd6c4!important;font-size:13.5px}
+  html[data-res="hd"] #eqpop #eqeff i{color:#8fd0c0;font-style:normal;display:block;margin-top:5px}
+  html[data-res="hd"] #eqpop #eqeff u{color:#7f9a92;text-decoration:none;display:block;
+    margin-top:6px;padding-top:5px;border-top:1px solid #2f4a44;font-size:11px}
+  html[data-res="hd"] #eqpop{max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain}
   .eqlink:hover{color:#b9e6da}
   #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
   #eqres .tag{font-size:9.5px;color:#0e0c0a;background:#8a7a5a;border-radius:3px;padding:1px 4px;vertical-align:1px}
@@ -224,6 +222,7 @@
   .tip[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:0;top:150%;z-index:60;white-space:normal;width:max-content;max-width:340px;background:#0d0b07;color:#f0d68a;border:1px solid #c8a83a;border-radius:6px;padding:5px 9px;font-size:12px;font-weight:400;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.65);pointer-events:none}
 @media(max-width:760px){body{font-size:16px;line-height:1.55}nav{font-size:14px}.wrap{padding:14px 14px 60px}table{font-size:15px}.zoomhint{font-size:14px}#kofiBtn,#langToggle,#kofi,#lang{font-size:13.5px}}</style>
 </head>
+<script>document.documentElement.dataset.res=(screen.width<=760?"mobile":screen.width<=1920?"hd":"ultra");</script>
 <body>
 <div class="wrap">
 
@@ -1871,7 +1870,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var _pe0=document.getElementById('eqeff');
     if(_pe0){
       // FUSION RESERVEE AU 1920x1080 : ailleurs, on ne touche a rien.
-      if(_liste0 && _pe0.style.display!=='none' && innerWidth>760 && innerWidth<=1920){ p.appendChild(_pe0); }
+      if(_liste0 && _pe0.style.display!=='none' && screen.width>760 && screen.width<=1920){ p.appendChild(_pe0); }
       else if(_pe0.parentNode===p){ document.body.appendChild(_pe0); }
     }
     p.style.display='block';
@@ -1884,7 +1883,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       var lr=liste.getBoundingClientRect();
       // 1920x1080 : on colle en haut pour que le bloc effet integre tienne dans l'ecran.
       // Toute autre resolution garde le placement d'origine, aligne sur le resultat.
-      top=(innerWidth>760 && innerWidth<=1920) ? 8 : Math.max(8, Math.min(r.top, innerHeight-h-8));
+      top=(screen.width>760 && screen.width<=1920) ? 8 : Math.max(8, Math.min(r.top, innerHeight-h-8));
       left=(lr.left-w-12 >= 8) ? lr.left-w-12 : Math.min(lr.right+12, innerWidth-w-8);
     }
     p.style.top=top+'px'; p.style.left=left+'px';
@@ -1896,7 +1895,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       // On cherche donc, DANS CET ORDRE : a gauche de la fiche objet, puis dessous,
       // puis dessus. Empiler d'abord menait a superposer les deux fiches quand la
       // hauteur manquait (constate en 1920x1080 sur un objet a longue description).
-      if(liste && innerWidth>760 && innerWidth<=1920){
+      if(liste && screen.width>760 && screen.width<=1920){
         /* 1920x1080 : l'effet est integre dans la fiche, rien a positionner */
       } else if(innerWidth<=760){
         // pas la place de cotoyer : on empile sous la fiche objet, ou au-dessus
