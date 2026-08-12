@@ -187,6 +187,11 @@
   #eqres .s{color:#a89a86;font-size:11px;line-height:1.35;margin-top:2px}
   #eqres .z{color:#8fd0c0;font-size:11px;margin-top:1px}
   .eqlink{color:#8fd0c0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+  /* ouvert depuis la recherche : l'effet vit DANS la fiche objet. Deux panneaux
+     flottants finissaient toujours par se recouvrir sur un ecran donne. */
+  #eqpop #eqeff{position:static!important;left:auto!important;top:auto!important;
+    display:block!important;max-width:none;width:auto;margin:8px 0 0;border:0;
+    border-top:1px solid #2f4a44;box-shadow:none;padding:8px 0 0}
   .eqlink:hover{color:#b9e6da}
   #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
   #eqres .tag{font-size:9.5px;color:#0e0c0a;background:#8a7a5a;border-radius:3px;padding:1px 4px;vertical-align:1px}
@@ -1851,6 +1856,13 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       });
     }
     sp.appendChild(document.createTextNode('maj '+data.updated));
+    // ouvert depuis la recherche : on fusionne l'effet dans la fiche, un seul panneau
+    var _liste0=el.closest && el.closest('#eqres');
+    var _pe0=document.getElementById('eqeff');
+    if(_pe0){
+      if(_liste0 && _pe0.style.display!=='none'){ p.appendChild(_pe0); }
+      else if(_pe0.parentNode===p){ document.body.appendChild(_pe0); }
+    }
     p.style.display='block';
     var r=el.getBoundingClientRect(), h=p.offsetHeight, w=p.offsetWidth;
     var top=r.bottom+8; if(top+h>innerHeight-8) top=Math.max(8,r.top-h-8);
@@ -1871,7 +1883,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       // On cherche donc, DANS CET ORDRE : a gauche de la fiche objet, puis dessous,
       // puis dessus. Empiler d'abord menait a superposer les deux fiches quand la
       // hauteur manquait (constate en 1920x1080 sur un objet a longue description).
-      if(innerWidth<=760 || liste){
+      if(liste){ /* integre dans la fiche : rien a positionner */ }
+      else if(innerWidth<=760){
         if(left-ew-12 >= 8){
           _pe.style.left=(left-ew-12)+'px';
           _pe.style.top=Math.max(8, Math.min(top, innerHeight-eh-8))+'px';
