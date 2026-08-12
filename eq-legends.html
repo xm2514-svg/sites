@@ -1867,11 +1867,25 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var _pe=document.getElementById('eqeff');
     if(_pe && _pe.style.display==='block'){
       var ew=_pe.offsetWidth, eh=_pe.offsetHeight;
-      // ouvert depuis la recherche : a droite de la fiche objet on recouvrirait la liste
-      // de resultats (constate en 1920x1080). On empile, comme en mobile.
+      // ouvert depuis la recherche : la droite est occupee par la liste de resultats.
+      // On cherche donc, DANS CET ORDRE : a gauche de la fiche objet, puis dessous,
+      // puis dessus. Empiler d'abord menait a superposer les deux fiches quand la
+      // hauteur manquait (constate en 1920x1080 sur un objet a longue description).
       if(innerWidth<=760 || liste){
-        _pe.style.left=Math.max(8, Math.min(left, innerWidth-ew-8))+'px';
-        _pe.style.top=(top+h+10+eh<=innerHeight-8 ? top+h+10 : Math.max(8, top-eh-10))+'px';
+        if(left-ew-12 >= 8){
+          _pe.style.left=(left-ew-12)+'px';
+          _pe.style.top=Math.max(8, Math.min(top, innerHeight-eh-8))+'px';
+        } else if(top+h+10+eh <= innerHeight-8){
+          _pe.style.left=Math.max(8, Math.min(left, innerWidth-ew-8))+'px';
+          _pe.style.top=(top+h+10)+'px';
+        } else if(top-eh-10 >= 8){
+          _pe.style.left=Math.max(8, Math.min(left, innerWidth-ew-8))+'px';
+          _pe.style.top=(top-eh-10)+'px';
+        } else {
+          // derniere chance : on colle a gauche de l'ecran, jamais par-dessus l'objet
+          _pe.style.left='8px';
+          _pe.style.top=Math.max(8, Math.min(top, innerHeight-eh-8))+'px';
+        }
       } else {
         var el2=(left-ew-12>=8)? left-ew-12 : Math.min(left+w+12, innerWidth-ew-8);
         _pe.style.left=el2+'px';
