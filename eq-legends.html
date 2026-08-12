@@ -1814,8 +1814,10 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var us=(window.__eqUsages||{})[nom];
     if(us){
       var l=[];
+      if(us.n) l.push(us.n);                                   // a quoi sert l'objet
       if(us.q) l.push('Quest: '+us.q.join(' · '));
       if(us.r) l.push('Recipe: '+us.r.join(' · '));
+      if(us.c) l.push('Crafted: '+us.c.join(' · '));         // fabrication joueur
       var du=document.createElement('span'); du.className='usage';
       du.textContent=l.join('\n');
       // une quete epique a son chapitre dans le guide : on y renvoie depuis la fiche
@@ -1999,9 +2001,16 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   // base des effets : fichier independant, 3 Ko aujourd'hui
   fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
     .then(function(e){ window.__eqEffets=e.effects||{}; liseres(); if(window.__eqRecherche) window.__eqRecherche(); }).catch(function(){});
-  // base des usages : a quoi sert un objet sans stat (quete, recherche, craft)
-  fetch('quests.json',{cache:'no-cache'}).then(function(r){return r.json();})
-    .then(function(u){ window.__eqUsages=u.uses||{}; liseres(); }).catch(function(){});
+  // base des usages : a quoi sert un objet sans stat (quete, recherche, craft).
+  // 856 Ko depuis le rescrape du 12/08/2026 (8 315 objets contre 123) : on ne bloque
+  // plus le premier rendu avec, on la charge une fois la page affichee.
+  addEventListener('load',function(){
+    setTimeout(function(){
+      fetch('quests.json',{cache:'no-cache'}).then(function(r){return r.json();})
+        .then(function(u){ window.__eqUsages=u.uses||{}; liseres();
+          if(window.__eqRecherche) window.__eqRecherche(); }).catch(function(){});
+    },200);
+  });
   // Le marquage doit attendre que TOUT le document soit analyse. items.json fait 43 Ko,
   // la page 4,3 Mo : la reponse arrivait presque toujours avant la fin de l'analyse, et
   // marque() ne voyait que les premieres sections. Le garde-fou data-eqdone interdisait

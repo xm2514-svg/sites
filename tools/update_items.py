@@ -177,15 +177,28 @@ def usages(w):
     """A quoi sert l'objet : quetes liees et recettes. Deux champs que le wiki remplit
     sur la fiche objet et que l'on ignorait — c'est la seule information utile pour les
     35 % d'objets sans aucune stat (cles, composants, pages de recherche)."""
+    # 12/08/2026 : |relatedquests et |recipes ne sont remplis que sur 123 objets sur
+    # 10 855. L'information vit en fait dans |notes et |playercrafted — sans eux,
+    # Celestial Temper n'affichait que son poids et sa taille alors que sa page dit
+    # a quoi il sert et comment on le fabrique.
+    def lignes(nom):
+        v = _nettoie(nettoie(champ(w, nom)))
+        v = re.sub(r"\{\{[^{}\n]*(\}\})?", "", v)   # {{SmIcon|1015}} — nettoie() a deja mange les }}
+        return [x for x in (re.sub(r"\s+", " ", y.strip(" *:'")) for y in v.split("\n")) if x]
+
     out = {}
-    q = [re.sub(r"\s+", " ", x).strip(" *")
-         for x in _nettoie(nettoie(champ(w, "relatedquests"))).split("\n") if x.strip(" *")]
-    r = [re.sub(r"\s+", " ", x).strip(" *")
-         for x in _nettoie(nettoie(champ(w, "recipes"))).split("\n") if x.strip(" *")]
+    q = lignes("relatedquests")
+    r = lignes("recipes")
+    n = lignes("notes")
+    c = lignes("playercrafted")
     if q:
         out["q"] = q[:6]
     if r:
         out["r"] = r[:6]
+    if n:
+        out["n"] = " ".join(n)[:300]
+    if c:
+        out["c"] = c[:8]
     return out
 
 
