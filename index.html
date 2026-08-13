@@ -2178,7 +2178,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
   place(); addEventListener('resize',place);
 
   var ZONES={'Befallen':'fl-befallen','Najena':'fl-najena','Upper Guk':'fl-uguk',
-             'Lower Guk':'fl-lguk','Crushbone':'fl-cb','Splitpaw':'fl-splitpaw','Unrest':'fl-unrest'};
+             'Lower Guk':'fl-lguk','Crushbone':'fl-cb','Splitpaw':'fl-splitpaw','Unrest':'fl-unrest',
+'The Hole':'fl-hole','Plane of Fear':'fl-fear','Plane of Hate':'fl-hate','Plane of Sky':'fl-sky'};
   function l1(s){var a=(s||'').split('\n').filter(function(x){return x.trim();});return a[0]||'';}
   function src(s){return (s||'').split('\n').filter(function(x){return x.trim();})
     .map(function(x){return x.replace(/^\*\s*/,'');}).join(' · ');}
