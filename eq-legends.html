@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EQ Legends Guide — Item Merging, Motes, Maps &amp; Trio 1–50</title>
-<meta name="description" content="EverQuest Legends guide — item merging, Motes of Potential, spell upgrading and zone difficulty explained, plus 8 annotated dungeon maps with entrances, traps and key chains, named farm loops and a full loot database for the Paladin / Monk / Shaman trio, level 1-50. Free, no ads. English, French &amp; German.">
+<meta name="description" content="EverQuest Legends guide — item merging, Motes of Potential, spell upgrading and zone difficulty explained, plus 12 annotated dungeon maps with entrances, traps and key chains, named farm loops and a full loot database for the Paladin / Monk / Shaman trio, level 1-50. Free, no ads. English, French &amp; German.">
 <link rel="canonical" href="https://xm2514-svg.github.io/sites/">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/icon_32.png">
@@ -13,19 +13,19 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="EQ Legends Guide">
 <meta property="og:title" content="EQ Legends Guide — Item Merging, Motes, Maps &amp; Trio 1–50">
-<meta property="og:description" content="EverQuest Legends guide — item merging, Motes of Potential, spell upgrading and zone difficulty explained, plus 8 annotated dungeon maps with entrances, traps and key chains, named farm loops and a full loot database for the Paladin / Monk / Shaman trio, level 1-50. Free, no ads. English, French &amp; German.">
+<meta property="og:description" content="EverQuest Legends guide — item merging, Motes of Potential, spell upgrading and zone difficulty explained, plus 12 annotated dungeon maps with entrances, traps and key chains, named farm loops and a full loot database for the Paladin / Monk / Shaman trio, level 1-50. Free, no ads. English, French &amp; German.">
 <meta property="og:url" content="https://xm2514-svg.github.io/sites/">
 <meta property="og:image" content="https://xm2514-svg.github.io/sites/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="EQ Legends Guide — Item Merging, Motes, Maps &amp; Trio 1–50">
-<meta name="twitter:description" content="EverQuest Legends guide — item merging, Motes of Potential, spell upgrading and zone difficulty explained, plus 8 annotated dungeon maps with entrances, traps and key chains, named farm loops and a full loot database for the Paladin / Monk / Shaman trio, level 1-50. Free, no ads. English, French &amp; German.">
+<meta name="twitter:description" content="EverQuest Legends guide — item merging, Motes of Potential, spell upgrading and zone difficulty explained, plus 12 annotated dungeon maps with entrances, traps and key chains, named farm loops and a full loot database for the Paladin / Monk / Shaman trio, level 1-50. Free, no ads. English, French &amp; German.">
 <meta name="twitter:image" content="https://xm2514-svg.github.io/sites/og-image.jpg">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Article",
 "headline":"EQ Legends Guide — Item Merging, Motes, Maps and the Paladin/Monk/Shaman Trio",
-"description":"EverQuest Legends guide — item merging, Motes of Potential, spell upgrading and zone difficulty explained, plus 8 annotated dungeon maps with entrances, traps and key chains, named farm loops and a full loot database for the Paladin / Monk / Shaman trio, level 1-50. Free, no ads. English, French &amp; German.",
+"description":"EverQuest Legends guide — item merging, Motes of Potential, spell upgrading and zone difficulty explained, plus 12 annotated dungeon maps with entrances, traps and key chains, named farm loops and a full loot database for the Paladin / Monk / Shaman trio, level 1-50. Free, no ads. English, French &amp; German.",
 "image":"https://xm2514-svg.github.io/sites/og-image.jpg","url":"https://xm2514-svg.github.io/sites/eq-legends.html",
 "datePublished":"2026-07-18","dateModified":"2026-08-04",
 "inLanguage":["en","fr","de"],
@@ -2209,7 +2209,12 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var base=data.items, horsGuide={};
     if(tout){ for(var k in tout){ if(!(k in base)) horsGuide[k]=tout[k]; } }
     var noms=Object.keys(base).concat(Object.keys(horsGuide));
-    function fiche(n){ return base[n] || horsGuide[n]; }
+    var ZONES_CARTOGRAPHIEES=["Befallen","Najena","Estate of Unrest","Crushbone","Splitpaw",
+"Upper Guk","Lower Guk","The Hole","Plane of Fear","Plane of Hate","Plane of Sky"];
+function zoneCartographiee(o){ if(!o||!o.d) return false;
+  for(var z=0;z<ZONES_CARTOGRAPHIEES.length;z++) if(o.d.indexOf(ZONES_CARTOGRAPHIEES[z])>=0) return true;
+  return false; }
+function fiche(n){ return base[n] || horsGuide[n]; }
     var hits=noms.filter(function(n){
       return n.toLowerCase().indexOf(q)>=0 || src(fiche(n).d).toLowerCase().indexOf(q)>=0;
     }).sort(function(a,b){
@@ -2224,7 +2229,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     }else{
       res.innerHTML=hits.map(function(n){
         var e=n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-        var hors=!(n in base);
+        var hors=!(n in base) && !zoneCartographiee(fiche(n));
         // meme calcul que liseres() : effet documente -> proc, objet de quete -> quete
         var _it=fiche(n), _c='';
         var _m=/Effect:\s*([^(\n]+?)\s*\(/.exec((_it&&_it.s)||'');
