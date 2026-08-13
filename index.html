@@ -1679,7 +1679,7 @@ f();addEventListener('resize',f);addEventListener('load',f);})();
 <button id="mvout" title="Zoom out">&minus;</button>
 <button id="mvfit">Fit</button>
 <button id="mvin" title="Zoom in">+</button>
-<button id="mvback" title="Close and go to this map in the guide">&#8618; Guide</button><button id="mvcls" title="Close">&times;</button>
+<button id="mvback" title="Close and go to this map in the guide" style="display:none">&#8618; Guide</button><button id="mvcls" title="Close">&times;</button>
 </div><div id="mvbox"></div></div>
 <script>
 (function(){
@@ -1687,7 +1687,7 @@ var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=nu
 var lgbox=document.createElement('div');lgbox.id='mvlg';mv.appendChild(lgbox);
 function fit(){if(!cur)return;if(cur.dataset&&cur.dataset.vb0)cur.setAttribute('viewBox',cur.dataset.vb0);var vb=(cur.getAttribute('viewBox')||'0 0 1 1').split(/[ ,]+/).map(Number);var ratio=(vb[2]&&vb[3])?vb[2]/vb[3]:1;var aw=box.clientWidth-20, ah=box.clientHeight-20;w=Math.max(80,Math.min(aw,ah*ratio));cur.style.width=w+'px';box.scrollTop=0;box.scrollLeft=0;}
 function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.width=w+'px';}
-function show(svg){srcSvg=svg;box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
+function show(svg){srcSvg=svg;var _b=document.getElementById('mvback'); if(_b) _b.style.display=window.__eqExterne?'':'none';window.__eqExterne=false;box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
   if(svg.dataset&&svg.dataset.vb0){cur.dataset.vb0=svg.dataset.vb0;cur.setAttribute('viewBox',svg.dataset.vb0);}
   cur.classList.remove('mapz');box.appendChild(cur);
   var lg=svg.nextElementSibling;
@@ -1713,6 +1713,7 @@ document.querySelectorAll('svg').forEach(function(s){
 function eqDepuisHash(){
   var m=/^#named=(.+)$/.exec(location.hash||'');
   if(!m) return;
+  window.__eqExterne=true;
   var k=decodeURIComponent(m[1].replace(/\+/g,' '));
   if(window.eqShowNamed) window.eqShowNamed(k);
 }
