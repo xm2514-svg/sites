@@ -1679,15 +1679,15 @@ f();addEventListener('resize',f);addEventListener('load',f);})();
 <button id="mvout" title="Zoom out">&minus;</button>
 <button id="mvfit">Fit</button>
 <button id="mvin" title="Zoom in">+</button>
-<button id="mvcls">&times;</button>
+<button id="mvback" title="Close and go to this map in the guide">&#8618; Guide</button><button id="mvcls" title="Close">&times;</button>
 </div><div id="mvbox"></div></div>
 <script>
 (function(){
-var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=null,w=0;
+var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=null,w=0,srcSvg=null;
 var lgbox=document.createElement('div');lgbox.id='mvlg';mv.appendChild(lgbox);
 function fit(){if(!cur)return;if(cur.dataset&&cur.dataset.vb0)cur.setAttribute('viewBox',cur.dataset.vb0);var vb=(cur.getAttribute('viewBox')||'0 0 1 1').split(/[ ,]+/).map(Number);var ratio=(vb[2]&&vb[3])?vb[2]/vb[3]:1;var aw=box.clientWidth-20, ah=box.clientHeight-20;w=Math.max(80,Math.min(aw,ah*ratio));cur.style.width=w+'px';box.scrollTop=0;box.scrollLeft=0;}
 function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.width=w+'px';}
-function show(svg){box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
+function show(svg){srcSvg=svg;box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
   if(svg.dataset&&svg.dataset.vb0){cur.dataset.vb0=svg.dataset.vb0;cur.setAttribute('viewBox',svg.dataset.vb0);}
   cur.classList.remove('mapz');box.appendChild(cur);
   var lg=svg.nextElementSibling;
@@ -1747,6 +1747,11 @@ document.getElementById('mvin').onclick=function(){zoom(1.4);};
 document.getElementById('mvout').onclick=function(){zoom(1/1.4);};
 document.getElementById('mvfit').onclick=fit;
 document.getElementById('mvcls').onclick=close;
+document.getElementById('mvback').onclick=function(){ close();
+  var t=srcSvg; if(!t) return;
+  var h3=t.parentElement; while(h3 && !(h3.tagName==='H3'||h3.previousElementSibling&&h3.previousElementSibling.tagName==='H3')) h3=h3.parentElement;
+  var cible=(h3&&h3.previousElementSibling&&h3.previousElementSibling.tagName==='H3')?h3.previousElementSibling:t;
+  cible.scrollIntoView({block:'start'}); };
 mv.addEventListener('click',function(e){if(e.target===mv||e.target===box)close();});
 addEventListener('keydown',function(e){if(e.key==='Escape')close();});
 // --- zoom dans la visionneuse : molette (PC), pincement (mobile), glisser pour deplacer
