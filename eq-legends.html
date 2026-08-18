@@ -187,6 +187,9 @@
   #eqres .s{color:#a89a86;font-size:11px;line-height:1.35;margin-top:2px}
   #eqres .z{color:#8fd0c0;font-size:11px;margin-top:1px}
   .eqlink{color:#8fd0c0;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.eqmap{color:#f4d585;font-weight:bold;text-decoration:underline;text-underline-offset:2px;text-decoration-color:#c8a83a;cursor:pointer;padding:0 2px;border-radius:3px}
+.eqmap:hover{background:rgba(200,168,58,.18)}
+#eqpop .aide{display:block;margin-top:6px;color:#c8a83a;font-size:11px;font-style:italic}
   /* ouvert depuis la recherche : l'effet vit DANS la fiche objet. Deux panneaux
      flottants finissaient toujours par se recouvrir sur un ecran donne. */
   /* PALIER PAR RESOLUTION D'ECRAN (data-res pose au chargement) :
@@ -1989,8 +1992,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         if(!nm) return;
         var pastille=window.eqPastille?window.eqPastille(nm):null;
         if(pastille){
-          var a=document.createElement('span'); a.className='eqlink'; a.textContent=nm;
-          a.title='Show on map';
+          var a=document.createElement('span'); a.className='eqmap';
+          a.textContent='\uD83D\uDDFA '+nm;
+          a.title='Show on the map where it drops';
           a.onclick=function(ev){ ev.stopPropagation();
             if(window.eqShowNamed) window.eqShowNamed(pastille||nm); };
           sp.appendChild(a);
@@ -2001,6 +2005,17 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       });
     }
     sp.appendChild(document.createTextNode('maj '+data.updated));
+    // On le dit : sans mention, personne ne devine que le nom en or ouvre la carte.
+    if(sp.querySelector('.eqmap')){
+      var _lg=(document.documentElement.getAttribute('data-lang')||'en');
+      var aide=document.createElement('span');
+      aide.className='aide';
+      aide.textContent = _lg==='fr' ? 'Cliquez le nom en or : la carte s\u2019ouvre sur l\u2019endroit ou il loot'
+        : _lg==='de' ? 'Auf den goldenen Namen klicken \u2014 die Karte zeigt die Fundstelle'
+        : _lg==='es' ? 'Haz clic en el nombre dorado: el mapa muestra donde suelta'
+        : 'Click the gold name \u2014 the map opens where it drops';
+      sp.appendChild(aide);
+    }
     // ouvert depuis la recherche : on fusionne l'effet dans la fiche, un seul panneau
     var _liste0=el.closest && el.closest('#eqres');
     var _pe0=document.getElementById('eqeff');
