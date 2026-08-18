@@ -1733,7 +1733,55 @@ function show(svg){srcSvg=svg;var _b=document.getElementById('mvback'); if(_b) _
   while(lg && !(lg.classList && lg.classList.contains('maplegend'))) lg=lg.nextElementSibling;
   lgbox.innerHTML=''; lgbox.style.display='none';
   if(lg){var c=lg.cloneNode(true);c.classList.remove('reveal');c.style.opacity='1';c.style.transform='none';c.querySelectorAll('.tip[data-tip]').forEach(function(t){t.title=t.getAttribute('data-tip');});c.style.margin='0';c.style.border='0';c.style.background='none';
-    lgbox.appendChild(c); lgbox.style.display='block';}
+    lgbox.appendChild(c); lgbox.style.display='block';
+    // Les numeros de la legende deviennent des reperes : un appui allume la pastille
+    // correspondante sur le plan affiche. Sans ca il fallait la chercher a l'oeil.
+    c.querySelectorAll('.lg').forEach(function(sp){
+      var t=(sp.textContent||'').trim();
+      if(!/^[\u2460-\u2473]$/.test(t)) return;      // ① a ⑳ seulement, pas "Loot by pin"
+      var num=t.charCodeAt(0)-0x245F;                  // ① = 1
+      sp.style.cursor='pointer';
+      sp.title='Show pin '+num;
+      sp.addEventListener('click',function(ev){
+        ev.stopPropagation();
+        if(!cur) return;
+        var vise=null;
+        cur.querySelectorAll('g.np').forEach(function(g){
+          var tx=g.querySelector('text');
+          if(tx && (tx.textContent||'').trim()===String(num)) vise=g;
+        });
+        if(!vise) return;
+        cur.querySelectorAll('g.np').forEach(function(g){ g.classList.remove('eqon'); });
+        vise.classList.add('eqon');
+        var ce=vise.querySelector('circle');
+        if(ce){
+          var halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
+          halo.setAttribute('cx',ce.getAttribute('cx'));
+          halo.setAttribute('cy',ce.getAttribute('cy'));
+          halo.setAttribute('r',ce.getAttribute('r'));
+          halo.setAttribute('fill','none');
+          halo.setAttribute('stroke','#f4d585');
+          halo.setAttribute('stroke-width','3');
+          halo.setAttribute('opacity','0.95');
+          var an=document.createElementNS('http://www.w3.org/2000/svg','animate');
+          an.setAttribute('attributeName','r');
+          an.setAttribute('from',ce.getAttribute('r'));
+          an.setAttribute('to',String(parseFloat(ce.getAttribute('r'))*4));
+          an.setAttribute('dur','1.1s'); an.setAttribute('repeatCount','3');
+          var op=document.createElementNS('http://www.w3.org/2000/svg','animate');
+          op.setAttribute('attributeName','opacity');
+          op.setAttribute('from','0.95'); op.setAttribute('to','0');
+          op.setAttribute('dur','1.1s'); op.setAttribute('repeatCount','3');
+          halo.appendChild(an); halo.appendChild(op);
+          vise.appendChild(halo);
+          setTimeout(function(){ if(halo.parentNode) halo.parentNode.removeChild(halo); },3400);
+        }
+        // on amene la pastille au centre de la zone visible
+        var b=vise.getBoundingClientRect(), z=box.getBoundingClientRect();
+        box.scrollLeft += (b.left+b.width/2) - (z.left+z.width/2);
+        box.scrollTop  += (b.top+b.height/2) - (z.top+z.height/2);
+      });
+    });}
   /* Telephone : la legende est masquee en plein ecran ; un appui sur un named ferme la
      carte et amene a la legende du loot de cette zone, mise en evidence. */
   if(box.clientWidth<760&&lg){
