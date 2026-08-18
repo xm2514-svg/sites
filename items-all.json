@@ -44273,6 +44273,10 @@
   "Scintillating Bracer of Protection": {
    "s": "MAGIC ITEM LORE ITEM NO DROP\nSlot: WRIST\nAC: 9\nSTR: +3 DEX: +3 WIS: +2\nSV FIRE: +8 SV DISEASE: +8 SV COLD: +8 SV MAGIC: +8 SV POISON: +8\nWT: 2.5 Size: MEDIUM\nClass: ROG\nRace: ALL except IKS",
    "d": ""
+  },
+  "Copper Ring": {
+   "s": "Slot: FINGER\nSTA: +1 CHA: -1\nWT: 0.1 Size: TINY\nClass: ALL\nRace: ALL",
+   "d": "Befallen\n* Gynok Moltor"
   }
  }
 }
