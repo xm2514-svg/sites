@@ -1770,6 +1770,17 @@ function eqDepuisHash(){
 addEventListener('load', function(){ setTimeout(eqDepuisHash, 350); });
 addEventListener('hashchange', eqDepuisHash);
 // ouvre la carte contenant un named et fait pulser sa pastille
+window.eqPastille=function(nom){
+  if(!nom) return null;
+  var e=document.querySelector('[data-named="'+String(nom).replace(/"/g,'')+'"]');
+  if(e) return e.getAttribute('data-named');
+  var norm=function(s){ return String(s).toLowerCase().replace(/^(the|a|an)\s+/,'').trim(); };
+  var cible=norm(nom), l=document.querySelectorAll('[data-named]');
+  for(var i=0;i<l.length;i++){
+    if(norm(l[i].getAttribute('data-named'))===cible) return l[i].getAttribute('data-named');
+  }
+  return null;
+};
 window.eqShowNamed=function(key){
   // On part sur la carte : l'infobulle de l'objet et celle de son effet n'ont plus lieu
   // d'etre, elles resteraient posees par-dessus le plan.
@@ -1777,21 +1788,10 @@ window.eqShowNamed=function(key){
     var e=document.getElementById(id);
     if(e) e.style.display='none';
   });
+  key=window.eqPastille(key)||key;
   var svgs=document.querySelectorAll('svg'), src=null, i;
   for(i=0;i<svgs.length;i++){ if(svgs[i].querySelector('[data-named="'+key+'"]')){src=svgs[i];break;} }
-  // La provenance d'un objet ecrit "a boogeyman", la pastille "A Boogeyman" :
-  // sans ce rattrapage a la casse pres, 59 objets ne trouvaient pas leur carte.
-  if(!src){
-    var bas=key.toLowerCase();
-    for(i=0;i<svgs.length && !src;i++){
-      var l=svgs[i].querySelectorAll('[data-named]');
-      for(var j=0;j<l.length;j++){
-        if((l[j].getAttribute('data-named')||'').toLowerCase()===bas){
-          key=l[j].getAttribute('data-named'); src=svgs[i]; break;
-        }
-      }
-    }
-  }
+
   if(!src) return false;
   show(src);
   var t=cur.querySelector('[data-named="'+key+'"]');
@@ -1987,12 +1987,12 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       it.d.split('\n').forEach(function(ligne){
         var nm=ligne.replace(/^\s*\*\s*/,'').trim();
         if(!nm) return;
-        var pastille=document.querySelector('[data-named="'+nm.replace(/"/g,'')+'"]');
+        var pastille=window.eqPastille?window.eqPastille(nm):null;
         if(pastille){
           var a=document.createElement('span'); a.className='eqlink'; a.textContent=nm;
           a.title='Show on map';
           a.onclick=function(ev){ ev.stopPropagation();
-            if(window.eqShowNamed) window.eqShowNamed(nm); };
+            if(window.eqShowNamed) window.eqShowNamed(pastille||nm); };
           sp.appendChild(a);
         } else {
           sp.appendChild(document.createTextNode(nm));
