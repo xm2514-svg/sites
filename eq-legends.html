@@ -1758,6 +1758,21 @@ mv.addEventListener('click',function(e){if(e.target===mv||e.target===box)close()
 addEventListener('keydown',function(e){if(e.key==='Escape')close();});
 // --- zoom dans la visionneuse : molette (PC), pincement (mobile), glisser pour deplacer
 box.style.touchAction='none';
+    /* glisser a la souris : sans lui, une carte zoomee ne se deplace qu'a la barre
+       de defilement. Le pincement tactile est gere plus bas, separement. */
+    (function(){ var gl=false,gx=0,gy=0,sl=0,stp=0;
+      box.style.cursor='grab';
+      box.addEventListener('mousedown',function(e){
+        if(e.button!==0) return;
+        gl=true; gx=e.clientX; gy=e.clientY; sl=box.scrollLeft; stp=box.scrollTop;
+        box.style.cursor='grabbing'; e.preventDefault(); });
+      window.addEventListener('mousemove',function(e){
+        if(!gl) return;
+        box.scrollLeft = sl-(e.clientX-gx);
+        box.scrollTop  = stp-(e.clientY-gy); });
+      window.addEventListener('mouseup',function(){
+        if(gl){ gl=false; box.style.cursor='grab'; } });
+    })();
 function zoomAt(f,cx,cy){
   if(!cur)return;
   var r=box.getBoundingClientRect();
