@@ -1747,8 +1747,9 @@ function show(svg){srcSvg=svg;var _b=document.getElementById('mvback'); if(_b) _
         if(!cur) return;
         var vise=null;
         cur.querySelectorAll('g.np').forEach(function(g){
-          var tx=g.querySelector('text');
-          if(tx && (tx.textContent||'').trim()===String(num)) vise=g;
+          g.querySelectorAll('text').forEach(function(tx){
+            if((tx.textContent||'').trim()===String(num)) vise=g;
+          });
         });
         if(!vise) return;
         cur.querySelectorAll('g.np').forEach(function(g){ g.classList.remove('eqon'); });
