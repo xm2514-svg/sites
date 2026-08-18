@@ -209,7 +209,7 @@
   html[data-res="hd"] #eqpop #eqeff u{color:#7f9a92;text-decoration:none;display:block;
     margin-top:6px;padding-top:5px;border-top:1px solid #2f4a44;font-size:11px}
   html[data-res="hd"] #eqpop{max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain}
-@media(hover:hover){#eqpop,#eqeff{pointer-events:none}#eqpop .eqlink,#eqpop .eqmap,#eqpop a,#eqeff a{pointer-events:auto}}
+@media(hover:hover){#eqpop,#eqeff{pointer-events:auto}}
   .eqlink:hover{color:#b9e6da}
   #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
   #eqres .tag{font-size:9.5px;color:#0e0c0a;background:#8a7a5a;border-radius:3px;padding:1px 4px;vertical-align:1px}
@@ -2201,8 +2201,22 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         var t=e.target.closest? e.target.closest('.eqi'):null;
         if(t) montre(t,t.getAttribute('data-eq'));
       });
+      // On ne ferme pas si le curseur part VERS l'infobulle : c'est le seul moyen
+      // d'atteindre le lien de carte. Xavier, 18/08/2026 — a la souris on ne peut pas
+      // se teleporter sur le lien, il faut y aller, et l'ancien mouseout fermait en route.
+      var versPop=function(e){
+        var v=e.relatedTarget;
+        return !!(v && v.closest && v.closest('#eqpop,#eqeff'));
+      };
       document.addEventListener('mouseout',function(e){
-        if(e.target.closest && e.target.closest('.eqi')) cache();
+        if(e.target.closest && e.target.closest('.eqi') && !versPop(e)) cache();
+      });
+      // et on ferme quand on quitte l'infobulle sans revenir sur l'objet
+      document.addEventListener('mouseout',function(e){
+        if(!e.target.closest || !e.target.closest('#eqpop,#eqeff')) return;
+        var v=e.relatedTarget;
+        if(v && v.closest && (v.closest('#eqpop,#eqeff')||v.closest('.eqi'))) return;
+        cache();
       });
     } else {
       addEventListener('scroll',cache,{passive:true});
