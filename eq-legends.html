@@ -2285,8 +2285,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     var base=data.items, horsGuide={};
     if(tout){ for(var k in tout){ if(!(k in base)) horsGuide[k]=tout[k]; } }
     var noms=Object.keys(base).concat(Object.keys(horsGuide));
-    var ZONES_CARTOGRAPHIEES=["Befallen","Najena","Estate of Unrest","Crushbone","Splitpaw",
-"Upper Guk","Lower Guk","The Hole","Plane of Fear","Plane of Hate","Plane of Sky"];
+    var ZONES_CARTOGRAPHIEES=["Befallen","Najena","Estate of Unrest","Crushbone","Splitpaw","Upper Guk","Lower Guk","The Hole","Plane of Fear","Plane of Hate","Plane of Sky","Blackburrow","Warrens","Nagafen's Lair","Solusek","Kedge Keep","Mistmoore"];
 function zoneCartographiee(o){ if(!o||!o.d) return false;
   for(var z=0;z<ZONES_CARTOGRAPHIEES.length;z++) if(o.d.indexOf(ZONES_CARTOGRAPHIEES[z])>=0) return true;
   return false; }
