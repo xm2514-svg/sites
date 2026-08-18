@@ -1773,6 +1773,19 @@ addEventListener('hashchange', eqDepuisHash);
 window.eqShowNamed=function(key){
   var svgs=document.querySelectorAll('svg'), src=null, i;
   for(i=0;i<svgs.length;i++){ if(svgs[i].querySelector('[data-named="'+key+'"]')){src=svgs[i];break;} }
+  // La provenance d'un objet ecrit "a boogeyman", la pastille "A Boogeyman" :
+  // sans ce rattrapage a la casse pres, 59 objets ne trouvaient pas leur carte.
+  if(!src){
+    var bas=key.toLowerCase();
+    for(i=0;i<svgs.length && !src;i++){
+      var l=svgs[i].querySelectorAll('[data-named]');
+      for(var j=0;j<l.length;j++){
+        if((l[j].getAttribute('data-named')||'').toLowerCase()===bas){
+          key=l[j].getAttribute('data-named'); src=svgs[i]; break;
+        }
+      }
+    }
+  }
   if(!src) return false;
   show(src);
   var t=cur.querySelector('[data-named="'+key+'"]');
@@ -2322,15 +2335,29 @@ function fiche(n){ return base[n] || horsGuide[n]; }
   inp.addEventListener('input',cherche);
   inp.addEventListener('focus',function(){ if(res.innerHTML&&inp.value.trim().length>1) res.style.display='block'; });
   res.addEventListener('click',function(e){var r=e.target.closest('.r'); if(r) ouvre(r);});
+  var __ouvert=null;
+  // Les named qui droppent un objet, lus dans sa provenance : "Befallen\n* Gynok Moltor".
+  function droppeurs(nom){
+    var f=fiche(nom), d=(f&&f.d)||'', out=[];
+    d.split('\n').forEach(function(l){
+      l=l.trim();
+      if(l.charAt(0)==='*') out.push(l.replace(/^\*+\s*/,'').trim());
+    });
+    return out.filter(Boolean);
+  }
   function ouvre(r){
     var n=r.dataset.n;
-    // objet traite par le guide : on saute a l'endroit qui en parle
-    // on saute a l'objet PUIS on ouvre sa fiche (et son effet) a cote de lui :
-    // sans ca le clic fermait la liste et le lecteur perdait les stats de vue.
-    // la fiche d'abord, sur place : c'est elle qui porte les liens vers
-    // le chapitre de la quete et vers la carte du named.
-    if(window.eqFiche) window.eqFiche(n, r);
-    // objet hors guide : rien ou aller, on montre sa fiche complete a cote du resultat
+    // Deuxieme clic sur le meme objet : on va le voir sur la carte. Le premier clic a
+    // montre la fiche ; celui-ci ouvre la carte du premier named qui en a une pastille.
+    if(__ouvert===n && window.eqShowNamed){
+      var l=droppeurs(n);
+      for(var i=0;i<l.length;i++){
+        if(window.eqShowNamed(l[i])){ __ouvert=null; res.style.display='none'; return; }
+      }
+    }
+    __ouvert=n;
+    // la fiche d'abord, sur place : c'est elle qui porte les liens vers le chapitre de
+    // la quete et vers la carte du named.
     if(window.eqFiche) window.eqFiche(n, r);
   }
   res.addEventListener('keydown',function(e){var r=e.target.closest('.r');
