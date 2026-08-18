@@ -200,6 +200,7 @@
   html[data-res="hd"] #eqpop #eqeff u{color:#7f9a92;text-decoration:none;display:block;
     margin-top:6px;padding-top:5px;border-top:1px solid #2f4a44;font-size:11px}
   html[data-res="hd"] #eqpop{max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain}
+@media(hover:hover){#eqpop,#eqeff{pointer-events:none}#eqpop .eqlink,#eqpop a,#eqeff a{pointer-events:auto}}
   .eqlink:hover{color:#b9e6da}
   #eqres .vide{padding:10px 12px;color:#a89a86;font-size:12px}
   #eqres .tag{font-size:9.5px;color:#0e0c0a;background:#8a7a5a;border-radius:3px;padding:1px 4px;vertical-align:1px}
@@ -1923,7 +1924,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     }
     p.style.visibility='hidden'; p.style.display='block';
     var r=el.getBoundingClientRect(), h=p.offsetHeight, w=p.offsetWidth;
-    var top=r.bottom+8; if(top+h>innerHeight-8) top=Math.max(8,r.top-h-8);
+    var top=r.bottom+14; if(top+h>innerHeight-8) top=Math.max(8,r.top-h-8);
     var left=Math.min(Math.max(8,r.left), innerWidth-w-8);
     // ouvert depuis la recherche : on se pose A COTE de la liste, jamais dessus
     var liste=el.closest && el.closest('#eqres');
