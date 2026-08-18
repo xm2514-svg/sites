@@ -2501,9 +2501,33 @@ function fiche(n){ return base[n] || horsGuide[n]; }
     ['eqpop','eqeff'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
     allume(svg,vise);
   });
+  /* La consigne : sans elle, personne ne devine que le numero est un bouton. */
+  function mention(){
+    var lg=(document.documentElement.getAttribute('data-lang')||'en');
+    var txt = lg==='fr' ? 'Appuyez sur un numero : sa pastille clignote sur la carte'
+      : lg==='de' ? 'Auf eine Nummer tippen \u2014 die Markierung blinkt auf der Karte'
+      : lg==='es' ? 'Pulsa un numero: su marca parpadea en el mapa'
+      : 'Tap a number \u2014 its pin flashes on the map';
+    document.querySelectorAll('.maplegend').forEach(function(L){
+      if(L.querySelector('.eqaide')) return;
+      if(!L.querySelector('.lg')) return;
+      var s=document.createElement('span'); s.className='eqaide'; s.textContent=txt;
+      L.insertBefore(s,L.firstChild);
+    });
+  }
+  mention();
+  addEventListener('load',mention);
+  window.eqMentionPing=mention;
+
   /* on montre que c'est cliquable */
   var st=document.createElement('style');
-  st.textContent='.maplegend .lg{cursor:pointer}'+
+  st.textContent='.maplegend .lg{cursor:pointer}
+/* Les numeros de pastille : lumineux, avec un cadre, pour qu'on voie qu'on peut
+   appuyer dessus. Plus grands encore en plein ecran, ou la legende est petite. */
+.maplegend .lg{color:#ffd97a;text-shadow:0 0 6px rgba(255,200,70,.55);background:rgba(200,168,58,.14);border:1px solid rgba(240,200,90,.45);border-radius:4px;padding:0 4px;transition:background .12s,box-shadow .12s}
+.maplegend .lg:hover{background:rgba(255,210,90,.34);box-shadow:0 0 8px rgba(255,200,70,.5)}
+#mvlg .lg{font-size:14px;padding:1px 6px;color:#ffe08a;text-shadow:0 0 8px rgba(255,205,80,.7);border-color:rgba(255,210,100,.6)}
+#mvlg .eqaide,.maplegend .eqaide{display:block;margin:2px 0 6px;color:#c8a83a;font-size:11.5px;font-style:italic}'+
     '.maplegend .lg:hover{background:rgba(200,168,58,.22);border-radius:3px}';
   document.head.appendChild(st);
 })();
