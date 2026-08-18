@@ -2197,26 +2197,19 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     // souris : survol comme avant. tactile : 1er tap ouvre, 2e tap ferme, defilement ferme.
     var survol = !!(window.matchMedia && matchMedia('(hover:hover)').matches);
     if(survol){
+      // Fermeture differee. Le relatedTarget d'un mouseout reel n'est PAS l'infobulle :
+      // entre le nom et elle, le curseur traverse la cellule du tableau, et tester la
+      // destination fermait quand meme. On laisse 400 ms pour arriver sur le lien.
+      var tCache=null;
+      var annule=function(){ if(tCache){ clearTimeout(tCache); tCache=null; } };
+      var cacheDiffere=function(){ annule(); tCache=setTimeout(function(){ cache(); tCache=null; },400); };
       document.addEventListener('mouseover',function(e){
         var t=e.target.closest? e.target.closest('.eqi'):null;
-        if(t) montre(t,t.getAttribute('data-eq'));
+        if(t){ annule(); montre(t,t.getAttribute('data-eq')); return; }
+        if(e.target.closest && e.target.closest('#eqpop,#eqeff')) annule();
       });
-      // On ne ferme pas si le curseur part VERS l'infobulle : c'est le seul moyen
-      // d'atteindre le lien de carte. Xavier, 18/08/2026 — a la souris on ne peut pas
-      // se teleporter sur le lien, il faut y aller, et l'ancien mouseout fermait en route.
-      var versPop=function(e){
-        var v=e.relatedTarget;
-        return !!(v && v.closest && v.closest('#eqpop,#eqeff'));
-      };
       document.addEventListener('mouseout',function(e){
-        if(e.target.closest && e.target.closest('.eqi') && !versPop(e)) cache();
-      });
-      // et on ferme quand on quitte l'infobulle sans revenir sur l'objet
-      document.addEventListener('mouseout',function(e){
-        if(!e.target.closest || !e.target.closest('#eqpop,#eqeff')) return;
-        var v=e.relatedTarget;
-        if(v && v.closest && (v.closest('#eqpop,#eqeff')||v.closest('.eqi'))) return;
-        cache();
+        if(e.target.closest && (e.target.closest('.eqi')||e.target.closest('#eqpop,#eqeff'))) cacheDiffere();
       });
     } else {
       addEventListener('scroll',cache,{passive:true});
