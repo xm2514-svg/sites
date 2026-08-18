@@ -1865,7 +1865,7 @@ window.eqPastille=function(nom){
   if(!nom) return null;
   var e=document.querySelector('[data-named="'+String(nom).replace(/"/g,'')+'"]');
   if(e) return e.getAttribute('data-named');
-  var norm=function(s){ return String(s).toLowerCase().replace(/^(the|a|an)\s+/,'').trim(); };
+  var norm=function(s){ return String(s).toLowerCase().replace(/^(the|a|an)\s+/,'').replace(/\s*\([^)]*\)\s*$/,'').trim(); };  // le suffixe entre parentheses est du commentaire de base : « Innoruuk (God) », « Najena (NPC) », « orc warlord (in water) »
   var cible=norm(nom), l=document.querySelectorAll('[data-named]');
   for(var i=0;i<l.length;i++){
     if(norm(l[i].getAttribute('data-named'))===cible) return l[i].getAttribute('data-named');
