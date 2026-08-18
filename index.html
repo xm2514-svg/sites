@@ -2451,5 +2451,71 @@ function fiche(n){ return base[n] || horsGuide[n]; }
   fetch('items.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){data=d;cherche();});
 })();
 </script>
+<script>
+/* Numeros de legende cliquables sur la page (hors plein ecran) : un appui allume la
+   pastille correspondante sur la carte juste au-dessus, et la fait defiler dans le champ. */
+(function(){
+  function pastilleDe(svg,num){
+    var vise=null;
+    svg.querySelectorAll('g.np').forEach(function(g){
+      g.querySelectorAll('text').forEach(function(tx){
+        if((tx.textContent||'').trim()===String(num)) vise=g;
+      });
+    });
+    return vise;
+  }
+  function allume(svg,vise){
+    svg.querySelectorAll('g.np').forEach(function(g){ g.classList.remove('eqon'); });
+    svg.querySelectorAll('.eqping').forEach(function(e){ e.remove(); });
+    vise.classList.add('eqon');
+    var ce=vise.querySelector('circle');
+    if(!ce) return;
+    var cx=parseFloat(ce.getAttribute('cx')), cy=parseFloat(ce.getAttribute('cy'));
+    var r0=parseFloat(ce.getAttribute('r'))||9;
+    [2.6,4.2].forEach(function(k,i){
+      var a=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      a.setAttribute('class','eqping');
+      a.setAttribute('cx',cx); a.setAttribute('cy',cy); a.setAttribute('r',(r0*k).toFixed(1));
+      a.setAttribute('fill','none'); a.setAttribute('stroke','#f4d585');
+      a.setAttribute('stroke-width',i?'2':'3.5'); a.setAttribute('opacity',i?'0.55':'0.95');
+      vise.appendChild(a);
+    });
+    setTimeout(function(){ svg.querySelectorAll('.eqping').forEach(function(e){ e.remove(); }); },6000);
+    /* la carte est dans un conteneur qui defile sur telephone : on y amene la pastille */
+    var w=svg.parentElement;
+    if(w && w.classList.contains('mapwrap') && w.scrollWidth>w.clientWidth){
+      var vb=(svg.getAttribute('viewBox')||'0 0 1 1').split(/[ ,]+/).map(Number);
+      var rc=svg.getBoundingClientRect();
+      w.scrollLeft=Math.max(0,(cx-(vb[0]||0))*(rc.width/(vb[2]||1)) - w.clientWidth/2);
+    }
+    svg.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  document.addEventListener('click',function(ev){
+    var sp=ev.target.closest? ev.target.closest('.maplegend .lg') : null;
+    if(!sp) return;
+    var t=(sp.textContent||'').trim();
+    if(!/^[\u2460-\u2473]$/.test(t)) return;
+    var num=t.charCodeAt(0)-0x245F;
+    var leg=sp.closest('.maplegend');
+    /* la carte est le SVG qui precede la legende, eventuellement dans un .mapwrap */
+    var n=leg.previousElementSibling, svg=null;
+    while(n && !svg){
+      svg = (n.tagName==='svg') ? n : n.querySelector && n.querySelector('svg');
+      if(!svg) n=n.previousElementSibling;
+    }
+    if(!svg) return;
+    var vise=pastilleDe(svg,num);
+    if(!vise) return;
+    ev.preventDefault();
+    ['eqpop','eqeff'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
+    allume(svg,vise);
+  });
+  /* on montre que c'est cliquable */
+  var st=document.createElement('style');
+  st.textContent='.maplegend .lg{cursor:pointer}'+
+    '.maplegend .lg:hover{background:rgba(200,168,58,.22);border-radius:3px}';
+  document.head.appendChild(st);
+})();
+</script>
 </body>
 </html>
