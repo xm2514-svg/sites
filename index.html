@@ -218,6 +218,9 @@
 
   /* infobulles en plein ecran : #mvlg a overflow:auto et les rognait ; on ouvre vers le haut et on laisse deborder sur la carte */
   #mvlg{overflow:visible}
+/* Telephone : la legende du loot est illisible dans les 24vh du bas et son bas sort
+   de l'ecran. On la retire du plein ecran — un appui sur un named y ramene (voir plus bas). */
+@media(max-width:760px){#mvlg{display:none!important}}
   #mvlg .tip[data-tip]:hover::after{display:none}
   #mvlg .tip[data-tip]{position:relative}
   .tip[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:0;top:150%;z-index:60;white-space:normal;width:max-content;max-width:340px;background:#0d0b07;color:#f0d68a;border:1px solid #c8a83a;border-radius:6px;padding:5px 9px;font-size:12px;font-weight:400;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.65);pointer-events:none}
@@ -1688,6 +1691,19 @@ var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=nu
 var lgbox=document.createElement('div');lgbox.id='mvlg';mv.appendChild(lgbox);
 function fit(){if(!cur)return;if(cur.dataset&&cur.dataset.vb0)cur.setAttribute('viewBox',cur.dataset.vb0);var vb=(cur.getAttribute('viewBox')||'0 0 1 1').split(/[ ,]+/).map(Number);var ratio=(vb[2]&&vb[3])?vb[2]/vb[3]:1;var aw=box.clientWidth-20, ah=box.clientHeight-20;w=Math.max(80,Math.min(aw,ah*ratio));cur.style.width=w+'px';box.scrollTop=0;box.scrollLeft=0;}
 function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.width=w+'px';}
+/* Ouverture : sur telephone, ajuster la carte a la largeur de l'ecran (~390 px) rend les
+   etiquettes illisibles — sur PC la meme carte s'ouvre a ~1900 px. On part donc zoome et
+   centre, et le bouton Fit reste disponible pour tout voir d'un coup. */
+function ouvre(){fit();
+  if(box.clientWidth<760&&cur){
+    var cible=Math.min(1100,w*3);
+    if(cible>w){w=cible;cur.style.width=w+'px';}
+    requestAnimationFrame(function(){
+      box.scrollLeft=Math.max(0,(box.scrollWidth-box.clientWidth)/2);
+      box.scrollTop=Math.max(0,(box.scrollHeight-box.clientHeight)/2);
+    });
+  }
+}
 function show(svg){srcSvg=svg;var _b=document.getElementById('mvback'); if(_b) _b.style.display=window.__eqExterne?'':'none';window.__eqExterne=false;box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
   if(svg.dataset&&svg.dataset.vb0){cur.dataset.vb0=svg.dataset.vb0;cur.setAttribute('viewBox',svg.dataset.vb0);}
   cur.classList.remove('mapz');box.appendChild(cur);
@@ -1698,8 +1714,22 @@ function show(svg){srcSvg=svg;var _b=document.getElementById('mvback'); if(_b) _
   lgbox.innerHTML=''; lgbox.style.display='none';
   if(lg){var c=lg.cloneNode(true);c.classList.remove('reveal');c.style.opacity='1';c.style.transform='none';c.querySelectorAll('.tip[data-tip]').forEach(function(t){t.title=t.getAttribute('data-tip');});c.style.margin='0';c.style.border='0';c.style.background='none';
     lgbox.appendChild(c); lgbox.style.display='block';}
+  /* Telephone : la legende est masquee en plein ecran ; un appui sur un named ferme la
+     carte et amene a la legende du loot de cette zone, mise en evidence. */
+  if(box.clientWidth<760&&lg){
+    var cible=lg;
+    cur.querySelectorAll('g.np[data-named]').forEach(function(g){
+      g.style.cursor='pointer';
+      g.addEventListener('click',function(e){
+        e.stopPropagation(); close();
+        cible.scrollIntoView({behavior:'smooth',block:'center'});
+        cible.classList.add('eqhit');
+        setTimeout(function(){cible.classList.remove('eqhit');},1800);
+      });
+    });
+  }
   mv.classList.add('on');
-  document.body.style.overflow='hidden';fit();}
+  document.body.style.overflow='hidden';ouvre();}
 function close(){mv.classList.remove('on');box.innerHTML='';lgbox.innerHTML='';lgbox.style.display='none';cur=null;
   document.body.style.overflow='';}
 document.querySelectorAll('svg').forEach(function(s){
