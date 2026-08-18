@@ -43821,10 +43821,6 @@
   "Zombie Skin": {
    "s": "QUEST ITEM\nWT: 0.1 Size: SMALL\nClass: ALL\nRace: ALL",
    "d": "Mistmoore Castle\n* a Mistmoore guard\nCommonlands\n* a zombie\nErud's Crossing\n* a zombie sailor\nThe Estate of Unrest\n* tormented dead\nInnothule Swamp\n* a zombie\nKithicor Forest\n* zombie advisor\n* Zombie"
-  },
-  "Packmasters Lash": {
-   "s": "MAGIC ITEM\nSlot: PRIMARY SECONDARY\nSkill: 1H Slashing Atk Delay: 24\nDMG: 4 AC: 3\nEffect: Choking (Combat, Casting Time: Instant) at Level 20\nWT: 2.5 Size: TINY\nClass: WAR RNG BRD ROG\nRace: ALL",
-   "d": "The Warrens\n* Packmaster Dledsh"
   }
  }
 }
