@@ -45,6 +45,12 @@
   .wrap{max-width:1000px;margin:0 auto;padding:16px 20px 60px}
   .maplegend{font-size:12px;color:#d6c8a8;line-height:1.7;margin:4px 0 10px;padding:7px 11px;border:1px solid var(--line);border-radius:6px;background:rgba(20,16,10,.5)}
   .maplegend .lg{color:#f4d585;font-weight:bold}
+/* Les numeros de pastille sont des boutons : halo, cadre, fond au survol.
+   Plus grands en plein ecran, ou la legende est en petit corps. */
+.maplegend .lg{color:#ffd97a;text-shadow:0 0 6px rgba(255,200,70,.55);background:rgba(200,168,58,.14);border:1px solid rgba(240,200,90,.45);border-radius:4px;padding:0 4px;transition:background .12s,box-shadow .12s}
+.maplegend .lg:hover{background:rgba(255,210,90,.34);box-shadow:0 0 8px rgba(255,200,70,.5)}
+#mvlg .lg{font-size:14px;padding:1px 6px;color:#ffe08a;text-shadow:0 0 8px rgba(255,205,80,.7);border-color:rgba(255,210,100,.6)}
+#mvlg .eqaide,.maplegend .eqaide{display:block;margin:2px 0 6px;color:#c8a83a;font-size:11.5px;font-style:italic}
   .maplegend .lghint{opacity:.75;font-size:11px;font-style:italic}
   svg g.namedpin{cursor:pointer}
 
@@ -2521,14 +2527,7 @@ function fiche(n){ return base[n] || horsGuide[n]; }
 
   /* on montre que c'est cliquable */
   var st=document.createElement('style');
-  st.textContent='.maplegend .lg{cursor:pointer}
-/* Les numeros de pastille : lumineux, avec un cadre, pour qu'on voie qu'on peut
-   appuyer dessus. Plus grands encore en plein ecran, ou la legende est petite. */
-.maplegend .lg{color:#ffd97a;text-shadow:0 0 6px rgba(255,200,70,.55);background:rgba(200,168,58,.14);border:1px solid rgba(240,200,90,.45);border-radius:4px;padding:0 4px;transition:background .12s,box-shadow .12s}
-.maplegend .lg:hover{background:rgba(255,210,90,.34);box-shadow:0 0 8px rgba(255,200,70,.5)}
-#mvlg .lg{font-size:14px;padding:1px 6px;color:#ffe08a;text-shadow:0 0 8px rgba(255,205,80,.7);border-color:rgba(255,210,100,.6)}
-#mvlg .eqaide,.maplegend .eqaide{display:block;margin:2px 0 6px;color:#c8a83a;font-size:11.5px;font-style:italic}'+
-    '.maplegend .lg:hover{background:rgba(200,168,58,.22);border-radius:3px}';
+  st.textContent='.maplegend .lg{cursor:pointer}';
   document.head.appendChild(st);
 })();
 </script>
