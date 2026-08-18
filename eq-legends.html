@@ -2338,7 +2338,8 @@ function fiche(n){ return base[n] || horsGuide[n]; }
   var __ouvert=null;
   // Les named qui droppent un objet, lus dans sa provenance : "Befallen\n* Gynok Moltor".
   function droppeurs(nom){
-    var f=fiche(nom), d=(f&&f.d)||'', out=[];
+    var f=(data&&data.items&&data.items[nom]) || (tout&&tout[nom]) || null;
+    var d=(f&&f.d)||'', out=[];
     d.split('\n').forEach(function(l){
       l=l.trim();
       if(l.charAt(0)==='*') out.push(l.replace(/^\*+\s*/,'').trim());
