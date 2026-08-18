@@ -1691,7 +1691,9 @@ function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.wid
 function show(svg){srcSvg=svg;var _b=document.getElementById('mvback'); if(_b) _b.style.display=window.__eqExterne?'':'none';window.__eqExterne=false;box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
   if(svg.dataset&&svg.dataset.vb0){cur.dataset.vb0=svg.dataset.vb0;cur.setAttribute('viewBox',svg.dataset.vb0);}
   cur.classList.remove('mapz');box.appendChild(cur);
-  var lg=svg.nextElementSibling;
+  var lgStart=(svg.parentElement && svg.parentElement.classList.contains('mapwrap'))
+                 ? svg.parentElement : svg;
+      var lg=lgStart.nextElementSibling;
   while(lg && !(lg.classList && lg.classList.contains('maplegend'))) lg=lg.nextElementSibling;
   lgbox.innerHTML=''; lgbox.style.display='none';
   if(lg){var c=lg.cloneNode(true);c.classList.remove('reveal');c.style.opacity='1';c.style.transform='none';c.querySelectorAll('.tip[data-tip]').forEach(function(t){t.title=t.getAttribute('data-tip');});c.style.margin='0';c.style.border='0';c.style.background='none';
@@ -1754,7 +1756,7 @@ document.getElementById('mvback').onclick=function(){ close();
   var h3=t.parentElement; while(h3 && !(h3.tagName==='H3'||h3.previousElementSibling&&h3.previousElementSibling.tagName==='H3')) h3=h3.parentElement;
   var cible=(h3&&h3.previousElementSibling&&h3.previousElementSibling.tagName==='H3')?h3.previousElementSibling:t;
   cible.scrollIntoView({block:'start'}); };
-mv.addEventListener('click',function(e){if(e.target===mv||e.target===box)close();});
+mv.addEventListener('click',function(e){ if(e.target===mv) close(); });
 addEventListener('keydown',function(e){if(e.key==='Escape')close();});
 // --- zoom dans la visionneuse : molette (PC), pincement (mobile), glisser pour deplacer
 box.style.touchAction='none';
