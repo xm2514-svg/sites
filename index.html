@@ -1761,6 +1761,10 @@ box.style.touchAction='none';
     /* glisser a la souris : sans lui, une carte zoomee ne se deplace qu'a la barre
        de defilement. Le pincement tactile est gere plus bas, separement. */
     (function(){ var gl=false,gx=0,gy=0,sl=0,stp=0;
+      /* vraie souris seulement : sur mobile un tap emet un mousedown de compatibilite,
+         et le preventDefault ci-dessous casserait le pincement et le defilement. */
+      var hasMouse = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+      if(!hasMouse) return;
       box.style.cursor='grab';
       box.addEventListener('mousedown',function(e){
         if(e.button!==0) return;
