@@ -1947,7 +1947,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       p.querySelector('.corps').after(du);
     }
     // fiche du proc : la ligne "Effect: X (" de l'objet renvoie a data.effects[X]
-    var me=/Effect:\s*([^(\n]+?)\s*\(/.exec(it.s||'');
+    var me=/(?:Worn |Focus )?Effect:\s*([^(\n]+?)\s*(?:\(|$)/m.exec(it.s||'');
     var EF=window.__eqEffets||{};
     var fe=me && EF[me[1].trim()];
     var pe=document.getElementById('eqeff');
@@ -2060,7 +2060,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
             var s=document.createElement('span');
             s.className='eqi'; s.setAttribute('data-eq',vrai); s.textContent=m[1];
         // liseré cyan si l'objet porte un proc documenté dans data.effects
-        var _o=data.items[vrai], _m=_o && /Effect:\s*([^(\n]+?)\s*\(/.exec(_o.s||'');
+        var _o=data.items[vrai], _m=_o && /(?:Worn |Focus )?Effect:\s*([^(\n]+?)\s*(?:\(|$)/m.exec(_o.s||'');
         if(_m && data.effects && data.effects[_m[1].trim()]) s.className='eqi proc';
             frag.appendChild(s);
           } else { frag.appendChild(document.createTextNode(m[1])); }
@@ -2102,7 +2102,7 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     document.querySelectorAll('.eqi').forEach(function(s){
       var it=data.items[s.getAttribute('data-eq')];
       if(!it) return;
-      var m=/Effect:\s*([^(\n]+?)\s*\(/.exec(it.s||'');
+      var m=/(?:Worn |Focus )?Effect:\s*([^(\n]+?)\s*(?:\(|$)/m.exec(it.s||'');
       if(m && EF[m[1].trim()]) s.classList.add('proc');
       if(US[s.getAttribute('data-eq')]) s.classList.add('quete');
     });
@@ -2307,7 +2307,7 @@ function fiche(n){ return base[n] || horsGuide[n]; }
         var hors=!(n in base) && !zoneCartographiee(fiche(n));
         // meme calcul que liseres() : effet documente -> proc, objet de quete -> quete
         var _it=fiche(n), _c='';
-        var _m=/Effect:\s*([^(\n]+?)\s*\(/.exec((_it&&_it.s)||'');
+        var _m=/(?:Worn |Focus )?Effect:\s*([^(\n]+?)\s*(?:\(|$)/m.exec((_it&&_it.s)||'');
         if(_m && (window.__eqEffets||{})[_m[1].trim()]) _c+=' proc';
         if((window.__eqUsages||{})[n]) _c+=' quete';
         return '<div class="r'+(hors?' hors':'')+'" role="option" tabindex="0" data-n="'+e+'">'+

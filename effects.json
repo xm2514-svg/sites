@@ -5275,6 +5275,51 @@
    "r": "1.50",
    "t": "48 Sec",
    "s": "Magic (0)"
+  },
+  "Improved Vampirism III": {
+   "d": "Focus : renforce les sorts de vol de vie du porteur. Ajoute par le patch du 18 aout 2026 sur Bloodmoon (Lord of Ire, Innoruuk).",
+   "e": [
+    "Focus: Lifetap"
+   ],
+   "t": "Focus",
+   "s": "—",
+   "r": "—"
+  },
+  "Scalp of the Ghoul Lord": {
+   "d": "Effet porte du casque du meme nom, butin du Ghoul Lord a Lower Guk.",
+   "e": [
+    "Worn effect"
+   ],
+   "t": "Worn",
+   "s": "—",
+   "r": "—"
+  },
+  "Servant of Earth": {
+   "d": "Invoque un serviteur de terre. Effet du Staff of Elemental Mastery: Earth.",
+   "e": [
+    "Summon pet"
+   ],
+   "t": "Invocation",
+   "s": "—",
+   "r": "—"
+  },
+  "Servant of Fire": {
+   "d": "Invoque un serviteur de feu. Effet du Staff of Elemental Mastery: Fire.",
+   "e": [
+    "Summon pet"
+   ],
+   "t": "Invocation",
+   "s": "—",
+   "r": "—"
+  },
+  "Minion of Hate": {
+   "d": "Renforce certains familiers mort-vivants. Seul focus pour les familiers de Necromancien.",
+   "e": [
+    "Focus: pet power"
+   ],
+   "t": "Focus",
+   "s": "—",
+   "r": "—"
   }
  }
 }

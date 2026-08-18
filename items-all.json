@@ -4055,7 +4055,7 @@
    "d": ""
   },
   "Bloodmoon": {
-   "s": "MAGIC ITEM LORE ITEM NO DROP\nSlot: PRIMARY\nSkill: 1H Slashing Atk Delay: 28\nDMG: 18 \nSTR: +10\nWT: 3.0 Size: MEDIUM\nClass: SHD\nRace: ALL",
+   "s": "MAGIC ITEM LORE ITEM NO DROP\nSlot: PRIMARY\nSkill: 1H Slashing Atk Delay: 28\nDMG: 18 \nFocus Effect: Improved Vampirism III\nSTR: +10\nWT: 3.0 Size: MEDIUM\nClass: SHD\nRace: ALL",
    "d": "Plane of Hate\n* Innoruuk (God)\n* Lord of Ire"
   },
   "Bloodshrine Necklace": {
