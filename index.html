@@ -1771,6 +1771,12 @@ addEventListener('load', function(){ setTimeout(eqDepuisHash, 350); });
 addEventListener('hashchange', eqDepuisHash);
 // ouvre la carte contenant un named et fait pulser sa pastille
 window.eqShowNamed=function(key){
+  // On part sur la carte : l'infobulle de l'objet et celle de son effet n'ont plus lieu
+  // d'etre, elles resteraient posees par-dessus le plan.
+  ['eqpop','eqeff'].forEach(function(id){
+    var e=document.getElementById(id);
+    if(e) e.style.display='none';
+  });
   var svgs=document.querySelectorAll('svg'), src=null, i;
   for(i=0;i<svgs.length;i++){ if(svgs[i].querySelector('[data-named="'+key+'"]')){src=svgs[i];break;} }
   // La provenance d'un objet ecrit "a boogeyman", la pastille "A Boogeyman" :
