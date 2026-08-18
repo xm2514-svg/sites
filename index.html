@@ -2507,6 +2507,33 @@ function fiche(n){ return base[n] || horsGuide[n]; }
     ['eqpop','eqeff'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
     allume(svg,vise);
   });
+  /* Les cartes anciennes ecrivent leurs numeros en texte nu : on les enveloppe pour
+     qu'ils deviennent cliquables comme les autres. Seuls les noeuds texte sont touches. */
+  function enveloppe(){
+    document.querySelectorAll('.maplegend').forEach(function(L){
+      var w=document.createTreeWalker(L,NodeFilter.SHOW_TEXT,null);
+      var lot=[],n;
+      while((n=w.nextNode())){
+        if(n.parentElement.closest('.lg')) continue;
+        if(/[\u2460-\u2473]/.test(n.nodeValue)) lot.push(n);
+      }
+      lot.forEach(function(t){
+        var frag=document.createDocumentFragment();
+        var reste=t.nodeValue, m;
+        while((m=/[\u2460-\u2473]/.exec(reste))){
+          if(m.index) frag.appendChild(document.createTextNode(reste.slice(0,m.index)));
+          var sp=document.createElement('span'); sp.className='lg'; sp.textContent=m[0];
+          frag.appendChild(sp);
+          reste=reste.slice(m.index+1);
+        }
+        if(reste) frag.appendChild(document.createTextNode(reste));
+        t.parentNode.replaceChild(frag,t);
+      });
+    });
+  }
+  enveloppe();
+  addEventListener('load',enveloppe);
+
   /* La consigne : sans elle, personne ne devine que le numero est un bouton. */
   function mention(){
     var lg=(document.documentElement.getAttribute('data-lang')||'en');
