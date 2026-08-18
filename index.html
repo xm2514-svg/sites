@@ -1757,33 +1757,25 @@ function show(svg){srcSvg=svg;var _b=document.getElementById('mvback'); if(_b) _
           var e=document.getElementById(id); if(e) e.style.display='none';
         });
         cur.querySelectorAll('g.np').forEach(function(g){ g.classList.remove('eqon'); });
-        cur.querySelectorAll('.eqping').forEach(function(e){ e.remove(); });
         vise.classList.add('eqon');
         var ce=vise.querySelector('circle');
         if(ce){
-          var cx=parseFloat(ce.getAttribute('cx')), cy=parseFloat(ce.getAttribute('cy'));
-          var r0=parseFloat(ce.getAttribute('r'))||9;
-          [2.6, 4.2].forEach(function(k,idx){
-            var an=document.createElementNS('http://www.w3.org/2000/svg','circle');
-            an.setAttribute('class','eqping');
-            an.setAttribute('cx',cx); an.setAttribute('cy',cy);
-            an.setAttribute('r',(r0*k).toFixed(1));
-            an.setAttribute('fill','none');
-            an.setAttribute('stroke','#f4d585');
-            an.setAttribute('stroke-width',idx?'2':'3.5');
-            an.setAttribute('opacity',idx?'0.55':'0.95');
-            vise.appendChild(an);
-          });
+          var c=ce;
+          var halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
+          halo.setAttribute('cx',c.getAttribute('cx'));
+          halo.setAttribute('cy',c.getAttribute('cy'));
+          halo.setAttribute('r',c.getAttribute('r'));
+          halo.setAttribute('class','eqhalo');
+          vise.insertBefore(halo,vise.firstChild);
           setTimeout(function(){
-            cur.querySelectorAll('.eqping').forEach(function(e){ e.remove(); });
-          },6000);
-          // recentrage : on convertit les unites de la carte en pixels affiches
+            vise.classList.remove('eqon');
+            var x=vise.querySelector('.eqhalo'); if(x&&x.parentNode) x.parentNode.removeChild(x);
+          },5000);
+          var cx=parseFloat(ce.getAttribute('cx')), cy=parseFloat(ce.getAttribute('cy'));
           var vb=(cur.getAttribute('viewBox')||'0 0 1 1').split(/[ ,]+/).map(Number);
           var rc=cur.getBoundingClientRect();
-          var ex=rc.width/(vb[2]||1), ey=rc.height/(vb[3]||1);
-          var px=(cx-(vb[0]||0))*ex, py=(cy-(vb[1]||0))*ey;
-          box.scrollLeft = Math.max(0, px - box.clientWidth/2);
-          box.scrollTop  = Math.max(0, py - box.clientHeight/2);
+          box.scrollLeft = Math.max(0,(cx-(vb[0]||0))*(rc.width/(vb[2]||1)) - box.clientWidth/2);
+          box.scrollTop  = Math.max(0,(cy-(vb[1]||0))*(rc.height/(vb[3]||1)) - box.clientHeight/2);
         }
       });
     });}
@@ -2466,21 +2458,20 @@ function fiche(n){ return base[n] || horsGuide[n]; }
   }
   function allume(svg,vise){
     svg.querySelectorAll('g.np').forEach(function(g){ g.classList.remove('eqon'); });
-    svg.querySelectorAll('.eqping').forEach(function(e){ e.remove(); });
     vise.classList.add('eqon');
     var ce=vise.querySelector('circle');
     if(!ce) return;
     var cx=parseFloat(ce.getAttribute('cx')), cy=parseFloat(ce.getAttribute('cy'));
-    var r0=parseFloat(ce.getAttribute('r'))||9;
-    [2.6,4.2].forEach(function(k,i){
-      var a=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      a.setAttribute('class','eqping');
-      a.setAttribute('cx',cx); a.setAttribute('cy',cy); a.setAttribute('r',(r0*k).toFixed(1));
-      a.setAttribute('fill','none'); a.setAttribute('stroke','#f4d585');
-      a.setAttribute('stroke-width',i?'2':'3.5'); a.setAttribute('opacity',i?'0.55':'0.95');
-      vise.appendChild(a);
-    });
-    setTimeout(function(){ svg.querySelectorAll('.eqping').forEach(function(e){ e.remove(); }); },6000);
+    var halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    halo.setAttribute('cx',ce.getAttribute('cx'));
+    halo.setAttribute('cy',ce.getAttribute('cy'));
+    halo.setAttribute('r',ce.getAttribute('r'));
+    halo.setAttribute('class','eqhalo');
+    vise.insertBefore(halo,vise.firstChild);
+    setTimeout(function(){
+      vise.classList.remove('eqon');
+      var x=vise.querySelector('.eqhalo'); if(x&&x.parentNode) x.parentNode.removeChild(x);
+    },5000);
     /* la carte est dans un conteneur qui defile sur telephone : on y amene la pastille */
     var w=svg.parentElement;
     if(w && w.classList.contains('mapwrap') && w.scrollWidth>w.clientWidth){
