@@ -47,6 +47,27 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 .pied{margin-top:2.4em;padding-top:1em;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
 @media(max-width:640px){body{padding:12px}h1{font-size:22px}.tiernum{font-size:26px}}
 </style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"WebApplication","name":"EQ Legends Spell Upgrade Calculator",
+  "url":"https://xm2514-svg.github.io/sites/spell-upgrades/",
+  "applicationCategory":"GameApplication","operatingSystem":"Any","browserRequirements":"JavaScript",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "description":"Pick any of the 2039 obtainable EverQuest Legends spells, set your character level and read what it does at every merge tier from +0 to +10: damage, healing, mana, cast time, duration and the mote cost.",
+  "isPartOf":{"@type":"WebSite","name":"EQ Legends Guide","url":"https://xm2514-svg.github.io/sites/"}},
+ {"@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"EQ Legends Guide","item":"https://xm2514-svg.github.io/sites/"},
+  {"@type":"ListItem","position":2,"name":"Spell upgrades","item":"https://xm2514-svg.github.io/sites/spell-upgrades/"}]},
+ {"@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"How much damage does a spell gain per upgrade tier in EQ Legends?",
+   "acceptedAnswer":{"@type":"Answer","text":"Direct-damage spells gain 6% of their base damage per rank, so +60% at rank 10. The figure is linear, not compounding, and the spell window keeps showing the unranked number at every tier."}},
+  {"@type":"Question","name":"How many motes does it take to reach tier 10 on a spell?",
+   "acceptedAnswer":{"@type":"Answer","text":"The cost doubles each rank: 2 motes for rank 1, 32 for rank 5, 256 for rank 8 and 1024 to reach rank 10."}},
+  {"@type":"Question","name":"Why does the same spell show different damage on two characters?",
+   "acceptedAnswer":{"@type":"Answer","text":"The client computes the value as base plus your level times a per-spell factor, then caps it. A level 20 and a level 50 character read different numbers for the same spell, which is why a database quoting a single figure is right for exactly one level."}},
+  {"@type":"Question","name":"Does upgrading a pet spell raise the pet's level?",
+   "acceptedAnswer":{"@type":"Answer","text":"Yes. Frenzied Spirit summons a level 36 wolf at +0 and a level 41 one at tier 5, one level per tier, and the spell window never mentions it."}}]}]}
+</script>
 </head>
 <body>
 <div class="wrap">
