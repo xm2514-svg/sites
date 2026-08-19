@@ -226,12 +226,7 @@
   .eqhit{animation:eqf 1.6s ease}
 
   /* infobulles en plein ecran : #mvlg a overflow:auto et les rognait ; on ouvre vers le haut et on laisse deborder sur la carte */
-  /* 19/08/2026 : overflow:visible retirait aussi le defilement, et le plafond 24vh est
-     reste — tout ce qui depassait etait coupe SANS barre de defilement, donc invisible.
-     Mesure a 1920x1080 : Plane of Hate 316px contre 259 de plafond. On enleve le plafond,
-     la legende prend sa hauteur naturelle et #mvbox absorbe le reste. Pire cas mesure :
-     316px sur 1080, la carte garde plus de 600px. */
-  #mvlg{overflow:visible;max-height:none}
+  #mvlg{overflow:visible}
 /* Telephone : la legende du loot est illisible dans les 24vh du bas et son bas sort
    de l'ecran. On la retire du plein ecran — un appui sur un named y ramene (voir plus bas). */
 @media(max-width:760px){#mvlg{display:none!important}}
