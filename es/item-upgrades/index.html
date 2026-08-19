@@ -19,6 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="https://xm2514-svg.github.io/sites/favicon.ico">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Mejora de objetos, +1 a +10 — qué da realmente cada tier de mote", "description": "Mejora de objetos en EverQuest Legends, de +1 a +10: qué da realmente cada mote y cada tier de fusión sobre una pieza de equipo — CA, PV, maná, estadísticas, daño — y cuánto cuesta cada rango en duplicados o motes. 11 069 objetos.", "datePublished": "2026-08-04", "dateModified": "2026-08-04", "inLanguage": "es", "mainEntityOfPage": "https://xm2514-svg.github.io/sites/es/item-upgrades/", "author": {"@type": "Person", "name": "Kepler Dust"}, "about": {"@type": "VideoGame", "name": "EverQuest Legends"}}</script>
+<script>document.documentElement.dataset.res=(screen.width<=760?"mobile":screen.width<=1920?"hd":"ultra");</script>
 <style>*{box-sizing:border-box}
 body{margin:0;background:#0e0c0a;color:#e7ddcf;font:15px/1.6 "Segoe UI",system-ui,Arial,sans-serif}
 .wrap{max-width:760px;margin:0 auto;padding:22px 18px 60px}
@@ -43,6 +44,13 @@ a.np:hover{border-bottom-color:#f4d585}
 footer{margin-top:34px;padding-top:14px;border-top:1px solid #3a2f22;color:#a89a86;font-size:13px}
 a:focus-visible,.back:focus-visible{outline:2px solid #f4d585;outline-offset:2px}
 @media(max-width:640px){.wrap{padding:16px 13px 48px}h1{font-size:21px}body{font-size:14.5px}}
+/* copie du guide : trois paliers par screen.width, tableaux defilables */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tw table{min-width:520px}
+@media(min-width:761px){#langToggle{right:14px!important;top:9px!important;left:auto!important}#kofiBtn{right:14px!important;top:45px!important;bottom:auto!important}}
+@media(max-width:760px){body{font-size:17px;line-height:1.55}table{font-size:15px}#kofiBtn,#langToggle{font-size:13.5px}
+  #langToggle{top:auto!important;bottom:16px!important;right:auto!important;left:16px!important}
+  #kofiBtn{top:auto!important;bottom:16px!important;right:16px!important}}
 .src{font-size:12.5px;color:var(--dim,#a08f78);margin:1.6em 0 0;line-height:1.5}</style>
 <style>:root{--bg:#0d0b09;--panel:#17130f;--line:#2c2419;--text:#e8dfd0;--dim:#a08f78;
       --gold:#c8a83a;--gold2:#ffd97a;--green:#7fd18c}
@@ -76,13 +84,7 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 .mesure{border-left-color:var(--green)}
 .calcul{border-left-color:var(--gold)}
 .pied{margin-top:2.4em;padding-top:1em;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
-@media(max-width:640px){body{padding:12px}h1{font-size:22px}.tiernum{font-size:26px}
-  /* quatre colonnes sur un telephone : on resserre, et l'en-tete le plus long est
-     remplace par « at tier » plutot que de passer sur trois lignes */
-  th,td{padding:6px 4px;font-size:14px}
-  th{font-size:10.5px;letter-spacing:.02em}
-  .col3{font-size:0}
-  .col3::after{content:"at tier";font-size:10.5px;letter-spacing:.02em}}
+
 </style>
 </head>
 <body>
@@ -123,10 +125,10 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
     </div>
   </div>
   <input type="range" id="tier" min="0" max="10" value="0" step="1">
-  <table>
+  <div class="tw"><table>
     <thead><tr><th>Est.</th><th class="v">+0</th><th class="v col3">en este tier</th><th class="v">ganancia</th></tr></thead>
     <tbody id="corps"></tbody>
-  </table>
+  </table></div>
   <div id="extra"></div>
 </div>
 
@@ -159,6 +161,41 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 <footer>EverQuest Legends · updated 2026-08-04 · part of the
 <a href="https://xm2514-svg.github.io/sites/#c13">Paladin / Monk / Shaman guide</a>.</footer>
 </div>
+<a id="kofiBtn" href="https://ko-fi.com/keplerdust" target="_blank" rel="noopener" style="position:fixed;top:9px;right:112px;z-index:9999;background:#1a1206;color:#f4d585;border:1px solid #c8a83a;border-radius:6px;padding:6px 13px;font:600 13px Segoe UI,Arial;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.5)">&#9749; Apoyar</a>
+<script>(function(){
+  var LANGS=[["en", "English"], ["fr", "French"], ["de", "German"], ["es", "Spanish"]], URLS={"en": "https://xm2514-svg.github.io/sites/item-upgrades/", "fr": "https://xm2514-svg.github.io/sites/fr/item-upgrades/", "de": "https://xm2514-svg.github.io/sites/de/item-upgrades/", "es": "https://xm2514-svg.github.io/sites/es/item-upgrades/"}, lang="es";
+  var btn=document.createElement("button");
+  btn.id="langToggle"; btn.type="button"; btn.textContent="\uD83C\uDF10 Languages";
+  btn.setAttribute("style","position:fixed;top:9px;right:14px;z-index:9999;background:#1a1206;color:#f4d585;border:1px solid #c8a83a;border-radius:6px;padding:6px 13px;font:600 13px Segoe UI,Arial;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5)");
+  var menu=document.createElement("div");
+  menu.id="langMenu";
+  menu.setAttribute("style","position:fixed;z-index:10001;display:none;background:#1a1206;border:1px solid #c8a83a;border-radius:6px;padding:4px;min-width:132px;box-shadow:0 4px 14px rgba(0,0,0,.6)");
+  function item(code,label){
+    var a=document.createElement("a");
+    a.setAttribute("data-lang",code); a.href=URLS[code]; a.hreflang=code;
+    a.textContent=label;
+    a.setAttribute("style","display:block;width:100%;text-align:left;background:"      +(code===lang?"#3a2f1a":"none")+";border:0;color:#f4d585;font:600 13px Segoe UI,Arial;padding:7px 10px;border-radius:4px;cursor:pointer;text-decoration:none");
+    a.onmouseover=function(){a.style.background="#2a2113";};
+    a.onmouseout=function(){a.style.background=(code===lang)?"#3a2f1a":"none";};
+    return a;
+  }
+  for(var i=0;i<LANGS.length;i++) menu.appendChild(item(LANGS[i][0],LANGS[i][1]));
+  function close(){menu.style.display="none";}
+  function open(){
+    var r=btn.getBoundingClientRect();
+    menu.style.display="block";
+    menu.style.right=Math.max(6,window.innerWidth-r.right)+"px";
+    if(r.top>window.innerHeight/2){menu.style.bottom=(window.innerHeight-r.top+6)+"px";menu.style.top="auto";}
+    else {menu.style.top=(r.bottom+6)+"px"; menu.style.bottom="auto";}
+  }
+  btn.onclick=function(e){e.stopPropagation();if(menu.style.display==="block")close();else open();};
+  document.addEventListener("click",close);
+  addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  addEventListener("resize",close);
+  function mount(){document.body.appendChild(btn);document.body.appendChild(menu);}
+  document.addEventListener("DOMContentLoaded",mount);
+  if(document.readyState!=="loading")mount();
+})();</script>
 <script>window.T={"haste": "Haste", "delay": "Delay", "weight": "Peso", "svvoid": "SV Void", "jamais": "nunca baja", "baisse": "baja un poco — ver abajo", "dropsfrom": "Lo dropea", "effet": "Efecto:", "tousslots": "Todas las ranuras", "touttype": "Todos los tipos", "unemain": "Una mano — todas", "deuxmains": "Dos manos — todas", "dansguide": "en el guía", "rien": "sin resultados", "brut": "sin mejorar", "exp": "exp", "pourcerang": "para este rango", "objets": "objetos", "sur": "de", "aucunestat": "Este objeto no lleva ninguna estadística numérica, así que un tier no le hace nada. Componentes de misión, contenedores, comida y objetos de lore están en la lista por exhaustividad.", "provenance": ". Un duplicado fusionado vale lo que costó su propio tier: farmear copias le gana a los motes en todo lo que dropea.", "effetfixe": " — los efectos no escalan con el tier."};</script>
 <script>// Les libelles visibles passent par T : une page traduite definit window.T avant
 // ce script et n'ecrase que ce qu'elle veut. L'anglais reste le defaut.
