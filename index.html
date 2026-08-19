@@ -2128,8 +2128,21 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     }
     p.style.visibility='hidden'; p.style.display='block';
     var r=el.getBoundingClientRect(), h=p.offsetHeight, w=p.offsetWidth;
-    var top=r.bottom+14; if(top+h>innerHeight-8) top=Math.max(8,r.top-h-8);
-    var left=Math.min(Math.max(8,r.left), innerWidth-w-8);
+    // La fiche s'ouvre PRES DU CURSEUR, pas sous l'objet. Ancree sur l'objet, elle
+    // pouvait naitre loin de la souris : pour aller cliquer le named dedans, le
+    // curseur traversait d'autres objets et la fiche etait remplacee en chemin.
+    // Repli sur le rectangle de l'objet quand il n'y a pas de curseur : tactile,
+    // clavier, ouverture depuis la recherche.
+    var _s = window.__eqSouris;
+    var _frais = _s && (Date.now() - _s.t) < 3000;
+    var top, left;
+    if(_frais){
+      top = _s.y + 16; if(top + h > innerHeight - 8) top = Math.max(8, _s.y - h - 16);
+      left = Math.min(Math.max(8, _s.x - 24), innerWidth - w - 8);
+    } else {
+      top = r.bottom + 14; if(top + h > innerHeight - 8) top = Math.max(8, r.top - h - 8);
+      left = Math.min(Math.max(8, r.left), innerWidth - w - 8);
+    }
     // ouvert depuis la recherche : on se pose A COTE de la liste, jamais dessus
     var liste=el.closest && el.closest('#eqres');
     if(liste){
@@ -2214,6 +2227,10 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       // Fermeture differee. Le relatedTarget d'un mouseout reel n'est PAS l'infobulle :
       // entre le nom et elle, le curseur traverse la cellule du tableau, et tester la
       // destination fermait quand meme. On laisse 400 ms pour arriver sur le lien.
+      // position du curseur, relue par montre() pour poser la fiche a cote de lui
+      document.addEventListener('mousemove',function(e){
+        window.__eqSouris={x:e.clientX,y:e.clientY,t:Date.now()};
+      },{passive:true});
       var tCache=null;
       var annule=function(){ if(tCache){ clearTimeout(tCache); tCache=null; } };
       var cacheDiffere=function(){ annule(); tCache=setTimeout(function(){ cache(); tCache=null; },400); };
