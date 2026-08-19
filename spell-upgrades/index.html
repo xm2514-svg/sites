@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6,11 +6,42 @@
 <title>Spell Upgrade +1 to +10 — what each mote tier gives (EQ Legends)</title>
 <meta name="description" content="EverQuest Legends spell upgrade, +1 to +10: what each mote tier actually gives — damage, healing, mana, cast, duration — and how many motes every rank costs. 2039 spells, computed for your own level.">
 <link rel="canonical" href="https://xm2514-svg.github.io/sites/spell-upgrades/">
-<meta property="og:title" content="Spell Upgrade +1 to +10 — mote tiers (EQ Legends)">
-<meta property="og:description" content="What motes actually give on a spell, tier by tier, computed from the game client's own data.">
+<link rel="alternate" hreflang="en" href="https://xm2514-svg.github.io/sites/spell-upgrades/">
+<link rel="alternate" hreflang="x-default" href="https://xm2514-svg.github.io/sites/spell-upgrades/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spell Upgrade +1 to +10 — what each mote tier gives (EQ Legends)">
+<meta property="og:description" content="EverQuest Legends spell upgrade, +1 to +10: what each mote tier actually gives — damage, healing, mana, cast, duration — and how many motes every rank costs. 2039 spells, computed for your own level.">
 <meta property="og:url" content="https://xm2514-svg.github.io/sites/spell-upgrades/">
-<style>
-:root{--bg:#0d0b09;--panel:#17130f;--line:#2c2419;--text:#e8dfd0;--dim:#a08f78;
+<meta property="og:image" content="https://xm2514-svg.github.io/sites/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="https://xm2514-svg.github.io/sites/favicon.ico">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "EQ Legends Spell Upgrade and Mote Tier Calculator", "url": "https://xm2514-svg.github.io/sites/spell-upgrades/", "applicationCategory": "GameApplication", "operatingSystem": "Any", "browserRequirements": "JavaScript", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": "Pick any of the 2039 obtainable EverQuest Legends spells, set your character level and read what it does at every merge tier from +0 to +10: damage, healing, mana, cast time, duration and the mote cost.", "isPartOf": {"@type": "WebSite", "name": "EQ Legends Guide", "url": "https://xm2514-svg.github.io/sites/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "EQ Legends Guide", "item": "https://xm2514-svg.github.io/sites/"}, {"@type": "ListItem", "position": 2, "name": "Spell upgrades and motes", "item": "https://xm2514-svg.github.io/sites/spell-upgrades/"}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What does a spell upgrade from +1 to +10 give in EQ Legends?", "acceptedAnswer": {"@type": "Answer", "text": "Direct-damage spells gain 6% of their base damage per rank, so +60% at rank 10. The figure is linear, not compounding, and the spell window keeps showing the unranked number at every tier."}}, {"@type": "Question", "name": "How many motes does it take to reach tier 10 on a spell?", "acceptedAnswer": {"@type": "Answer", "text": "The cost doubles each rank: 2 motes for rank 1, 32 for rank 5, 256 for rank 8 and 1024 to reach rank 10."}}, {"@type": "Question", "name": "Why does the same spell show different damage on two characters?", "acceptedAnswer": {"@type": "Answer", "text": "The client computes the value as base plus your level times a per-spell factor, then caps it. A level 20 and a level 50 character read different numbers for the same spell, which is why a database quoting a single figure is right for exactly one level."}}, {"@type": "Question", "name": "Does upgrading a pet spell raise the pet's level?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Frenzied Spirit summons a level 36 wolf at +0 and a level 41 one at tier 5, one level per tier, and the spell window never mentions it."}}]}]}</script>
+<style>*{box-sizing:border-box}
+body{margin:0;background:#0e0c0a;color:#e7ddcf;font:15px/1.6 "Segoe UI",system-ui,Arial,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:22px 18px 60px}
+a{color:#f4d585}
+h1{font-size:25px;line-height:1.25;color:#f4d585;margin:14px 0 6px}
+h2{font-size:17px;color:#f4d585;background:#211b14;border-left:4px solid #e0b04a;border-radius:8px;padding:8px 12px;margin:26px 0 10px}
+.lead{color:#a89a86;margin:0 0 18px}
+.card{background:#181410;border:1px solid #3a2f22;border-radius:9px;padding:12px 14px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 9px;border-bottom:1px solid #3a2f22}
+th{color:#e0b04a;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+tr:last-child td{border-bottom:0}
+.loc{color:#8fd0c0;white-space:nowrap}
+a.np{color:#f4d585;font-weight:600;text-decoration:none;border-bottom:1px dashed #8a7a5a}
+a.np:hover{border-bottom-color:#f4d585}
+.item{color:#f4d585;font-weight:600}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.back{display:inline-block;margin:26px 0 0;background:#211b14;border:1px solid #5a4a33;border-radius:8px;padding:10px 16px;color:#ffd77a;font-weight:700;text-decoration:none}
+.back:hover{background:#3a2c12;border-color:#f4d585}
+.crumb{font-size:13px;color:#a89a86}
+.crumb a{color:#a89a86}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid #3a2f22;color:#a89a86;font-size:13px}
+a:focus-visible,.back:focus-visible{outline:2px solid #f4d585;outline-offset:2px}
+@media(max-width:640px){.wrap{padding:16px 13px 48px}h1{font-size:21px}body{font-size:14.5px}}
+.src{font-size:12.5px;color:var(--dim,#a08f78);margin:1.6em 0 0;line-height:1.5}</style>
+<style>:root{--bg:#0d0b09;--panel:#17130f;--line:#2c2419;--text:#e8dfd0;--dim:#a08f78;
       --gold:#c8a83a;--gold2:#ffd97a;--green:#7fd18c}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Georgia,"Times New Roman",serif;padding:18px}
@@ -45,40 +76,24 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 .mesure{border-left-color:var(--green)}
 .calcul{border-left-color:var(--gold)}
 .pied{margin-top:2.4em;padding-top:1em;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
-@media(max-width:640px){body{padding:12px}h1{font-size:22px}.tiernum{font-size:26px}}
+@media(max-width:640px){body{padding:12px}h1{font-size:22px}.tiernum{font-size:26px}
+  /* quatre colonnes sur un telephone : on resserre, et l'en-tete le plus long est
+     remplace par « at tier » plutot que de passer sur trois lignes */
+  th,td{padding:6px 4px;font-size:14px}
+  th{font-size:10.5px;letter-spacing:.02em}
+  .col3{font-size:0}
+  .col3::after{content:"at tier";font-size:10.5px;letter-spacing:.02em}}
 </style>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
- {"@type":"WebApplication","name":"EQ Legends Spell Upgrade and Mote Tier Calculator",
-  "url":"https://xm2514-svg.github.io/sites/spell-upgrades/",
-  "applicationCategory":"GameApplication","operatingSystem":"Any","browserRequirements":"JavaScript",
-  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
-  "description":"Pick any of the 2039 obtainable EverQuest Legends spells, set your character level and read what it does at every merge tier from +0 to +10: damage, healing, mana, cast time, duration and the mote cost.",
-  "isPartOf":{"@type":"WebSite","name":"EQ Legends Guide","url":"https://xm2514-svg.github.io/sites/"}},
- {"@type":"BreadcrumbList","itemListElement":[
-  {"@type":"ListItem","position":1,"name":"EQ Legends Guide","item":"https://xm2514-svg.github.io/sites/"},
-  {"@type":"ListItem","position":2,"name":"Spell upgrades and motes","item":"https://xm2514-svg.github.io/sites/spell-upgrades/"}]},
- {"@type":"FAQPage","mainEntity":[
-  {"@type":"Question","name":"What does a spell upgrade from +1 to +10 give in EQ Legends?",
-   "acceptedAnswer":{"@type":"Answer","text":"Direct-damage spells gain 6% of their base damage per rank, so +60% at rank 10. The figure is linear, not compounding, and the spell window keeps showing the unranked number at every tier."}},
-  {"@type":"Question","name":"How many motes does it take to reach tier 10 on a spell?",
-   "acceptedAnswer":{"@type":"Answer","text":"The cost doubles each rank: 2 motes for rank 1, 32 for rank 5, 256 for rank 8 and 1024 to reach rank 10."}},
-  {"@type":"Question","name":"Why does the same spell show different damage on two characters?",
-   "acceptedAnswer":{"@type":"Answer","text":"The client computes the value as base plus your level times a per-spell factor, then caps it. A level 20 and a level 50 character read different numbers for the same spell, which is why a database quoting a single figure is right for exactly one level."}},
-  {"@type":"Question","name":"Does upgrading a pet spell raise the pet's level?",
-   "acceptedAnswer":{"@type":"Answer","text":"Yes. Frenzied Spirit summons a level 36 wolf at +0 and a level 41 one at tier 5, one level per tier, and the spell window never mentions it."}}]}]}
-</script>
 </head>
 <body>
 <div class="wrap">
-
-<p class="fil"><a href="../">EQ Legends Guide</a> › <a href="../motes/">Motes of Potential</a> › Spell motes</p>
+<p class="crumb"><a href="https://xm2514-svg.github.io/sites/">EQ Legends Guide</a> ›</p>
 <h1>Spell upgrade, +1 to +10 — what each mote tier actually gives</h1>
-<p class="intro">Before you feed a rare <b>mote</b> into a spell, see what it buys. Upgrading gear instead? <a href="../item-upgrades/">The item version is here</a>. Set your level, pick a spell, drag the tier. Every number below is computed
+<p class="lead">Before you feed a rare <b>mote</b> into a spell, see what it buys. Upgrading gear instead? <a href="https://xm2514-svg.github.io/sites/item-upgrades/">The item version is here</a>. Set your level, pick a spell, drag the tier. Every number below is computed
 the way the game computes it &mdash; the base value, your level, and the cap &mdash; so the +0 column
 should match your own spell window line for line. If it does not, tell me: that is a bug worth
-knowing about.</p>
-
+knowing about.
+</p>
 <div class="panel">
   <div class="rangee">
     <div class="court">
@@ -114,7 +129,7 @@ knowing about.</p>
   <p class="desc" id="desc"></p>
   <input type="range" id="tier" min="0" max="10" value="0" step="1">
   <table>
-    <thead><tr><th>Stat</th><th class="v">+0</th><th class="v">at this tier</th><th class="v">change</th></tr></thead>
+    <thead><tr><th>Stat</th><th class="v">+0</th><th class="v col3">at this tier</th><th class="v">change</th></tr></thead>
     <tbody id="corps"></tbody>
   </table>
   <div id="effets"></div>
@@ -151,13 +166,15 @@ a rank raises the highest NPC level the spell will land on.</div>
 it already carries your stance, specialisation and focus items, so a stat can read modified at tier 0.
 Compare against your own tier 0, not against the base.</div>
 
-<p class="pied">Spell data from the EverQuest Legends client, files dated 17 August 2026.
+<p class="src">Spell data from the EverQuest Legends client, files dated 17 August 2026.
 Tier scaling from <a href="https://eqltools.com/learn/spell-upgrades" target="_blank" rel="noopener">EQL Tools</a>,
-corrected against live client readings. Part of the <a href="../">EQ Legends guide</a>.</p>
+corrected against live client readings. Part of the <a href="https://xm2514-svg.github.io/sites/">EQ Legends guide</a>.</p>
 
+<a class="back" href="https://xm2514-svg.github.io/sites/#c13">Full 1–50 trio guide → Chapter 11 — Legends systems: merging, motes and spell ranks</a>
+<footer>EverQuest Legends · updated 2026-08-04 · part of the
+<a href="https://xm2514-svg.github.io/sites/#c13">Paladin / Monk / Shaman guide</a>.</footer>
 </div>
-<script>
-var CLASSES={WAR:'Warrior',CLR:'Cleric',PAL:'Paladin',RNG:'Ranger',SHD:'Shadow Knight',
+<script>var CLASSES={WAR:'Warrior',CLR:'Cleric',PAL:'Paladin',RNG:'Ranger',SHD:'Shadow Knight',
   DRU:'Druid',MNK:'Monk',BRD:'Bard',ROG:'Rogue',SHM:'Shaman',NEC:'Necromancer',
   WIZ:'Wizard',MAG:'Magician',ENC:'Enchanter',BST:'Beastlord',BER:'Berserker'};
 var TYPES={nuke:'direct damage',dot:'damage over time',heal:'heal',hot:'heal over time',
@@ -212,6 +229,9 @@ function texte(v,lvl,rang){
   if(v.ticks){
     var t=v.ticks*(1+taux(v.t,'duree')*rang);
     d=d.replace(/%z/g,'<b>'+duree(t*6)+'</b>');
+    // Le client ecrit « between #1 and @1 » : la valeur, puis son plafond. Au niveau ou
+    // le sort plafonne les deux sont egaux et la phrase se mord la queue.
+    d=d.replace(/between (<b>[^<]+<\/b>) and \1/g, '$1');
   }
   return d.replace(/%\w/g,'');
 }
@@ -288,7 +308,7 @@ function choisi(){
   affiche();
 }
 
-fetch('../spells.json').then(function(r){return r.json();}).then(function(j){
+fetch('https://xm2514-svg.github.io/sites/spells.json').then(function(r){return r.json();}).then(function(j){
   D=j.spells;
   var s=document.getElementById('cl');
   s.innerHTML='<option value="">Every class</option>'+Object.keys(CLASSES).map(function(c){
@@ -303,5 +323,6 @@ document.getElementById('sp').addEventListener('change',choisi);
 document.getElementById('tier').addEventListener('input',affiche);
 document.getElementById('lv').addEventListener('input',affiche);
 </script>
+<script data-goatcounter="https://keplerdust.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
