@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Spell Mote Calculator — what motes give at every tier +0 to +10 (EQ Legends)</title>
-<meta name="description" content="Feeding motes into a spell in EverQuest Legends? See exactly what each mote tier gives — damage, healing, mana, cast, duration — from +0 to +10, and how many motes each rank costs. 2039 spells, computed for your level.">
+<title>Spell Upgrade +1 to +10 — what each mote tier gives (EQ Legends)</title>
+<meta name="description" content="EverQuest Legends spell upgrade, +1 to +10: what each mote tier actually gives — damage, healing, mana, cast, duration — and how many motes every rank costs. 2039 spells, computed for your own level.">
 <link rel="canonical" href="https://xm2514-svg.github.io/sites/spell-upgrades/">
-<meta property="og:title" content="Spell Mote Calculator — EQ Legends">
+<meta property="og:title" content="Spell Upgrade +1 to +10 — mote tiers (EQ Legends)">
 <meta property="og:description" content="What motes actually give on a spell, tier by tier, computed from the game client's own data.">
 <meta property="og:url" content="https://xm2514-svg.github.io/sites/spell-upgrades/">
 <style>
@@ -49,7 +49,7 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
- {"@type":"WebApplication","name":"EQ Legends Spell Mote Calculator",
+ {"@type":"WebApplication","name":"EQ Legends Spell Upgrade and Mote Tier Calculator",
   "url":"https://xm2514-svg.github.io/sites/spell-upgrades/",
   "applicationCategory":"GameApplication","operatingSystem":"Any","browserRequirements":"JavaScript",
   "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
@@ -57,9 +57,9 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
   "isPartOf":{"@type":"WebSite","name":"EQ Legends Guide","url":"https://xm2514-svg.github.io/sites/"}},
  {"@type":"BreadcrumbList","itemListElement":[
   {"@type":"ListItem","position":1,"name":"EQ Legends Guide","item":"https://xm2514-svg.github.io/sites/"},
-  {"@type":"ListItem","position":2,"name":"Spell motes","item":"https://xm2514-svg.github.io/sites/spell-upgrades/"}]},
+  {"@type":"ListItem","position":2,"name":"Spell upgrades and motes","item":"https://xm2514-svg.github.io/sites/spell-upgrades/"}]},
  {"@type":"FAQPage","mainEntity":[
-  {"@type":"Question","name":"How much damage does a spell gain per upgrade tier in EQ Legends?",
+  {"@type":"Question","name":"What does a spell upgrade from +1 to +10 give in EQ Legends?",
    "acceptedAnswer":{"@type":"Answer","text":"Direct-damage spells gain 6% of their base damage per rank, so +60% at rank 10. The figure is linear, not compounding, and the spell window keeps showing the unranked number at every tier."}},
   {"@type":"Question","name":"How many motes does it take to reach tier 10 on a spell?",
    "acceptedAnswer":{"@type":"Answer","text":"The cost doubles each rank: 2 motes for rank 1, 32 for rank 5, 256 for rank 8 and 1024 to reach rank 10."}},
@@ -73,7 +73,7 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 <div class="wrap">
 
 <p class="fil"><a href="../">EQ Legends Guide</a> › <a href="../motes/">Motes of Potential</a> › Spell motes</p>
-<h1>Spell motes — what each tier actually gives, +0 to +10</h1>
+<h1>Spell upgrade, +1 to +10 — what each mote tier actually gives</h1>
 <p class="intro">Before you feed a rare <b>mote</b> into a spell, see what it buys. Set your level, pick a spell, drag the tier. Every number below is computed
 the way the game computes it &mdash; the base value, your level, and the cap &mdash; so the +0 column
 should match your own spell window line for line. If it does not, tell me: that is a bug worth
@@ -120,6 +120,8 @@ knowing about.</p>
   <div id="effets"></div>
 </div>
 
+<h2>Spell upgrade tiers, +1 to +10 — the mote cost and what it buys</h2>
+<div class="note calcul"><b>Rank by rank.</b> Each rank costs twice the previous one in motes &mdash; 2 at +1, 32 at +5, 256 at +8, 1 024 to reach +10 &mdash; and gives a direct-damage spell +6 % of its base damage, a buff +10 % duration, and every spell a shorter cast and a lower mana cost. Drag the slider above to read any spell at any tier.</div>
 <h2>Where the numbers come from</h2>
 
 <div class="note mesure"><b>The game's own files.</b> Spell data is read from the client's
