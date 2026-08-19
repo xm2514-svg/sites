@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Item Upgrade +1 to +10 — what each mote tier gives (EQ Legends)</title>
+<meta name="description" content="EverQuest Legends item upgrade, +1 to +10: what each mote and merge tier actually gives on any piece of gear — AC, HP, mana, stats, damage — and how many duplicates or motes every rank costs. 11 069 items.">
+<link rel="canonical" href="https://xm2514-svg.github.io/sites/item-upgrades/">
+<meta property="og:title" content="Item Upgrade +1 to +10 — mote tiers (EQ Legends)">
+<meta property="og:description" content="What merging and motes actually give on a piece of gear, tier by tier.">
+<meta property="og:url" content="https://xm2514-svg.github.io/sites/item-upgrades/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"WebApplication","name":"EQ Legends Item Upgrade and Mote Tier Calculator",
+  "url":"https://xm2514-svg.github.io/sites/item-upgrades/",
+  "applicationCategory":"GameApplication","operatingSystem":"Any","browserRequirements":"JavaScript",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "description":"Pick any of 11069 EverQuest Legends items and read every stat at each merge tier from +0 to +10, with the duplicate and mote cost to get there.",
+  "isPartOf":{"@type":"WebSite","name":"EQ Legends Guide","url":"https://xm2514-svg.github.io/sites/"}},
+ {"@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"EQ Legends Guide","item":"https://xm2514-svg.github.io/sites/"},
+  {"@type":"ListItem","position":2,"name":"Item upgrades and motes","item":"https://xm2514-svg.github.io/sites/item-upgrades/"}]},
+ {"@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"What does an item upgrade from +1 to +10 give in EQ Legends?",
+   "acceptedAnswer":{"@type":"Answer","text":"Each tier adds 10% of the item's base stats, with a guaranteed minimum of +1 per stat, so a tier-10 item sits at +100% of its base, and every value rounds down: AC 17 reads 20 at tier 2. Measured in game, three things break that rule: weapon damage gets no minimum, resistances and haste go up by exactly +1 per tier, and weight goes down by an amount that does not fit a clean formula. Armour also gains SV Void equal to its tier from +2 up."}},
+  {"@type":"Question","name":"How many duplicates does it take to reach tier 10 on an item?",
+   "acceptedAnswer":{"@type":"Answer","text":"1023 experience in total. A tier-0 copy donates 1, and the value doubles each tier: a tier-4 copy is worth 16, a tier-9 copy 512. Climbing on tier-0 drops alone means merging around a thousand of them."}},
+  {"@type":"Question","name":"Does upgrading a weapon reduce its delay?",
+   "acceptedAnswer":{"@type":"Answer","text":"No, the delay never decreases. Weapon damage rises 10% per tier and, unlike other stats, gets no minimum of +1: a base damage of 6 reads 8 at tier 4. Weight goes down slightly, and upgraded armour gains SV Void equal to its tier from +2 onwards."}},
+  {"@type":"Question","name":"Should I use motes or duplicates to upgrade gear?",
+   "acceptedAnswer":{"@type":"Answer","text":"The developers describe motes as a catch-up path rather than the main one, meant for gear you cannot easily farm duplicates of, such as epics and long quest rewards. Farming duplicates is the primary route for droppable items."}}]}]}
+</script>
+<style>
+:root{--bg:#0d0b09;--panel:#17130f;--line:#2c2419;--text:#e8dfd0;--dim:#a08f78;
+      --gold:#c8a83a;--gold2:#ffd97a;--green:#7fd18c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Georgia,"Times New Roman",serif;padding:18px}
+.wrap{max-width:1000px;margin:0 auto}
+a{color:var(--gold2)}
+h1{font-size:26px;color:var(--gold);margin:.2em 0 .1em}
+h2{font-size:19px;color:var(--gold);margin:1.6em 0 .5em}
+.fil{color:var(--dim);font-size:13px;margin:0 0 1.2em}
+.intro{color:var(--dim);font-size:15px;max-width:70ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin:14px 0}
+label{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+select,input[type=search]{width:100%;padding:9px 10px;background:#0b0908;color:var(--text);
+     border:1px solid var(--line);border-radius:6px;font:15px Georgia,serif}
+.rangee{display:flex;gap:12px;flex-wrap:wrap}
+.rangee>div{flex:1 1 220px}
+#tier{width:100%;accent-color:var(--gold)}
+.tiertete{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.tiernum{font-size:30px;color:var(--gold2);font-weight:bold}
+table{width:100%;border-collapse:collapse;margin-top:6px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);font-size:15px}
+th{color:var(--gold);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+td.v{text-align:right;font-variant-numeric:tabular-nums}
+.mieux{color:var(--green)}
+.rien{color:var(--dim)}
+.nom{color:var(--gold2);font-size:20px;font-weight:bold}
+.eti{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+     border:1px solid var(--line);border-radius:4px;padding:1px 7px;color:var(--dim);margin-right:5px}
+.note{font-size:13px;color:var(--dim);border-left:2px solid var(--line);padding-left:12px;margin:12px 0}
+.mesure{border-left-color:var(--green)}
+.calcul{border-left-color:var(--gold)}
+.pied{margin-top:2.4em;padding-top:1em;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+@media(max-width:640px){body{padding:12px}h1{font-size:22px}.tiernum{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="fil"><a href="../">EQ Legends Guide</a> › <a href="../motes/">Motes of Potential</a> › Item upgrades</p>
+<h1>Item upgrade, +1 to +10 — what each mote tier actually gives</h1>
+<p class="intro">Before you sink a thousand duplicates or a rare <b>mote</b> into a piece of gear,
+see what it buys. Pick an item, drag the tier: every stat is recomputed the way the game does it,
+along with the merge experience each rank costs. Looking for spells instead?
+<a href="../spell-upgrades/">The spell version is here</a>.</p>
+
+<div class="panel">
+  <div class="rangee">
+    <div>
+      <label for="q">Search an item</label>
+      <input type="search" id="q" placeholder="cloak of flames, mithril, fbss…" autocomplete="off">
+    </div>
+    <div>
+      <label for="sl">Slot</label>
+      <select id="sl"></select>
+    </div>
+    <div>
+      <label for="sk">Weapon type</label>
+      <select id="sk"></select>
+    </div>
+  </div>
+  <div style="margin-top:12px">
+    <label for="it">Item <span id="cpt" style="float:right;text-transform:none;letter-spacing:0;font-style:italic">…</span></label>
+    <select id="it"></select>
+  </div>
+</div>
+
+<div class="panel" id="fiche" hidden>
+  <div class="tiertete">
+    <div>
+      <div class="nom" id="nom"></div>
+      <div id="etis"></div>
+    </div>
+    <div style="text-align:right">
+      <div class="tiernum" id="tnum">+0</div>
+      <div style="font-size:12px;color:var(--dim)" id="tcout"></div>
+    </div>
+  </div>
+  <input type="range" id="tier" min="0" max="10" value="0" step="1">
+  <table>
+    <thead><tr><th>Stat</th><th class="v">+0</th><th class="v">at this tier</th><th class="v">gain</th></tr></thead>
+    <tbody id="corps"></tbody>
+  </table>
+  <div id="extra"></div>
+</div>
+
+<h2>Item upgrade tiers, +1 to +10 — the cost and what it buys</h2>
+<div class="note calcul"><b>Rank by rank.</b> Every tier adds <b>10 % of the base</b>, with a
+guaranteed <b>minimum of +1</b> per stat, so a tier-10 piece sits at <b>+100 %</b> &mdash; the growth
+is linear, not compounded. Every value rounds down: AC 17 reads 20 at tier 2, not 21. A negative
+stat is left alone, and <b>a weapon's delay never decreases</b>.</div>
+
+<div class="note mesure"><b>Checked against the game, not just the patch notes.</b> Eleven upgraded
+items were read side by side with their unranked entry, from +1 up to +8 &mdash; <b>24 stats, no
+deviation</b> from the rule above. A Bronze Mask at +0 matches its database entry exactly (AC 5,
+weight 1.9), which is the reference the rest is measured from. Two behaviours do break the published
+rule, and the calculator follows the measured one:
+
+<br><br><b>Weapon damage gets no minimum.</b> A Flaming Fist with base damage 6 reads 8 at +4 and 9
+at +5 &mdash; not 10 and 11. Damage takes its 10 % and nothing more, which is why a low-damage weapon
+climbs so slowly.
+
+<br><br><b>Haste is the real exception.</b> A Flowing Black Silk Sash reads 24 % at +3, up from 21 %,
+and a Mithril Two-Handed Sword 33 % at +2, up from 31 % &mdash; one point per tier, not ten percent.
+At +10 that is 41 %, not 62 %.
+<br><br><b>Resistances are not an exception</b>, though they look like one. A Silver-Plated Bracer goes
+from 5 poison to 9 at +4, which reads as +1 per tier &mdash; but it is the guaranteed minimum winning
+over 10 % of a small base. On a resist of 40 the percentage takes over. The calculator applies the
+general rule.</div>
+
+<div class="note calcul"><b>Why your item can read higher than this page.</b> Merge experience carries
+between merges, and the stats climb <b>partway through a tier</b>, not only when it flips. An item
+sitting at +4 with its bar half full is already worth a little more than a clean +4. This page shows
+the clean tier, so treat it as the floor for a partly-filled bar.</div>
+
+<div class="note mesure"><b>Upgrading grants SV Void, and nothing tells you.</b> Void resistance
+appears on 3 items out of 11 069 in the database, yet every upgraded piece of armour carries it:
+2 at +2, 3 at +3, 4 at +4, 5 at +5, 8 at +8. It equals the tier.
+<br><br>Two limits, both measured: the <b>two items seen at +1 have none at all</b>, so it seems to
+start at +2, and <b>weapons don't get it</b> &mdash; a Flaming Fist at +5 shows its fire resistance
+and no Void.</div>
+
+<div class="note mesure"><b>What counts as a duplicate.</b> Straight from the client's own help
+file, section 4.3: <i>the item's + modifier does not matter as long as the base item is the same</i>.
+A Rusty Short Sword merges into a Rusty Short Sword +2 without trouble &mdash; but a Rusty Short
+Sword and a Short Sword are two different items and will not combine. Any copy you find is fuel,
+whatever tier it dropped at, and it donates what its own tier cost.</div>
+
+<div class="note mesure"><b>Upgrading unlocks Exaltations.</b> Section 4.4 of the client help: once an
+item is upgraded you can lift an effect off one piece and put it on another, provided both share the
+same slot, the same class restriction and <b>the same upgrade level</b>. A +4 Gnoll Hide Lariat's stun
+proc moves onto a +4 Mithril Two Hander; it will not move onto a +4 Dagger of Marnek, because the
+Lariat was never usable by a Necromancer. There are four slots &mdash; Focus, Click, Worn and Proc
+&mdash; which is why an upgraded item shows four empty Exaltation lines. Effects themselves never
+scale with tier, but this is how you move a good one onto better gear.</div>
+
+<div class="note"><b>Weight, honestly.</b> It goes down, but the step doesn't fit a formula yet:
+1.9 becomes 1.8 at +1, 1.0 becomes 0.8 at +2 and 0.7 at +4, while 0.2 is still 0.2 at +5. Rather than
+print a number that would be wrong, the table leaves the base value and says so. It has no bearing on
+anything but your encumbrance.</div>
+
+<div class="note calcul"><b>What it costs.</b> Reaching tier 10 takes <b>1 023 experience</b>. A
+duplicate donates what its own tier cost: a tier-0 copy is worth 1, and it doubles every tier &mdash;
+a tier-4 copy 16, a tier-9 copy 512. Climbing on base drops alone means merging on the order of a
+thousand of them, which is why a high-difficulty drop, already several tiers up, is worth so much
+more than its count suggests.</div>
+
+<div class="note calcul"><b>Motes are a bad deal on gear &mdash; and that is deliberate.</b> The same
+mote pays two completely different amounts depending on what you feed it to. Into a <b>spell</b>, a
+rank-N mote gives its <b>total</b> value, which doubles every rank: 1, 2, 4, 8, 16, 32. Into an
+<b>item</b>, the very same mote gives only its <b>rank number</b>: 1, 2, 3, 4, 5, 6. A Mote of Major
+Potential is worth <b>16 to a spell and 5 to a piece of gear</b> &mdash; against the 32 that tier
+costs.
+<br><br>A mote must also <b>out-rank the item</b>: a +4 item only accepts rank-5 motes and above, so
+past +4 you are forced onto expensive motes that pay 5. That is the cliff, and it is why the
+developers call motes a catch-up path rather than the main one.</div>
+
+<div class="note calcul"><b>The trick worth knowing: load a duplicate, then merge it.</b> An item
+merged into an item pays like a mote into a spell &mdash; <b>the full doubling value</b>, not the
+linear one. So don't feed good motes to the piece you are wearing. Take a <b>second copy</b>, pour
+your cheap motes into that one, and merge the loaded copy in.
+<br><br>The split that follows: <b>high motes into spells, low motes into duplicate gear</b>, and
+spend <b>Void-touched Potential on items</b> &mdash; three a week from raid activity, each worth a
+full rank. A spell can be finished with whatever motes you happen to own; an item cannot.
+<span class="rien">(Mote values are player-stated and consistent across two independent accounts;
+no developer post tabulates them.)</span></div>
+
+<div class="note mesure"><b>Haste is the exception.</b> The published rule does not carve it out,
+but a client reading does: a Mithril Two-Handed Sword shows <b>31 % at +0 and 33 % at +2</b> &mdash;
+one point per tier, not ten percent. At +10 that is 41 %, not 62 %. This page applies +1 per tier to
+haste and says so rather than quoting a number nobody will see in game.</div>
+
+<div class="note"><b>Motes or duplicates?</b> The developers are explicit: motes are a catch-up path,
+not the main one &mdash; <i>&ldquo;mostly meant to help out with items you really don't want to farm
+duplicates of, like long quests, epics, and such&rdquo;</i>. For anything that drops, farming copies
+is the intended route. And Void-touched Potential, earned from raids up to three times a week, raises
+any item a full rank &mdash; worth most at the top, where a single rank would otherwise cost 512 copies.</div>
+
+<p class="pied">Item data from the guide's own database, all 11 069 items — 6 594 of them carry at least one stat a tier can raise.
+Upgrade rules from <a href="https://eqltools.com/learn/upgrades" target="_blank" rel="noopener">EQL Tools</a>,
+checked against live client readings. Part of the <a href="../">EQ Legends guide</a>.</p>
+
+</div>
+<script>
+var D=null, cour=null, TOTAL=0;
+var ORDRE=['AC','HP','MANA','ENDUR','STR','STA','AGI','DEX','WIS','INT','CHA','DMG','Attack',
+  'HP Regen','Mana Regen','SV Magic','SV Fire','SV Cold','SV Poison','SV Disease','SV Corruption'];
+
+// +10 % du base par tier, minimum +1 par tier, arrondi vers le bas.
+// « cumulative +10% ... +100% at tier 10 » : c'est lineaire, pas compose — sinon
+// 1,1^10 donnerait +159 %. Une penalite (valeur negative) ne bouge pas.
+function auTier(base,tier){
+  if(base<0) return base;
+  return Math.floor(Math.max(base*(1+0.10*tier), base+tier));
+}
+// le poids baisse dans les memes proportions, jamais sous 0.1
+// Mesure sur six objets en jeu (Flaming Fist +4 et +5, FBSS +3, Mithril Breastplate +2,
+// Carnal Pauldrons +2, Pristine Studded Leather Gloves +5) :
+//   · les degats d'arme n'ont PAS le minimum +1 — base 6 donne 8 a +4, pas 10
+//   · les resistances suivent bien la regle generale : le +1 par tier qu'on observe sur
+//     une base de 5 est le minimum garanti qui prend le dessus sur les 10 %, pas une regle
+//     a part. La Haste, elle, est une vraie exception : 21 % → 24 % a +3.
+function degats(base,tier){
+  if(base<0) return base;
+  return Math.floor(base*(1+0.10*tier));
+}
+
+function affiche(){
+  if(!cour) return;
+  var v=cour, r=+document.getElementById('tier').value;
+  document.getElementById('tnum').textContent='+'+r;
+  document.getElementById('tcout').textContent = r?
+    ((Math.pow(2,r)-1).toLocaleString('en')+' exp · '+Math.pow(2,r-1).toLocaleString('en')+' for this rank')
+    : 'unupgraded';
+  var out='';
+  ORDRE.forEach(function(k){
+    var b=(v.st||{})[k]; if(b===undefined||b===0) return;
+    var n = k==='DMG' ? degats(b,r) : auTier(b,r), g=n-b;
+    out+='<tr><td>'+k+'</td><td class="v">'+b+'</td>'+
+         '<td class="v '+(g?'mieux':'rien')+'">'+n+'</td>'+
+         '<td class="v '+(g?'mieux':'rien')+'">'+(g? '+'+g : '&mdash;')+'</td></tr>';
+  });
+  if(v.haste){
+    var h=v.haste+r, g=r;
+    out+='<tr><td>Haste</td><td class="v">'+v.haste+' %</td>'+
+         '<td class="v '+(g?'mieux':'rien')+'">'+h+' %</td>'+
+         '<td class="v '+(g?'mieux':'rien')+'">'+(g? '+'+g : '&mdash;')+'</td></tr>';
+  }
+  if(v.dly) out+='<tr><td>Delay</td><td class="v">'+v.dly+'</td><td class="v rien">'+v.dly+
+                 '</td><td class="v rien">never drops</td></tr>';
+  if(v.wt!==undefined) out+='<tr><td>Weight</td><td class="v">'+v.wt+'</td><td class="v rien">'+
+                            v.wt+'</td><td class="v rien">drops a little &mdash; see below</td></tr>';
+  // La resistance au Void n'existe pas dans les fiches (3 objets sur 11 069) : c'est
+  // l'amelioration qui la donne. Relevee sur 7 pieces d'armure, elle vaut le tier — mais
+  // les deux objets vus a +1 n'en ont aucune, et ni l'arme ni la ceinture n'en gagnent.
+  if((v.st||{}).AC){
+    var vd = r>=2 ? r : 0;
+    out+='<tr><td>SV Void</td><td class="v">0</td><td class="v '+(vd?'mieux':'rien')+'">'+vd+
+         '</td><td class="v '+(vd?'mieux':'rien')+'">'+(vd? '+'+vd : '&mdash;')+'</td></tr>';
+  }
+  document.getElementById('corps').innerHTML=out||
+    '<tr><td colspan="4" class="rien">This item carries no numeric stat, so a tier does nothing to it '+
+    '&mdash; quest components, containers, food and lore items are in the list for completeness.</td></tr>';
+
+  var e='';
+  if(v.dmg2||(v.st&&v.st.DMG&&v.dly)){
+    var d0=v.st.DMG, d1=degats(d0,r);
+    e+='<div class="note" style="margin-top:10px">Ratio '+(d0/v.dly).toFixed(2)+' &rarr; <b>'+
+       (d1/v.dly).toFixed(2)+'</b> damage per unit of delay. The delay is fixed, so every point of '+
+       'damage is a straight gain.</div>';
+  }
+  if(v.mobs&&v.mobs.length) e+='<div class="note" style="margin-top:10px"><b>Drops from</b> '+
+     v.mobs.join(', ')+(v.zone? ' &mdash; '+v.zone : '')+'. A duplicate merged in is worth '+
+     'what its own tier cost, so farming copies beats motes on anything that drops.</div>';
+  if(v.eff) e+='<div class="note" style="margin-top:10px"><b>Effect:</b> '+v.eff+
+     ' &mdash; effects do not scale with tier.</div>';
+  document.getElementById('extra').innerHTML=e;
+}
+
+function liste(){
+  var q=document.getElementById('q').value.toLowerCase().trim(),
+      sl=document.getElementById('sl').value,
+      sk=document.getElementById('sk').value, l=[];
+  for(var n in D){
+    var v=D[n];
+    if(sl && v.slot!==sl) continue;
+    // « One hand » / « Two hand » regroupent les trois familles de degats
+    if(sk){
+      if(sk==='1H'){ if(!v.skill||v.skill.indexOf('1H')!==0) continue; }
+      else if(sk==='2H'){ if(!v.skill||v.skill.indexOf('2H')!==0) continue; }
+      else if(v.skill!==sk) continue;
+    }
+    if(q && n.toLowerCase().indexOf(q)<0) continue;
+    l.push([n,v]);
+  }
+  // les objets du guide d'abord : ce sont ceux qu'on sait ou farmer
+  l.sort(function(a,b){ return (b[1].g||0)-(a[1].g||0) || a[0].localeCompare(b[0]); });
+  var s=document.getElementById('it');
+  s.innerHTML=l.slice(0,400).map(function(x){
+    return '<option value="'+x[0].replace(/"/g,'&quot;')+'">'+x[0]+(x[1].g?' ★':'')+'</option>';
+  }).join('')||'<option value="">no match</option>';
+  var c=document.getElementById('cpt');
+  if(c) c.textContent = l.length ?
+    (l.length===TOTAL ? TOTAL.toLocaleString('en')+' items'
+                      : l.length.toLocaleString('en')+' of '+TOTAL.toLocaleString('en'))
+    : 'no match';
+  choisi();
+}
+function choisi(){
+  var n=document.getElementById('it').value;
+  cour=n? D[n]:null;
+  document.getElementById('fiche').hidden=!cour;
+  if(!cour) return;
+  document.getElementById('nom').textContent=n;
+  var e='';
+  if(cour.slot) e+='<span class="eti">'+cour.slot+'</span>';
+  if(cour.skill) e+='<span class="eti">'+cour.skill+'</span>';
+  if(cour.cl&&cour.cl!=='ALL') e+='<span class="eti">'+cour.cl+'</span>';
+  if(cour.race) e+='<span class="eti">'+cour.race+'</span>';
+  if(cour.g) e+='<span class="eti" style="border-color:var(--gold);color:var(--gold2)">in the guide</span>';
+  document.getElementById('etis').innerHTML=e;
+  affiche();
+}
+
+fetch('../items-calc.json').then(function(r){return r.json();}).then(function(j){
+  D=j.items; TOTAL=Object.keys(D).length;
+  var slots={};
+  for(var n in D) if(D[n].slot) slots[D[n].slot]=1;
+  document.getElementById('sl').innerHTML='<option value="">Every slot</option>'+
+    Object.keys(slots).sort().map(function(s){return '<option>'+s+'</option>';}).join('');
+  // l'ordre est celui qu'un joueur cherche, pas l'alphabet
+  var ORDRE=['1H Slashing','1H Blunt','1H Piercing','2H Slashing','2H Blunt','2H Piercing',
+             'Hand to Hand','Archery','Throwing'];
+  var nb={}; for(var n2 in D) if(D[n2].skill) nb[D[n2].skill]=(nb[D[n2].skill]||0)+1;
+  var un=0,deux=0; for(var k in nb){ if(k.indexOf('1H')===0) un+=nb[k]; if(k.indexOf('2H')===0) deux+=nb[k]; }
+  document.getElementById('sk').innerHTML='<option value="">Any type</option>'
+    +'<option value="1H">One hand — all ('+un+')</option>'
+    +'<option value="2H">Two hand — all ('+deux+')</option>'
+    +ORDRE.filter(function(s){return nb[s];})
+       .map(function(s){return '<option value="'+s+'">'+s+' ('+nb[s]+')</option>';}).join('');
+  liste();
+  document.getElementById('it').value='Cloak of Flames';
+  choisi();
+});
+['q','sl','sk'].forEach(function(id){ document.getElementById(id).addEventListener('input',liste); });
+document.getElementById('it').addEventListener('change',choisi);
+document.getElementById('tier').addEventListener('input',affiche);
+</script>
+</body>
+</html>
