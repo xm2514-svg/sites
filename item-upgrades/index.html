@@ -197,11 +197,6 @@ full rank. A spell can be finished with whatever motes you happen to own; an ite
 <span class="rien">(Mote values are player-stated and consistent across two independent accounts;
 no developer post tabulates them.)</span></div>
 
-<div class="note mesure"><b>Haste is the exception.</b> The published rule does not carve it out,
-but a client reading does: a Mithril Two-Handed Sword shows <b>31 % at +0 and 33 % at +2</b> &mdash;
-one point per tier, not ten percent. At +10 that is 41 %, not 62 %. This page applies +1 per tier to
-haste and says so rather than quoting a number nobody will see in game.</div>
-
 <div class="note"><b>Motes or duplicates?</b> The developers are explicit: motes are a catch-up path,
 not the main one &mdash; <i>&ldquo;mostly meant to help out with items you really don't want to farm
 duplicates of, like long quests, epics, and such&rdquo;</i>. For anything that drops, farming copies
@@ -295,7 +290,8 @@ function liste(){
       sk=document.getElementById('sk').value, l=[];
   for(var n in D){
     var v=D[n];
-    if(sl && v.slot!==sl) continue;
+    // un objet « PRIMARY SECONDARY » se porte en primaire : demander PRIMARY doit le sortir
+    if(sl && (!v.slot || (' '+v.slot+' ').indexOf(' '+sl+' ')<0)) continue;
     // « One hand » / « Two hand » regroupent les trois familles de degats
     if(sk){
       if(sk==='1H'){ if(!v.skill||v.skill.indexOf('1H')!==0) continue; }
@@ -336,10 +332,17 @@ function choisi(){
 
 fetch('../items-calc.json').then(function(r){return r.json();}).then(function(j){
   D=j.items; TOTAL=Object.keys(D).length;
-  var slots={};
-  for(var n in D) if(D[n].slot) slots[D[n].slot]=1;
+  // 53 combinaisons dans la base pour 18 emplacements reels : on liste les emplacements,
+  // dans l'ordre ou on s'habille, et on compte les objets qui les acceptent
+  var ORDRE_SL=['HEAD','FACE','EAR','NECK','SHOULDERS','BACK','CHEST','ARMS','WRIST','HANDS',
+                'FINGERS','WAIST','LEGS','FEET','PRIMARY','SECONDARY','RANGE','AMMO'];
+  var nbsl={};
+  for(var n in D){ if(!D[n].slot) continue;
+    D[n].slot.split(' ').forEach(function(s){ nbsl[s]=(nbsl[s]||0)+1; }); }
   document.getElementById('sl').innerHTML='<option value="">Every slot</option>'+
-    Object.keys(slots).sort().map(function(s){return '<option>'+s+'</option>';}).join('');
+    ORDRE_SL.filter(function(s){return nbsl[s];})
+      .map(function(s){return '<option value="'+s+'">'+s.charAt(0)+s.slice(1).toLowerCase()+
+                              ' ('+nbsl[s]+')</option>';}).join('');
   // l'ordre est celui qu'un joueur cherche, pas l'alphabet
   var ORDRE=['1H Slashing','1H Blunt','1H Piercing','2H Slashing','2H Blunt','2H Piercing',
              'Hand to Hand','Archery','Throwing'];
