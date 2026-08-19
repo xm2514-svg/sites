@@ -2116,15 +2116,6 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         : _lg==='de' ? 'Auf den goldenen Namen klicken \u2014 die Karte zeigt die Fundstelle'
         : _lg==='es' ? 'Haz clic en el nombre dorado: el mapa muestra donde suelta'
         : 'Click the gold name \u2014 the map opens where it drops';
-      // En plein ecran c'est le clic qui ouvre et ferme : on l'ecrit DANS la meme ligne
-      // que l'aide existante. Un second <span> n'apparaissait pas a l'ecran.
-      var _mv=document.getElementById('mv');
-      if(_mv && _mv.classList.contains('on')){
-        aide.textContent += _lg==='fr' ? ' \u00b7 un second clic referme l\u2019infobulle'
-          : _lg==='de' ? ' \u00b7 ein zweiter Klick schliesst das Tooltip'
-          : _lg==='es' ? ' \u00b7 un segundo clic cierra la informaci\u00f3n'
-          : ' \u00b7 a second click closes this tooltip';
-      }
       sp.appendChild(aide);
     }
     // ouvert depuis la recherche : on fusionne l'effet dans la fiche, un seul panneau
@@ -2652,6 +2643,12 @@ function fiche(n){ return base[n] || horsGuide[n]; }
       : lg==='de' ? 'Auf eine Nummer tippen \u2014 die Markierung blinkt auf der Karte'
       : lg==='es' ? 'Pulsa un numero: su marca parpadea en el mapa'
       : 'Tap a number \u2014 its pin flashes on the map';
+    // La consigne du clic va ICI, sur la page : dans l'infobulle on ne la lirait
+    // qu'apres l'avoir ouverte, donc trop tard.
+    txt += lg==='fr' ? ' \u00b7 cliquez un objet pour son infobulle, un second clic la ferme'
+      : lg==='de' ? ' \u00b7 auf einen Gegenstand klicken f\u00fcr sein Tooltip, ein zweiter Klick schliesst es'
+      : lg==='es' ? ' \u00b7 haz clic en un objeto para su informaci\u00f3n, un segundo clic la cierra'
+      : ' \u00b7 click an item for its tooltip, a second click closes it';
     document.querySelectorAll('.maplegend').forEach(function(L){
       if(L.querySelector('.eqaide')) return;
       if(!L.querySelector('.lg')) return;
