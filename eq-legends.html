@@ -2117,6 +2117,18 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         : _lg==='es' ? 'Haz clic en el nombre dorado: el mapa muestra donde suelta'
         : 'Click the gold name \u2014 the map opens where it drops';
       sp.appendChild(aide);
+      // En plein ecran la fiche est verrouillee 5 s : on le dit, sinon le joueur
+      // ne devine pas qu'un clic est ce qui la referme.
+      var _mv=document.getElementById('mv');
+      if(_mv && _mv.classList.contains('on')){
+        var aide2=document.createElement('span');
+        aide2.className='aide';
+        aide2.textContent = _lg==='fr' ? 'Un second clic referme l\u2019infobulle'
+          : _lg==='de' ? 'Ein zweiter Klick schliesst das Tooltip'
+          : _lg==='es' ? 'Un segundo clic cierra la informaci\u00f3n'
+          : 'A second click closes this tooltip';
+        sp.appendChild(aide2);
+      }
     }
     // ouvert depuis la recherche : on fusionne l'effet dans la fiche, un seul panneau
     var _liste0=el.closest && el.closest('#eqres');
@@ -2234,14 +2246,43 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       var tCache=null;
       var annule=function(){ if(tCache){ clearTimeout(tCache); tCache=null; } };
       var cacheDiffere=function(){ annule(); tCache=setTimeout(function(){ cache(); tCache=null; },400); };
+      // VERROU 5 s. Une fois la fiche ouverte, plus rien ne la remplace ni ne la ferme
+      // pendant cinq secondes : ni le survol d'un autre objet, ni la sortie du curseur.
+      // Sans ca, remonter vers la fiche pour cliquer le named frole les objets de la
+      // ligne au passage et la fiche est remplacee avant d'etre atteinte.
+      // Seul un clic ferme. Le verrou expire tout seul au bout de 5 s.
+      // UNIQUEMENT en plein ecran carte : ailleurs dans le guide le survol reste
+      // instantane comme avant, le probleme du frolement n'y existe pas.
+      var pleinEcran=function(){ var m=document.getElementById('mv');
+        return !!(m && m.classList.contains('on')); };
+      var verrou=0, tVerrou=null;
+      var deverrouille=function(){ verrou=0; if(tVerrou){ clearTimeout(tVerrou); tVerrou=null; } };
       document.addEventListener('mouseover',function(e){
         var t=e.target.closest? e.target.closest('.eqi'):null;
-        if(t){ annule(); montre(t,t.getAttribute('data-eq')); return; }
+        if(t){
+          if(pleinEcran() && Date.now()<verrou) return;   // verrouillee : on ignore le survol
+          annule(); montre(t,t.getAttribute('data-eq'));
+          if(!pleinEcran()){ deverrouille(); return; }    // hors plein ecran : rien ne change
+          verrou=Date.now()+5000;
+          if(tVerrou) clearTimeout(tVerrou);
+          // a l'expiration, on ferme si le curseur n'est ni sur un objet ni sur la fiche
+          tVerrou=setTimeout(function(){ verrou=0; tVerrou=null;
+            if(!document.querySelector('.eqi:hover,#eqpop:hover,#eqeff:hover')) cacheDiffere();
+          },5000);
+          return;
+        }
         if(e.target.closest && e.target.closest('#eqpop,#eqeff')) annule();
       });
       document.addEventListener('mouseout',function(e){
+        if(pleinEcran() && Date.now()<verrou) return;   // verrouillee : on ne ferme pas
         if(e.target.closest && (e.target.closest('.eqi')||e.target.closest('#eqpop,#eqeff'))) cacheDiffere();
       });
+      // un clic ferme, ou qu'il tombe — sauf dans la fiche, ou il sert a suivre le named
+      document.addEventListener('click',function(e){
+        if(!verrou) return;                              // pas de verrou actif : on ne touche a rien
+        if(e.target.closest && e.target.closest('#eqpop,#eqeff,#eqres')) return;
+        deverrouille(); cache();
+      },true);
     } else {
       addEventListener('scroll',cache,{passive:true});
     }
