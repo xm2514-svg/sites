@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spell Upgrade Calculator — every spell from +0 to +10 (EQ Legends)</title>
+<meta name="description" content="Pick any EverQuest Legends spell, set your level, and read exactly what it does — damage, healing, mana, cast, duration — at every merge tier from +0 to +10, with the mote cost.">
+<link rel="canonical" href="https://xm2514-svg.github.io/sites/spell-upgrades/">
+<meta property="og:title" content="Spell Upgrade Calculator — EQ Legends">
+<meta property="og:description" content="What every merge tier gives on any spell, +0 to +10, computed from the game client's own data.">
+<meta property="og:url" content="https://xm2514-svg.github.io/sites/spell-upgrades/">
+<style>
+:root{--bg:#0d0b09;--panel:#17130f;--line:#2c2419;--text:#e8dfd0;--dim:#a08f78;
+      --gold:#c8a83a;--gold2:#ffd97a;--green:#7fd18c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Georgia,"Times New Roman",serif;padding:18px}
+.wrap{max-width:1000px;margin:0 auto}
+a{color:var(--gold2)}
+h1{font-size:26px;color:var(--gold);margin:.2em 0 .1em}
+h2{font-size:19px;color:var(--gold);margin:1.6em 0 .5em}
+.fil{color:var(--dim);font-size:13px;margin:0 0 1.2em}
+.intro{color:var(--dim);font-size:15px;max-width:70ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin:14px 0}
+label{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+select,input[type=search],input[type=number]{width:100%;padding:9px 10px;background:#0b0908;color:var(--text);
+     border:1px solid var(--line);border-radius:6px;font:15px Georgia,serif}
+.rangee{display:flex;gap:12px;flex-wrap:wrap}
+.rangee>div{flex:1 1 200px}
+.rangee>div.court{flex:0 0 110px}
+#tier{width:100%;accent-color:var(--gold)}
+.tiertete{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.tiernum{font-size:30px;color:var(--gold2);font-weight:bold}
+table{width:100%;border-collapse:collapse;margin-top:6px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);font-size:15px}
+th{color:var(--gold);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+td.v{text-align:right;font-variant-numeric:tabular-nums}
+.mieux{color:var(--green)}
+.rien{color:var(--dim)}
+.nom{color:var(--gold2);font-size:20px;font-weight:bold}
+.desc{color:var(--dim);font-style:italic;margin:.3em 0 .8em}
+.desc b{color:var(--gold2);font-style:normal}
+.eti{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+     border:1px solid var(--line);border-radius:4px;padding:1px 7px;color:var(--dim);margin-right:5px}
+.note{font-size:13px;color:var(--dim);border-left:2px solid var(--line);padding-left:12px;margin:12px 0}
+.mesure{border-left-color:var(--green)}
+.calcul{border-left-color:var(--gold)}
+.pied{margin-top:2.4em;padding-top:1em;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+@media(max-width:640px){body{padding:12px}h1{font-size:22px}.tiernum{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="fil"><a href="../">EQ Legends Guide</a> › Spell upgrades</p>
+<h1>What +0 to +10 actually gives on a spell</h1>
+<p class="intro">Set your level, pick a spell, drag the tier. Every number below is computed
+the way the game computes it &mdash; the base value, your level, and the cap &mdash; so the +0 column
+should match your own spell window line for line. If it does not, tell me: that is a bug worth
+knowing about.</p>
+
+<div class="panel">
+  <div class="rangee">
+    <div class="court">
+      <label for="lv">Your level</label>
+      <input type="number" id="lv" min="1" max="60" value="50">
+    </div>
+    <div>
+      <label for="cl">Class</label>
+      <select id="cl"></select>
+    </div>
+    <div>
+      <label for="q">Search</label>
+      <input type="search" id="q" placeholder="blizzard, odium, healing…" autocomplete="off">
+    </div>
+  </div>
+  <div style="margin-top:12px">
+    <label for="sp">Spell</label>
+    <select id="sp"></select>
+  </div>
+</div>
+
+<div class="panel" id="fiche" hidden>
+  <div class="tiertete">
+    <div>
+      <div class="nom" id="nom"></div>
+      <div id="etis"></div>
+    </div>
+    <div style="text-align:right">
+      <div class="tiernum" id="tnum">+0</div>
+      <div style="font-size:12px;color:var(--dim)" id="tcout"></div>
+    </div>
+  </div>
+  <p class="desc" id="desc"></p>
+  <input type="range" id="tier" min="0" max="10" value="0" step="1">
+  <table>
+    <thead><tr><th>Stat</th><th class="v">+0</th><th class="v">at this tier</th><th class="v">change</th></tr></thead>
+    <tbody id="corps"></tbody>
+  </table>
+  <div id="effets"></div>
+</div>
+
+<h2>Where the numbers come from</h2>
+
+<div class="note mesure"><b>The game's own files.</b> Spell data is read from the client's
+<code>spells_us.txt</code> and <code>dbstr_us.txt</code> &mdash; the same files the game reads to draw
+your spell window. Not a wiki, not a scrape. What the client shows is a base value grown by your
+level and then capped:
+<b>value = base + level &times; factor, capped at the maximum</b>.
+That is why the same spell reads differently on two characters, and why community databases quoting
+a single number are right for exactly one level.</div>
+
+<div class="note calcul"><b>The per-tier rates</b> come from
+<a href="https://eqltools.com/learn/spell-upgrades" target="_blank" rel="noopener">EQL Tools</a>:
+cast &minus;2 % per rank on direct-damage spells and &minus;4 % on everything else, recovery and reuse
+&minus;2 %, duration +10 % on buffs and debuffs and +5 % on damage- and heal-over-time, direct nuke
+damage +6 %, and a mote cost that doubles every rank to 1 024 at rank 10. Linear, not compounding.</div>
+
+<div class="note mesure"><b>Mana disagrees with that table.</b> It puts mana at &minus;2 % per rank;
+two spells read off a live client say &minus;4 %. Armor of Faith drops 139 &rarr; 133 between tier 0 and
+tier 1, and Frenzied Spirit sits at 372 at tier 5 where &minus;2 % predicts 417 and &minus;4 % predicts
+371. This page uses <b>&minus;4 % on non-nukes</b>, mirroring the cast line.</div>
+
+<div class="note mesure"><b>Two things the spell window never shows.</b> A pet gains a level per tier
+&mdash; Frenzied Spirit summons a level 36 wolf at +0, a level 41 one at tier 5. And on crowd control,
+a rank raises the highest NPC level the spell will land on.</div>
+
+<div class="note"><b>Reading your own window.</b> The value in parentheses is the fully modified one:
+it already carries your stance, specialisation and focus items, so a stat can read modified at tier 0.
+Compare against your own tier 0, not against the base.</div>
+
+<p class="pied">Spell data from the EverQuest Legends client, files dated 17 August 2026.
+Tier scaling from <a href="https://eqltools.com/learn/spell-upgrades" target="_blank" rel="noopener">EQL Tools</a>,
+corrected against live client readings. Part of the <a href="../">EQ Legends guide</a>.</p>
+
+</div>
+<script>
+var CLASSES={WAR:'Warrior',CLR:'Cleric',PAL:'Paladin',RNG:'Ranger',SHD:'Shadow Knight',
+  DRU:'Druid',MNK:'Monk',BRD:'Bard',ROG:'Rogue',SHM:'Shaman',NEC:'Necromancer',
+  WIZ:'Wizard',MAG:'Magician',ENC:'Enchanter',BST:'Beastlord',BER:'Berserker'};
+var TYPES={nuke:'direct damage',dot:'damage over time',heal:'heal',hot:'heal over time',
+  buff:'buff',debuff:'debuff',pet:'pet',voyage:'travel',controle:'crowd control',utilitaire:'utility'};
+var D=null, cour=null;
+
+// le calcul du client : base, augmentee par le niveau, plafonnee
+function auNiveau(s,lvl){
+  var v=Math.abs(s.b);
+  if(s.c===101) v+=Math.floor(lvl/2);
+  else if(s.c>=102 && s.c<=109) v+=lvl*(s.c-101);
+  else if(s.c===10) v+=lvl*10;
+  return s.m? Math.min(v,Math.abs(s.m)) : v;
+}
+function taux(t,champ){
+  var nuke=(t==='nuke');
+  if(champ==='cast')   return nuke? -0.02 : -0.04;
+  if(champ==='mana')   return nuke? -0.02 : -0.04;
+  if(champ==='recast'||champ==='recov') return -0.02;
+  if(champ==='duree')  return (t==='dot'||t==='hot')? 0.05 : 0.10;
+  return 0;
+}
+function arrondi(x){ return Math.round(x*100)/100; }
+function duree(s){
+  s=Math.round(s);
+  if(s<60) return s+'s';
+  var m=Math.floor(s/60), r=s%60;
+  if(m<60) return m+'m'+(r? ' '+r+'s':'');
+  return Math.floor(m/60)+'h'+String(m%60).padStart(2,'0');
+}
+function ligne(nom,base,t,champ,rang,suf){
+  if(!base) return '';
+  var v=base*(1+taux(t,champ)*rang), pct=Math.round((v/base-1)*1000)/10;
+  var cl=pct===0?'rien':'mieux';
+  return '<tr><td>'+nom+'</td><td class="v">'+arrondi(base)+(suf||'')+'</td>'+
+         '<td class="v '+cl+'">'+arrondi(v)+(suf||'')+'</td>'+
+         '<td class="v '+cl+'">'+(rang? (pct>0?'+':'')+pct+' %':'&mdash;')+'</td></tr>';
+}
+
+// la description du client porte des jetons : #N la valeur du slot N a votre niveau, @N son plafond
+function texte(v,lvl,rang){
+  var d=v.d||'';
+  if(!d) return '';
+  var k=(v.t==='nuke')? (1+0.06*rang) : 1;
+  d=d.replace(/([#@])(\d+)/g,function(_,sig,n){
+    var s=(v.sl||[]).filter(function(x){return x.s===+n;})[0];
+    if(!s) return '';
+    var val=(sig==='#')? auNiveau(s,lvl) : Math.abs(s.m||auNiveau(s,lvl));
+    return '<b>'+Math.round(val*k)+'</b>';
+  });
+  // %z est la duree, que le client remplace a l'affichage
+  if(v.ticks){
+    var t=v.ticks*(1+taux(v.t,'duree')*rang);
+    d=d.replace(/%z/g,'<b>'+duree(t*6)+'</b>');
+  }
+  return d.replace(/%\w/g,'');
+}
+
+function affiche(){
+  if(!cour) return;
+  var v=cour, r=+document.getElementById('tier').value, lvl=+document.getElementById('lv').value||50;
+  document.getElementById('tnum').textContent='+'+r;
+  document.getElementById('tcout').textContent=r? (Math.pow(2,r).toLocaleString('en')+' motes total'):'unupgraded';
+  document.getElementById('desc').innerHTML=texte(v,lvl,r);
+  var out='';
+  out+=ligne('Mana',v.mana,v.t,'mana',r,'');
+  out+=ligne('Cast',v.cast,v.t,'cast',r,'s');
+  out+=ligne('Recovery',v.recov,v.t,'recov',r,'s');
+  out+=ligne('Recast',v.recast,v.t,'recast',r,'s');
+  if(v.ticks){
+    var t0=v.ticks, t1=t0*(1+taux(v.t,'duree')*r), p=Math.round((t1/t0-1)*1000)/10;
+    out+='<tr><td>Duration</td><td class="v">'+t0+' ticks &middot; '+duree(t0*6)+'</td>'+
+         '<td class="v '+(p?'mieux':'rien')+'">'+arrondi(t1)+' ticks &middot; '+duree(t1*6)+'</td>'+
+         '<td class="v '+(p?'mieux':'rien')+'">'+(r?'+'+p+' %':'&mdash;')+'</td></tr>';
+  }
+  document.getElementById('corps').innerHTML=out||'<tr><td colspan="4" class="rien">No numeric stat.</td></tr>';
+
+  var e='';
+  if(v.sl && v.sl.length){
+    e+='<p style="font-size:13px;color:var(--dim);margin:.9em 0 .2em">Effects at level '+lvl+
+       ', straight from the client:</p><ul style="margin:.2em 0;font-size:14px">';
+    v.sl.forEach(function(s){
+      var val=auNiveau(s,lvl), cap=Math.abs(s.m);
+      var k=(v.t==='nuke')? (1+0.06*r) : 1;
+      e+='<li>slot '+s.s+' &middot; <b>'+Math.round(val*k)+'</b>'+
+         (cap&&val<cap? ' <span class="rien">(cap '+Math.round(cap*k)+')</span>':
+          cap? ' <span class="rien">(at cap)</span>':'')+'</li>';
+    });
+    e+='</ul>';
+  }
+  if(v.t==='nuke'&&r) e+='<div class="note calcul" style="margin-top:10px">Damage carries the '+
+     '<b>+'+(6*r)+' %</b> of rank '+r+'. The window keeps showing the unranked figure, so this is read from the combat log.</div>';
+  if((v.t==='heal'||v.t==='hot')&&r) e+='<div class="note" style="margin-top:10px">The healing figure above is '+
+     'the unranked one: <b>what a rank adds to a heal is not documented</b>. Treat it as the floor.</div>';
+  if(v.t==='pet'&&r) e+='<div class="note mesure" style="margin-top:10px">Pet level <b>+'+r+'</b> over the base, '+
+     'measured on Frenzied Spirit at tier 5.</div>';
+  document.getElementById('effets').innerHTML=e;
+}
+
+function listeSorts(){
+  var cl=document.getElementById('cl').value,
+      q=document.getElementById('q').value.toLowerCase().trim(),
+      lvl=+document.getElementById('lv').value||60, l=[];
+  for(var id in D){
+    var v=D[id];
+    if(cl && !(v.c&&v.c[cl])) continue;
+    if(q && v.n.toLowerCase().indexOf(q)<0) continue;
+    var mini=99; for(var k in v.c) if(!cl||k===cl) mini=Math.min(mini,v.c[k]);
+    if(mini>lvl) continue;
+    l.push([id,v,mini]);
+  }
+  l.sort(function(a,b){ return b[2]-a[2] || a[1].n.localeCompare(b[1].n); });
+  var s=document.getElementById('sp');
+  s.innerHTML=l.slice(0,500).map(function(x){
+    return '<option value="'+x[0]+'">'+x[1].n+' — L'+x[2]+'</option>';
+  }).join('')||'<option value="">nothing at this level</option>';
+  choisi();
+}
+function choisi(){
+  var id=document.getElementById('sp').value;
+  cour=id? D[id]:null;
+  document.getElementById('fiche').hidden=!cour;
+  if(!cour) return;
+  document.getElementById('nom').textContent=cour.n;
+  var e='<span class="eti">'+(TYPES[cour.t]||cour.t)+'</span>';
+  for(var c in (cour.c||{})) e+='<span class="eti">'+c+' L'+cour.c[c]+'</span>';
+  document.getElementById('etis').innerHTML=e;
+  affiche();
+}
+
+fetch('../spells.json').then(function(r){return r.json();}).then(function(j){
+  D=j.spells;
+  var s=document.getElementById('cl');
+  s.innerHTML='<option value="">Every class</option>'+Object.keys(CLASSES).map(function(c){
+    return '<option value="'+c+'">'+CLASSES[c]+'</option>';}).join('');
+  s.value='SHM';
+  listeSorts();
+});
+['cl','q','lv'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',listeSorts);
+});
+document.getElementById('sp').addEventListener('change',choisi);
+document.getElementById('tier').addEventListener('input',affiche);
+document.getElementById('lv').addEventListener('input',affiche);
+</script>
+</body>
+</html>
