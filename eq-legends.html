@@ -2207,6 +2207,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         var txt=node.nodeValue, frag=document.createDocumentFragment(), pos=0, m;
         re.lastIndex=0;
         while((m=re.exec(txt))){
+          // « Test of Tranquility » est une epreuve du Plane of Sky, pas l'objet « Tranquility »
+          if(/\bTest of $/.test(txt.slice(0,m.index))) continue;
           if(m.index>pos) frag.appendChild(document.createTextNode(txt.slice(pos,m.index)));
           // un alias (FBSS, Dark Reaver...) pointe vers le vrai nom de la fiche eqlwiki
           var vrai=(data.alias&&data.alias[m[1]])||m[1];
@@ -2404,6 +2406,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
         var txt=node.nodeValue, frag=document.createDocumentFragment(), pos=0, m;
         re.lastIndex=0;
         while((m=re.exec(txt))){
+          // « Test of Tranquility » est une epreuve du Plane of Sky, pas l'objet « Tranquility »
+          if(/\bTest of $/.test(txt.slice(0,m.index))) continue;
           if(m.index>pos) frag.appendChild(document.createTextNode(txt.slice(pos,m.index)));
           var cle=corresp[m[1].toLowerCase()];
           if(!cle){ frag.appendChild(document.createTextNode(m[1])); pos=m.index+m[1].length; continue; }
