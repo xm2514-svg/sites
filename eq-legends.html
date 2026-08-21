@@ -2683,5 +2683,10 @@ function fiche(n){ return base[n] || horsGuide[n]; }
 section a[href^="#named="]{color:inherit;text-decoration:underline;text-decoration-color:#9fb4d8}
 section a[href^="#fl-"]{color:inherit;text-decoration:underline;text-decoration-color:#c8a83a}
 </style>
+<style>/* 1920x1080 uniquement : on resserre les espaces de la nav, la taille du texte
+   et la disposition ne changent pas. Mobile et 3440 intacts. */
+html[data-res="hd"] nav{gap:8px;padding:5px 0;margin-bottom:10px}
+html[data-res="hd"] nav .sep{margin:2px 0 1px}
+</style>
 </body>
 </html>
