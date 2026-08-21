@@ -2261,6 +2261,8 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
       if(e.target.closest && e.target.closest('#eqres')) return;   // la recherche gere son propre clic
       var t=e.target.closest? e.target.closest('.eqi'):null;
       if(!t){ cache(); return; }
+      // un objet place a l'interieur d'un lien : le clic appartient au lien
+      if(t.closest && t.closest('a[href]')){ cache(); return; }
       e.preventDefault(); e.stopPropagation();
       // second clic sur le meme objet = fermeture. Tactile depuis toujours, et
       // desormais aussi en plein ecran carte, ou le survol est desactive.
