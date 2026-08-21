@@ -1746,7 +1746,11 @@ document.querySelectorAll('#loops svg').forEach(function(svg){
       var v = D ? D[k] : undefined;
       // pas de traduction dans cette langue -> retour a l'anglais, jamais a la langue precedente
       if (v === undefined) v = ORIG[k];
-      if (v !== undefined && el.innerHTML !== v) el.innerHTML = v;
+      if (v !== undefined && el.innerHTML !== v) {
+        el.innerHTML = v;
+        // le bloc reinjecte n'est plus observe par le reveal : sans ca il reste invisible
+        el.querySelectorAll('.reveal').forEach(function(n){ n.classList.remove('reveal'); });
+      }
     });
   };
   document.addEventListener('DOMContentLoaded', snapshot);
