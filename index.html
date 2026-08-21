@@ -2677,5 +2677,11 @@ function fiche(n){ return base[n] || horsGuide[n]; }
   document.head.appendChild(st);
 })();
 </script>
+<style>/* convention de couleur des liens dans le corps du guide :
+   jaune = un boss (fiche du named) · or = une zone (carte). Les liens sans style
+   inline heritaient du contexte et se confondaient. */
+section a[href^="#named="]{color:inherit;text-decoration:underline;text-decoration-color:#e8d44a}
+section a[href^="#fl-"]{color:inherit;text-decoration:underline;text-decoration-color:#c8a83a}
+</style>
 </body>
 </html>
