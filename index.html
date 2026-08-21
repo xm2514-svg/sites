@@ -2422,7 +2422,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     lierTexte();
     if(window.eqMarque) window.eqMarque();
     var p=window.__applyBlocks;
-    if(p && !p.__eqwrap){ var f=function(l){ p(l); lier(); }; f.__eqwrap=1; window.__applyBlocks=f; }
+    if(p && !p.__eqwrap){ var f=function(l){ p(l); lier(); lierTexte();
+      // les blocs traduits arrivent sans les reperes d'objets : on les repose
+      if(window.eqMarque) window.eqMarque(); }; f.__eqwrap=1; window.__applyBlocks=f; }
   }
   document.addEventListener('DOMContentLoaded',go);
   if(document.readyState!=='loading') go();
