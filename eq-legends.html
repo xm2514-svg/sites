@@ -2751,6 +2751,7 @@ html[data-res="hd"] nav a{padding-top:1px;padding-bottom:1px}
 .d-txt{position:absolute;left:16px;top:16px;right:16px;color:#c9bda9}
 .d-item{color:#f4d585;border-bottom:1px dotted #c8a83a}
 .d-tip{position:absolute;left:52px;top:50px;width:290px;padding:9px 11px;background:#120f0c;
+  animation-fill-mode:both;
   border:1px solid #c8a83a;border-radius:7px;box-shadow:0 6px 20px rgba(0,0,0,.6);
   opacity:0;transform:translateY(-4px);animation:d-tip 11s linear infinite}
 .d-tip b{display:block;color:#f4d585;font-size:14px;margin-bottom:4px}
@@ -2759,10 +2760,12 @@ html[data-res="hd"] nav a{padding-top:1px;padding-bottom:1px}
 .d-eff{color:#6fd6c4}
 .d-src{display:block;margin-top:7px;padding-top:6px;border-top:1px solid #2b2318;color:#8d8271;font-size:11px}
 .d-go{color:#ff8ae0;border-bottom:1px dashed #ff8ae0;padding:1px 2px;animation:d-go 11s linear infinite}
-.d-map{position:absolute;left:0;top:22px;width:100%;height:188px;opacity:0;animation:d-map 11s linear infinite}
+.d-map{position:absolute;left:0;top:22px;width:100%;height:188px;opacity:0;
+  animation:d-map 11s linear infinite;animation-fill-mode:both}
 .d-halo{fill:none;stroke:#ff2fd6;stroke-width:2;transform-box:fill-box;transform-origin:center;
   opacity:0;animation:d-halo 11s linear infinite}
 .d-cur{position:absolute;left:0;top:0;width:13px;height:19px;background:#fff;
+  transform:translate(250px,215px);animation-fill-mode:both;
   clip-path:polygon(0 0,0 17px,4px 13px,7px 19px,10px 17px,7px 11px,12px 11px);
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.9));animation:d-cur 11s linear infinite}
 .d-cap{max-width:520px;margin:0 auto 18px;color:#a89a86;font-size:13px;text-align:center}
@@ -2783,7 +2786,7 @@ html[data-res="hd"] nav a{padding-top:1px;padding-bottom:1px}
 .d-steps{position:absolute;left:0;right:0;bottom:0;height:34px;border-top:1px solid #2b2318;
   background:#120f0c}
 .d-steps span{position:absolute;left:0;right:0;top:9px;text-align:center;color:#f4d585;
-  font-size:12.5px;opacity:0}
+  font-size:12.5px;opacity:0;animation-fill-mode:both}
 .d-steps .s1{animation:d-s1 11s linear infinite}
 .d-steps .s2{animation:d-s2 11s linear infinite}
 .d-steps .s3{animation:d-s3 11s linear infinite}
