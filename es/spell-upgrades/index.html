@@ -142,7 +142,7 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 
 <div class="note mesure"><b>Los propios archivos del juego.</b> Los datos de hechizos se leen de <code>spells_us.txt</code> y <code>dbstr_us.txt</code> del cliente &mdash; los mismos archivos que el juego lee para dibujar tu ventana de hechizo. Ni wiki ni scrape. Lo que muestra el cliente es un valor base que tu nivel hace crecer y que luego se topa: <b>valor = base + nivel &times; factor, topado en el máximo</b>. Por eso el mismo hechizo se lee distinto en dos personajes, y por eso las bases comunitarias que citan una sola cifra aciertan para exactamente un nivel.</div>
 
-<div class="note calcul"><b>Las tasas por rango</b> se <b>midieron en un cliente en vivo el 25 de agosto de 2026</b>, no se copiaron de una tabla: lanzamiento &minus;2 % por rango en hechizos de daño directo y &minus;4 % en todo lo demás, maná &minus;2 % en hechizos de daño y &minus;4 % en el resto, recuperación y reutilización &minus;2 %, duración +10 % en buffs y debuffs y +5 % en daño y curación por tiempo, y un coste en motas que se duplica cada rango hasta 1 024 en el rango 10. Lineal, no compuesto.</div>
+<div class="note calcul"><b>Las tasas por rango</b> se <b>midieron en un cliente en vivo el 25 de agosto de 2026</b>, no se copiaron de una tabla: lanzamiento &minus;2 % por rango en hechizos de daño directo y &minus;4 % en todo lo demás, maná &minus;2 % en todo lo que hace daño o cura y &minus;4 % en buffs y mascotas, recuperación y reutilización &minus;2 %, duración +10 % en buffs y debuffs y +5 % en daño y curación por tiempo, y un coste en motas que se duplica cada rango hasta 1 024 en el rango 10. Lineal, no compuesto.</div>
 
 <div class="note mesure"><b>Un rango nunca sube el daño.</b> Blizzard Blast, fusionado de verdad del tier 0 al tier 1, sigue marcando <b>346</b>. Envenomed Bolt, cuyos ticks están lejos de su tope, marca <b>345 &ndash; 351</b> tanto en tier 0 como en tier 4. Lo que crece es la <b>duración</b>: 36 s pasan a 42 s, seis ticks pasan a siete, así que el hechizo hace <b>+16 %</b> de daño total aunque cada golpe sea idéntico. Los ticks se redondean hacia abajo &mdash; 6 &times; 1,20 = 7,2 da siete, no 7,2.</div>
 <div class="note mesure"><b>Cada rango también baja la tirada de resistencia en 15.</b> Odium marca <i>Resist: Magic &minus;60</i> en tier 4, y Blizzard Blast <i>Resist: Cold &minus;15</i> en tier 1. La ventana de hechizos no lo menciona hasta que colocas la mota, y contra un objetivo que resiste suele valer más que el maná ahorrado.</div>
@@ -231,9 +231,12 @@ function auNiveau(s,lvl){
 // Odium et Envenomed Bolt +0 -> +4) : le mana suit le type de DEGATS, pas le type
 // de sort. Un nuke et un DoT perdent 2 %, un buff ou un pet en perdent 4 %.
 function taux(t,champ){
-  var nuke=(t==='nuke'), degats=(nuke||t==='dot');
+  // Le mana suit ce que le sort PRODUIT : degats ou soin -> -2 %, le reste -> -4 %.
+  // Mesure : Blizzard Blast (nuke) 133->130 a +1, Odium et Envenomed Bolt (dot) 361->332 a +4,
+  // Kragg's Salve (heal) 204->200 a +1 et ->188 a +4 ; Infusion of Spirit (buff) 167->160 a +1.
+  var nuke=(t==='nuke'), produit=(nuke||t==='dot'||t==='heal'||t==='hot');
   if(champ==='cast')   return nuke? -0.02 : -0.04;
-  if(champ==='mana')   return degats? -0.02 : -0.04;
+  if(champ==='mana')   return produit? -0.02 : -0.04;
   if(champ==='recast'||champ==='recov') return -0.02;
   if(champ==='duree')  return (t==='dot'||t==='hot')? 0.05 : 0.10;
   return 0;

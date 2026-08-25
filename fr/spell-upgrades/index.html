@@ -142,7 +142,7 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 
 <div class="note mesure"><b>Les fichiers du jeu lui-même.</b> Les données de sorts sont lues dans les fichiers <code>spells_us.txt</code> et <code>dbstr_us.txt</code> du client &mdash; ceux-là mêmes que le jeu lit pour dessiner votre fenêtre de sort. Pas un wiki, pas un scrape. Ce que le client affiche est une valeur de base que votre niveau fait croître, puis plafonnée : <b>valeur = base + niveau &times; facteur, plafonnée au maximum</b>. C’est pour cela qu’un même sort se lit différemment sur deux personnages, et pourquoi les bases communautaires qui annoncent un seul chiffre ont raison pour exactement un niveau.</div>
 
-<div class="note calcul"><b>Les taux par palier</b> ont été <b>mesurés sur un client vivant le 25 août 2026</b>, et non recopiés d’un tableau : incantation &minus;2 % par rang sur les sorts de dégâts directs et &minus;4 % sur tout le reste, mana &minus;2 % sur les sorts de dégâts et &minus;4 % ailleurs, récupération et réutilisation &minus;2 %, durée +10 % sur les buffs et débuffs et +5 % sur les dégâts et soins sur la durée, et un coût en motes qui double à chaque rang jusqu’à 1 024 au rang 10. Linéaire, pas composé.</div>
+<div class="note calcul"><b>Les taux par palier</b> ont été <b>mesurés sur un client vivant le 25 août 2026</b>, et non recopiés d’un tableau : incantation &minus;2 % par rang sur les sorts de dégâts directs et &minus;4 % sur tout le reste, mana &minus;2 % sur tout ce qui inflige des dégâts ou soigne et &minus;4 % sur les buffs et les pets, récupération et réutilisation &minus;2 %, durée +10 % sur les buffs et débuffs et +5 % sur les dégâts et soins sur la durée, et un coût en motes qui double à chaque rang jusqu’à 1 024 au rang 10. Linéaire, pas composé.</div>
 
 <div class="note mesure"><b>Un palier n’augmente jamais les dégâts.</b> Blizzard Blast, fusionné pour de vrai du tier 0 au tier 1, affiche toujours <b>346</b>. Envenomed Bolt, dont les ticks sont loin de leur plafond, affiche <b>345 &ndash; 351</b> au tier 0 comme au tier 4. Ce qui grandit, c’est la <b>durée</b> : 36 s deviennent 42 s, six ticks deviennent sept, donc le sort inflige <b>+16 %</b> de dégâts totaux alors que chaque coup est identique. Les ticks sont arrondis à l’entier inférieur &mdash; 6 &times; 1,20 = 7,2 donne sept, pas 7,2.</div>
 <div class="note mesure"><b>Chaque rang réduit aussi le jet de résistance de 15.</b> Odium affiche <i>Resist: Magic &minus;60</i> au tier 4, Blizzard Blast <i>Resist: Cold &minus;15</i> au tier 1. La fenêtre de sort n’en parle jamais avant que tu ne poses la mote, et sur une cible qui résiste, cela vaut souvent plus que le mana économisé.</div>
@@ -231,9 +231,12 @@ function auNiveau(s,lvl){
 // Odium et Envenomed Bolt +0 -> +4) : le mana suit le type de DEGATS, pas le type
 // de sort. Un nuke et un DoT perdent 2 %, un buff ou un pet en perdent 4 %.
 function taux(t,champ){
-  var nuke=(t==='nuke'), degats=(nuke||t==='dot');
+  // Le mana suit ce que le sort PRODUIT : degats ou soin -> -2 %, le reste -> -4 %.
+  // Mesure : Blizzard Blast (nuke) 133->130 a +1, Odium et Envenomed Bolt (dot) 361->332 a +4,
+  // Kragg's Salve (heal) 204->200 a +1 et ->188 a +4 ; Infusion of Spirit (buff) 167->160 a +1.
+  var nuke=(t==='nuke'), produit=(nuke||t==='dot'||t==='heal'||t==='hot');
   if(champ==='cast')   return nuke? -0.02 : -0.04;
-  if(champ==='mana')   return degats? -0.02 : -0.04;
+  if(champ==='mana')   return produit? -0.02 : -0.04;
   if(champ==='recast'||champ==='recov') return -0.02;
   if(champ==='duree')  return (t==='dot'||t==='hot')? 0.05 : 0.10;
   return 0;

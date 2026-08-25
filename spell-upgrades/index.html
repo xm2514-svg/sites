@@ -154,7 +154,7 @@ a single number are right for exactly one level.</div>
 
 <div class="note calcul"><b>The per-tier rates</b> were measured on a live client on
 <b>25 August 2026</b>, not copied from a table: cast &minus;2 % per rank on direct-damage spells and
-&minus;4 % on everything else, mana &minus;2 % on damage spells and &minus;4 % elsewhere, recovery and
+&minus;4 % on everything else, mana &minus;2 % on anything that deals damage or heals and &minus;4 % on buffs and pets, recovery and
 reuse &minus;2 %, duration +10 % on buffs and debuffs and +5 % on damage- and heal-over-time,
 and a mote cost that doubles every rank to 1 024 at rank 10. Linear, not compounding.</div>
 
@@ -257,9 +257,12 @@ function auNiveau(s,lvl){
 // Odium et Envenomed Bolt +0 -> +4) : le mana suit le type de DEGATS, pas le type
 // de sort. Un nuke et un DoT perdent 2 %, un buff ou un pet en perdent 4 %.
 function taux(t,champ){
-  var nuke=(t==='nuke'), degats=(nuke||t==='dot');
+  // Le mana suit ce que le sort PRODUIT : degats ou soin -> -2 %, le reste -> -4 %.
+  // Mesure : Blizzard Blast (nuke) 133->130 a +1, Odium et Envenomed Bolt (dot) 361->332 a +4,
+  // Kragg's Salve (heal) 204->200 a +1 et ->188 a +4 ; Infusion of Spirit (buff) 167->160 a +1.
+  var nuke=(t==='nuke'), produit=(nuke||t==='dot'||t==='heal'||t==='hot');
   if(champ==='cast')   return nuke? -0.02 : -0.04;
-  if(champ==='mana')   return degats? -0.02 : -0.04;
+  if(champ==='mana')   return produit? -0.02 : -0.04;
   if(champ==='recast'||champ==='recov') return -0.02;
   if(champ==='duree')  return (t==='dot'||t==='hot')? 0.05 : 0.10;
   return 0;

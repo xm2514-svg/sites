@@ -142,7 +142,7 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 
 <div class="note mesure"><b>Die Dateien des Spiels selbst.</b> Die Zauberdaten stammen aus <code>spells_us.txt</code> und <code>dbstr_us.txt</code> des Clients &mdash; genau den Dateien, die das Spiel liest, um dein Zauberfenster zu zeichnen. Kein Wiki, kein Scrape. Was der Client zeigt, ist ein Grundwert, den dein Level wachsen lässt und der dann gedeckelt wird: <b>Wert = Basis + Level &times; Faktor, gedeckelt beim Maximum</b>. Deshalb liest sich derselbe Zauber auf zwei Charakteren unterschiedlich, und deshalb haben Community-Datenbanken mit einer einzigen Zahl für genau ein Level recht.</div>
 
-<div class="note calcul"><b>Die Werte pro Rang</b> wurden am <b>25. August 2026 an einem laufenden Client gemessen</b> und nicht aus einer Tabelle abgeschrieben: Zauberzeit &minus;2 % pro Rang bei direktem Schaden und &minus;4 % bei allem anderen, Mana &minus;2 % bei Schadenszaubern und &minus;4 % sonst, Erholung und Wiederverwendung &minus;2 %, Dauer +10 % bei Buffs und Debuffs und +5 % bei Schaden und Heilung über Zeit, und Mote-Kosten, die sich mit jedem Rang verdoppeln, bis 1 024 bei Rang 10. Linear, nicht kumulativ.</div>
+<div class="note calcul"><b>Die Werte pro Rang</b> wurden am <b>25. August 2026 an einem laufenden Client gemessen</b> und nicht aus einer Tabelle abgeschrieben: Zauberzeit &minus;2 % pro Rang bei direktem Schaden und &minus;4 % bei allem anderen, Mana &minus;2 % bei allem, was Schaden macht oder heilt, und &minus;4 % bei Buffs und Pets, Erholung und Wiederverwendung &minus;2 %, Dauer +10 % bei Buffs und Debuffs und +5 % bei Schaden und Heilung über Zeit, und Mote-Kosten, die sich mit jedem Rang verdoppeln, bis 1 024 bei Rang 10. Linear, nicht kumulativ.</div>
 
 <div class="note mesure"><b>Ein Rang erhöht den Schaden nie.</b> Blizzard Blast, echt gemerged von Tier 0 auf Tier 1, zeigt weiter <b>346</b>. Envenomed Bolt, dessen Ticks weit unter ihrem Maximum liegen, zeigt <b>345 &ndash; 351</b> auf Tier 0 wie auf Tier 4. Was wächst, ist die <b>Dauer</b>: aus 36 s werden 42 s, aus sechs Ticks sieben, also landet der Zauber <b>+16 %</b> Gesamtschaden, obwohl jeder Treffer gleich bleibt. Ticks werden abgerundet &mdash; 6 &times; 1,20 = 7,2 ergibt sieben, nicht 7,2.</div>
 <div class="note mesure"><b>Jeder Rang senkt zusätzlich den Widerstandswurf um 15.</b> Odium zeigt <i>Resist: Magic &minus;60</i> auf Tier 4, Blizzard Blast <i>Resist: Cold &minus;15</i> auf Tier 1. Das Zauberfenster erwähnt es nie, bevor du die Mote einsetzt, und bei einem Ziel, das widersteht, ist es oft mehr wert als das gesparte Mana.</div>
@@ -231,9 +231,12 @@ function auNiveau(s,lvl){
 // Odium et Envenomed Bolt +0 -> +4) : le mana suit le type de DEGATS, pas le type
 // de sort. Un nuke et un DoT perdent 2 %, un buff ou un pet en perdent 4 %.
 function taux(t,champ){
-  var nuke=(t==='nuke'), degats=(nuke||t==='dot');
+  // Le mana suit ce que le sort PRODUIT : degats ou soin -> -2 %, le reste -> -4 %.
+  // Mesure : Blizzard Blast (nuke) 133->130 a +1, Odium et Envenomed Bolt (dot) 361->332 a +4,
+  // Kragg's Salve (heal) 204->200 a +1 et ->188 a +4 ; Infusion of Spirit (buff) 167->160 a +1.
+  var nuke=(t==='nuke'), produit=(nuke||t==='dot'||t==='heal'||t==='hot');
   if(champ==='cast')   return nuke? -0.02 : -0.04;
-  if(champ==='mana')   return degats? -0.02 : -0.04;
+  if(champ==='mana')   return produit? -0.02 : -0.04;
   if(champ==='recast'||champ==='recov') return -0.02;
   if(champ==='duree')  return (t==='dot'||t==='hot')? 0.05 : 0.10;
   return 0;
