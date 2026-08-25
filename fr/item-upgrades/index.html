@@ -237,9 +237,16 @@ function auTier(base,tier){
 //   · les resistances suivent bien la regle generale : le +1 par tier qu'on observe sur
 //     une base de 5 est le minimum garanti qui prend le dessus sur les 10 %, pas une regle
 //     a part. La Haste, elle, est une vraie exception : 21 % → 24 % a +3.
+// Degats d'arme — mesure du 25/08/2026 sur DIX armes du personnage de Xavier.
+// 12 % par palier, tronque, colle a 8 mesures sur 10 : Mithril 21->26 a +2,
+// Claymore 20->24, Treant 14->17, Baron 10->12, Ykesha 9->11, Silver 15->20 a +3,
+// Flaming Fist 6->8 a +4 et 6->9 a +5. Les 10 % d'avant n'en expliquaient que 3.
+// Les deux ecarts restants sont les deux seules mesures a +1, toutes deux de base 20
+// et observees a 23 la ou la regle donne 22 : le premier palier semble donner plus
+// que les suivants, sans qu'on ait assez de points pour le formuler.
 function degats(base,tier){
   if(base<0) return base;
-  return Math.floor(base*(1+0.10*tier));
+  return Math.floor(base*(1+0.12*tier));
 }
 
 function affiche(){
