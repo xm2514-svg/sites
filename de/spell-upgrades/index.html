@@ -274,8 +274,10 @@ function texte(v,lvl,rang){
   });
   // %z est la duree, que le client remplace a l'affichage
   if(v.ticks){
-    // Envenomed Bolt : 6 ticks x 1,20 = 7,2 -> le jeu en donne 7, soit 42 s et non 43.
-    var t=Math.floor(v.ticks*(1+taux(v.t,'duree')*rang));
+    // Le jeu arrondit le nombre de ticks au plus proche, il ne tronque pas :
+    // Envenomed Bolt 6 x 1,20 = 7,2 -> 7 ticks (42 s), Togor's Insects 27 x 1,40 = 37,8
+    // -> 38 ticks (3:48). Un plancher aurait donne 3:42.
+    var t=Math.round(v.ticks*(1+taux(v.t,'duree')*rang));
     d=d.replace(/%z/g,'<b>'+duree(t*6)+'</b>');
     // Le client ecrit « between #1 and @1 » : la valeur, puis son plafond. Au niveau ou
     // le sort plafonne les deux sont egaux et la phrase se mord la queue.
