@@ -152,16 +152,21 @@ level and then capped:
 That is why the same spell reads differently on two characters, and why community databases quoting
 a single number are right for exactly one level.</div>
 
-<div class="note calcul"><b>The per-tier rates</b> come from
-<a href="https://eqltools.com/learn/spell-upgrades" target="_blank" rel="noopener">EQL Tools</a>:
-cast &minus;2 % per rank on direct-damage spells and &minus;4 % on everything else, recovery and reuse
-&minus;2 %, duration +10 % on buffs and debuffs and +5 % on damage- and heal-over-time, direct nuke
-damage +6 %, and a mote cost that doubles every rank to 1 024 at rank 10. Linear, not compounding.</div>
+<div class="note calcul"><b>The per-tier rates</b> were measured on a live client on
+<b>25 August 2026</b>, not copied from a table: cast &minus;2 % per rank on direct-damage spells and
+&minus;4 % on everything else, mana &minus;2 % on damage spells and &minus;4 % elsewhere, recovery and
+reuse &minus;2 %, duration +10 % on buffs and debuffs and +5 % on damage- and heal-over-time,
+and a mote cost that doubles every rank to 1 024 at rank 10. Linear, not compounding.</div>
 
-<div class="note mesure"><b>Mana disagrees with that table.</b> It puts mana at &minus;2 % per rank;
-two spells read off a live client say &minus;4 %. Armor of Faith drops 139 &rarr; 133 between tier 0 and
-tier 1, and Frenzied Spirit sits at 372 at tier 5 where &minus;2 % predicts 417 and &minus;4 % predicts
-371. This page uses <b>&minus;4 % on non-nukes</b>, mirroring the cast line.</div>
+<div class="note mesure"><b>A tier never raises damage.</b> Blizzard Blast merged for real from
+tier 0 to tier 1 still reads <b>346</b>. Envenomed Bolt, whose ticks are nowhere near their cap, reads
+<b>345 &ndash; 351</b> at tier 0 and at tier 4 alike. What grows is the <b>duration</b>: 36 s becomes
+42 s, six ticks become seven, so the spell lands <b>+16 %</b> total damage while every hit is unchanged.
+Ticks are floored &mdash; 6 &times; 1.20 = 7.2 gives seven, not 7.2.</div>
+<div class="note mesure"><b>Every rank also cuts the resist check by 15.</b> Odium shows
+<i>Resist: Magic &minus;60</i> at tier 4, Blizzard Blast <i>Resist: Cold &minus;15</i> at tier 1. The
+spell window never mentions it before you place the mote, and on a resisted line it may be worth more
+than the mana it saves.</div>
 
 <div class="note mesure"><b>Two things the spell window never shows.</b> A pet gains a level per tier
 &mdash; Frenzied Spirit summons a level 36 wolf at +0, a level 41 one at tier 5. And on crowd control,
@@ -248,10 +253,13 @@ function auNiveau(s,lvl){
   else if(s.c===10) v+=lvl*10;
   return s.m? Math.min(v,Math.abs(s.m)) : v;
 }
+// Taux mesures sur client vivant le 25/08/2026 (Blizzard Blast +0 -> +1 reel,
+// Odium et Envenomed Bolt +0 -> +4) : le mana suit le type de DEGATS, pas le type
+// de sort. Un nuke et un DoT perdent 2 %, un buff ou un pet en perdent 4 %.
 function taux(t,champ){
-  var nuke=(t==='nuke');
+  var nuke=(t==='nuke'), degats=(nuke||t==='dot');
   if(champ==='cast')   return nuke? -0.02 : -0.04;
-  if(champ==='mana')   return nuke? -0.02 : -0.04;
+  if(champ==='mana')   return degats? -0.02 : -0.04;
   if(champ==='recast'||champ==='recov') return -0.02;
   if(champ==='duree')  return (t==='dot'||t==='hot')? 0.05 : 0.10;
   return 0;
@@ -277,7 +285,10 @@ function ligne(nom,base,t,champ,rang,suf){
 function texte(v,lvl,rang){
   var d=v.d||'';
   if(!d) return '';
-  var k=(v.t==='nuke')? (1+0.06*rang) : 1;
+  // Mesure du 25/08/2026 : le palier ne touche JAMAIS les degats par coup. Verifie sur
+  // une fusion reelle (Blizzard Blast 346 -> 346 de +0 a +1) et sur un DoT hors plafond
+  // (Envenomed Bolt 345-351, identique de +0 a +4). Le gain passe par la duree.
+  var k=1;
   d=d.replace(/([#@])(\d+)/g,function(_,sig,n){
     var s=(v.sl||[]).filter(function(x){return x.s===+n;})[0];
     if(!s) return '';
@@ -286,7 +297,8 @@ function texte(v,lvl,rang){
   });
   // %z est la duree, que le client remplace a l'affichage
   if(v.ticks){
-    var t=v.ticks*(1+taux(v.t,'duree')*rang);
+    // Envenomed Bolt : 6 ticks x 1,20 = 7,2 -> le jeu en donne 7, soit 42 s et non 43.
+    var t=Math.floor(v.ticks*(1+taux(v.t,'duree')*rang));
     d=d.replace(/%z/g,'<b>'+duree(t*6)+'</b>');
     // Le client ecrit « between #1 and @1 » : la valeur, puis son plafond. Au niveau ou
     // le sort plafonne les deux sont egaux et la phrase se mord la queue.

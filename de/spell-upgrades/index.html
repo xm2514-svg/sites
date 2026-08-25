@@ -142,9 +142,10 @@ td.v{text-align:right;font-variant-numeric:tabular-nums}
 
 <div class="note mesure"><b>Die Dateien des Spiels selbst.</b> Die Zauberdaten stammen aus <code>spells_us.txt</code> und <code>dbstr_us.txt</code> des Clients &mdash; genau den Dateien, die das Spiel liest, um dein Zauberfenster zu zeichnen. Kein Wiki, kein Scrape. Was der Client zeigt, ist ein Grundwert, den dein Level wachsen lässt und der dann gedeckelt wird: <b>Wert = Basis + Level &times; Faktor, gedeckelt beim Maximum</b>. Deshalb liest sich derselbe Zauber auf zwei Charakteren unterschiedlich, und deshalb haben Community-Datenbanken mit einer einzigen Zahl für genau ein Level recht.</div>
 
-<div class="note calcul"><b>Die Raten pro Tier</b> stammen von <a href="https://eqltools.com/learn/spell-upgrades" target="_blank" rel="noopener">EQL Tools</a>: Zauberzeit &minus;2 % pro Rang bei Direktschaden und &minus;4 % bei allem anderen, Erholung und Wiederverwendung &minus;2 %, Dauer +10 % bei Buffs und Debuffs und +5 % bei Schaden und Heilung über Zeit, Direktschaden +6 %, und Motekosten, die sich mit jedem Rang verdoppeln bis 1 024 auf Rang 10. Linear, nicht zinseszinsartig.</div>
+<div class="note calcul"><b>Die Werte pro Rang</b> wurden am <b>25. August 2026 an einem laufenden Client gemessen</b> und nicht aus einer Tabelle abgeschrieben: Zauberzeit &minus;2 % pro Rang bei direktem Schaden und &minus;4 % bei allem anderen, Mana &minus;2 % bei Schadenszaubern und &minus;4 % sonst, Erholung und Wiederverwendung &minus;2 %, Dauer +10 % bei Buffs und Debuffs und +5 % bei Schaden und Heilung über Zeit, und Mote-Kosten, die sich mit jedem Rang verdoppeln, bis 1 024 bei Rang 10. Linear, nicht kumulativ.</div>
 
-<div class="note mesure"><b>Mana widerspricht dieser Tabelle.</b> Sie setzt Mana auf &minus;2 % pro Rang; zwei an einem laufenden Client abgelesene Zauber sagen &minus;4 %. Armor of Faith fällt von 139 auf 133 zwischen Tier 0 und Tier 1, und Frenzied Spirit steht auf Tier 5 bei 372, wo &minus;2 % 417 und &minus;4 % 371 vorhersagt. Diese Seite verwendet <b>&minus;4 % bei allem außer Direktschaden</b>, parallel zur Zauberzeit.</div>
+<div class="note mesure"><b>Ein Rang erhöht den Schaden nie.</b> Blizzard Blast, echt gemerged von Tier 0 auf Tier 1, zeigt weiter <b>346</b>. Envenomed Bolt, dessen Ticks weit unter ihrem Maximum liegen, zeigt <b>345 &ndash; 351</b> auf Tier 0 wie auf Tier 4. Was wächst, ist die <b>Dauer</b>: aus 36 s werden 42 s, aus sechs Ticks sieben, also landet der Zauber <b>+16 %</b> Gesamtschaden, obwohl jeder Treffer gleich bleibt. Ticks werden abgerundet &mdash; 6 &times; 1,20 = 7,2 ergibt sieben, nicht 7,2.</div>
+<div class="note mesure"><b>Jeder Rang senkt zusätzlich den Widerstandswurf um 15.</b> Odium zeigt <i>Resist: Magic &minus;60</i> auf Tier 4, Blizzard Blast <i>Resist: Cold &minus;15</i> auf Tier 1. Das Zauberfenster erwähnt es nie, bevor du die Mote einsetzt, und bei einem Ziel, das widersteht, ist es oft mehr wert als das gesparte Mana.</div>
 
 <div class="note mesure"><b>Zwei Dinge, die das Zauberfenster nie zeigt.</b> Ein Pet gewinnt pro Tier ein Level &mdash; Frenzied Spirit beschwört auf +0 einen Wolf auf Stufe 36, auf Tier 5 einen auf Stufe 41. Und bei Kontrollzaubern hebt ein Rang das höchste NSC-Level, auf dem der Zauber noch greift.</div>
 
@@ -226,10 +227,13 @@ function auNiveau(s,lvl){
   else if(s.c===10) v+=lvl*10;
   return s.m? Math.min(v,Math.abs(s.m)) : v;
 }
+// Taux mesures sur client vivant le 25/08/2026 (Blizzard Blast +0 -> +1 reel,
+// Odium et Envenomed Bolt +0 -> +4) : le mana suit le type de DEGATS, pas le type
+// de sort. Un nuke et un DoT perdent 2 %, un buff ou un pet en perdent 4 %.
 function taux(t,champ){
-  var nuke=(t==='nuke');
+  var nuke=(t==='nuke'), degats=(nuke||t==='dot');
   if(champ==='cast')   return nuke? -0.02 : -0.04;
-  if(champ==='mana')   return nuke? -0.02 : -0.04;
+  if(champ==='mana')   return degats? -0.02 : -0.04;
   if(champ==='recast'||champ==='recov') return -0.02;
   if(champ==='duree')  return (t==='dot'||t==='hot')? 0.05 : 0.10;
   return 0;
@@ -255,7 +259,10 @@ function ligne(nom,base,t,champ,rang,suf){
 function texte(v,lvl,rang){
   var d=v.d||'';
   if(!d) return '';
-  var k=(v.t==='nuke')? (1+0.06*rang) : 1;
+  // Mesure du 25/08/2026 : le palier ne touche JAMAIS les degats par coup. Verifie sur
+  // une fusion reelle (Blizzard Blast 346 -> 346 de +0 a +1) et sur un DoT hors plafond
+  // (Envenomed Bolt 345-351, identique de +0 a +4). Le gain passe par la duree.
+  var k=1;
   d=d.replace(/([#@])(\d+)/g,function(_,sig,n){
     var s=(v.sl||[]).filter(function(x){return x.s===+n;})[0];
     if(!s) return '';
@@ -264,7 +271,8 @@ function texte(v,lvl,rang){
   });
   // %z est la duree, que le client remplace a l'affichage
   if(v.ticks){
-    var t=v.ticks*(1+taux(v.t,'duree')*rang);
+    // Envenomed Bolt : 6 ticks x 1,20 = 7,2 -> le jeu en donne 7, soit 42 s et non 43.
+    var t=Math.floor(v.ticks*(1+taux(v.t,'duree')*rang));
     d=d.replace(/%z/g,'<b>'+duree(t*6)+'</b>');
     // Le client ecrit « between #1 and @1 » : la valeur, puis son plafond. Au niveau ou
     // le sort plafonne les deux sont egaux et la phrase se mord la queue.
