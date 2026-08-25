@@ -37,6 +37,53 @@ jobs:
           print("controle ok :", n, "objets, maj", d["updated"])
           PY
 
+      # Le message de commit doit dire CE QUI a change : sinon l'historique GitHub est
+      # une suite de lignes identiques et personne ne voit arriver les objets d'un patch.
+      - name: Resumer ce qui a change
+        id: resume
+        run: |
+          python - <<'PY' >> "$GITHUB_ENV"
+          import json, subprocess
+
+          def avant(chemin):
+              try:
+                  b = subprocess.run(["git", "show", "HEAD:" + chemin],
+                                     capture_output=True, check=True).stdout
+                  return json.loads(b).get("items", {})
+              except Exception:
+                  return {}
+
+          def maintenant(chemin):
+              try:
+                  return json.load(open(chemin, encoding="utf-8")).get("items", {})
+              except Exception:
+                  return {}
+
+          a, b = avant("items-all.json"), maintenant("items-all.json")
+          neufs = sorted(set(b) - set(a))
+          partis = sorted(set(a) - set(b))
+          bouges = sorted(n for n in set(a) & set(b) if a[n] != b[n])
+
+          bouts = []
+          if neufs:
+              bouts.append("%d nouveaux" % len(neufs))
+          if bouges:
+              bouts.append("%d modifies" % len(bouges))
+          if partis:
+              bouts.append("%d retires" % len(partis))
+          resume = ", ".join(bouts) or "aucun objet touche"
+
+          # les trois premiers noms neufs dans le titre : c'est eux qu'on guette apres un patch
+          titre = "Auto: " + resume
+          if neufs:
+              titre += " — " + ", ".join(neufs[:3]) + ("…" if len(neufs) > 3 else "")
+          print("RESUME_ITEMS=" + titre.replace("\n", " ")[:180])
+          for n in neufs[:40]:
+              print("  nouveau :", n)
+          for n in bouges[:40]:
+              print("  modifie :", n)
+          PY
+
       - name: Publier si quelque chose a change
         run: |
           FICHIERS="items.json items-all.json items-calc.json effects.json quests.json drops.json"
@@ -48,6 +95,6 @@ jobs:
             git config user.name  "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add $SUIVIS
-            git commit -m "Auto: item stats refreshed from eqlwiki"
+            git commit -m "${RESUME_ITEMS:-Auto: item stats refreshed from eqlwiki}"
             git push
           fi
