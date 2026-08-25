@@ -264,10 +264,16 @@ function affiche(){
   if(v.wt!==undefined) out+='<tr><td>'+T.weight+'</td><td class="v">'+v.wt+'</td><td class="v rien">'+
                             v.wt+'</td><td class="v rien">'+T.baisse+'</td></tr>';
   // La resistance au Void n'existe pas dans les fiches (3 objets sur 11 069) : c'est
-  // l'amelioration qui la donne. Relevee sur 7 pieces d'armure, elle vaut le tier — mais
-  // les deux objets vus a +1 n'en ont aucune, et ni l'arme ni la ceinture n'en gagnent.
-  if((v.st||{}).AC){
-    var vd = r>=2 ? r : 0;
+  // l'amelioration qui la donne. Mesure du 25/08/2026 sur six armes : elle vaut le tier
+  // DES +1, et elle n'est accordee qu'aux objets portant deja des ATTRIBUTS. Ni le haste
+  // ni une resistance ne suffisent.
+  //   Aldryn +1 (STR STA WIS) -> SV Void 1   ·  Theologian Claymore +2 (STR INT) -> 2
+  //   Dark Reaver +1 et Whitened Treant Fists +2 (aucun attribut) -> rien
+  //   Mithril +2 (Haste seul) et Flaming Fist +5 (SV Fire seul) -> rien
+  var ATTRS=['STR','STA','AGI','DEX','WIS','INT','CHA'];
+  var aAttribut = ATTRS.some(function(a){ return (v.st||{})[a]; });
+  if(aAttribut){
+    var vd = r>=1 ? r : 0;
     out+='<tr><td>'+T.svvoid+'</td><td class="v">0</td><td class="v '+(vd?'mieux':'rien')+'">'+vd+
          '</td><td class="v '+(vd?'mieux':'rien')+'">'+(vd? '+'+vd : '&mdash;')+'</td></tr>';
   }
