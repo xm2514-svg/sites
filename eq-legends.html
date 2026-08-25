@@ -289,7 +289,14 @@
     <span class="s4" data-i18n="3455">4 &middot; The map opens on its pin</span>
   </div>
   <span class="d-cur"></span>
-</div></div>
+</div>
+  <ul class="d-list">
+    <li data-i18n="3452">1 &middot; Hover an item</li>
+    <li data-i18n="3453">2 &middot; Its stats open where you are reading</li>
+    <li data-i18n="3454">3 &middot; Click the mob that drops it</li>
+    <li data-i18n="3455">4 &middot; The map opens on its pin</li>
+  </ul>
+</div>
 <p class="d-cap" data-i18n="3451">Every item in the guide works like this &mdash; hover for the stats, click the mob for its place on the map.</p>
 
 <!-- THE PATH (level by level) -->
@@ -2785,6 +2792,25 @@ html[data-res="hd"] nav a{padding-top:1px;padding-bottom:1px}
 @keyframes d-s2{0%,17%{opacity:0}21%,36%{opacity:1}40%,100%{opacity:0}}
 @keyframes d-s3{0%,36%{opacity:0}40%,49%{opacity:1}53%,100%{opacity:0}}
 @keyframes d-s4{0%,49%{opacity:0}55%,90%{opacity:1}95%,100%{opacity:0}}
+.d-list{display:none}
+/* 1920x1080 uniquement : un seul bloc a la largeur du cadre, l'animation a gauche,
+   les quatre etapes ecrites en permanence a droite, boucle raccourcie a 7 s.
+   Le mobile et le 3440 gardent la version centree. */
+html[data-res="hd"] .demo-wrap{width:auto;height:auto;max-width:none;margin:14px 0 6px;
+  display:flex;gap:28px;align-items:center;border:1px solid #241d14;border-radius:9px;
+  background:#0c0a08;padding:14px 20px}
+html[data-res="hd"] .demo{position:relative;flex:0 0 520px;border:0;background:transparent;
+  border-radius:0;transform:none}
+html[data-res="hd"] .demo .d-tip,
+html[data-res="hd"] .demo .d-map,
+html[data-res="hd"] .demo .d-halo,
+html[data-res="hd"] .demo .d-cur,
+html[data-res="hd"] .demo .d-go{animation-duration:7s}
+html[data-res="hd"] .d-steps{display:none}
+html[data-res="hd"] .demo{height:236px}
+html[data-res="hd"] .d-list{display:block;list-style:none;margin:0;padding:0;color:#cfc4b1;font-size:15px}
+html[data-res="hd"] .d-list li{margin:10px 0}
+html[data-res="hd"] .d-cap{max-width:none;text-align:left;margin:0 0 16px}
 html[data-res="mobile"] .demo-wrap{width:322px;height:163px}
 html[data-res="mobile"] .demo{transform:scale(.62)}
 html[data-res="ultra"]  .demo-wrap{width:598px;height:302px}
