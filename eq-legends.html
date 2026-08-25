@@ -271,7 +271,7 @@
 
 
 
-<div class="demo" role="img" aria-label="Hover an item, click the mob that drops it, the map opens on its pin">
+<div class="demo-wrap"><div class="demo" role="img" aria-label="Hover an item, click the mob that drops it, the map opens on its pin">
   <div class="d-txt" data-i18n="3450">&hellip;&nbsp;the shin lord drops <span class="d-item">Ghoulbane</span>, still the best undead weapon at 30.</div>
   <div class="d-tip">
     <b>Ghoulbane</b>
@@ -289,7 +289,7 @@
     <span class="s4" data-i18n="3455">4 &middot; The map opens on its pin</span>
   </div>
   <span class="d-cur"></span>
-</div>
+</div></div>
 <p class="d-cap" data-i18n="3451">Every item in the guide works like this &mdash; hover for the stats, click the mob for its place on the map.</p>
 
 <!-- THE PATH (level by level) -->
@@ -2735,8 +2735,12 @@ html[data-res="hd"] nav a{padding-top:1px;padding-bottom:1px}
 <style>
 /* Demonstration animee : survol -> infobulle -> clic -> la carte et sa pastille.
    Une seule horloge de 11 s, aucun JavaScript, coupee si l'utilisateur veut moins d'animation. */
-.demo{position:relative;max-width:520px;margin:14px auto 4px;height:262px;border:1px solid #241d14;
-  border-radius:9px;background:#0c0a08;overflow:hidden;font:13px/1.5 "Segoe UI",Arial,sans-serif}
+/* Les coordonnees du curseur sont en pixels : si le bloc se reflowait, il pointerait
+   a cote. On fige donc la geometrie a 520x262 et on met a l'echelle par palier. */
+.demo-wrap{position:relative;width:520px;height:262px;max-width:100%;margin:14px auto 4px}
+.demo{position:absolute;left:0;top:0;width:520px;height:262px;transform-origin:top left;
+  border:1px solid #241d14;border-radius:9px;background:#0c0a08;overflow:hidden;
+  font:13px/1.5 "Segoe UI",Arial,sans-serif}
 .d-txt{position:absolute;left:16px;top:16px;right:16px;color:#c9bda9}
 .d-item{color:#f4d585;border-bottom:1px dotted #c8a83a}
 .d-tip{position:absolute;left:52px;top:50px;width:290px;padding:9px 11px;background:#120f0c;
@@ -2769,7 +2773,6 @@ html[data-res="hd"] nav a{padding-top:1px;padding-bottom:1px}
   74%{opacity:0;transform:scale(1.7)}76%{opacity:.95;transform:scale(1)}84%,100%{opacity:0;transform:scale(1.7)}}
 @media(prefers-reduced-motion:reduce){.d-tip,.d-map,.d-halo,.d-cur,.d-go{animation:none}
   .d-tip{opacity:1;transform:none}.d-map,.d-cur{display:none}}
-.demo{height:262px}
 .d-steps{position:absolute;left:0;right:0;bottom:0;height:34px;border-top:1px solid #2b2318;
   background:#120f0c}
 .d-steps span{position:absolute;left:0;right:0;top:9px;text-align:center;color:#f4d585;
@@ -2782,11 +2785,14 @@ html[data-res="hd"] nav a{padding-top:1px;padding-bottom:1px}
 @keyframes d-s2{0%,17%{opacity:0}21%,36%{opacity:1}40%,100%{opacity:0}}
 @keyframes d-s3{0%,36%{opacity:0}40%,49%{opacity:1}53%,100%{opacity:0}}
 @keyframes d-s4{0%,49%{opacity:0}55%,90%{opacity:1}95%,100%{opacity:0}}
+html[data-res="mobile"] .demo-wrap{width:322px;height:163px}
+html[data-res="mobile"] .demo{transform:scale(.62)}
+html[data-res="ultra"]  .demo-wrap{width:598px;height:302px}
+html[data-res="ultra"]  .demo{transform:scale(1.15)}
+html[data-res="ultra"]  .d-cap{max-width:598px}
 @media(prefers-reduced-motion:reduce){.d-steps span{animation:none;position:static;display:block;opacity:1}
   .d-steps{position:static;height:auto;padding:8px 10px}}
-html[data-res="mobile"] .demo{height:300px}
 
-html[data-res="mobile"] .d-tip{left:12px;width:calc(100% - 24px)}
 </style>
 </body>
 </html>
