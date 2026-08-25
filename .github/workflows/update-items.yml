@@ -21,6 +21,11 @@ jobs:
       - name: Regenerer items.json depuis eqlwiki
         run: python tools/update_items.py
 
+      # items-all.json sortait deja de l'etape precedente mais n'etait jamais commite :
+      # la base complete des deux calculateurs restait figee. On la decoupe et on la garde.
+      - name: Refabriquer items-calc.json depuis items-all.json
+        run: python tools/build_items_calc.py
+
       - name: Verifier que items.json est valide
         run: |
           python - <<'PY'
@@ -34,12 +39,15 @@ jobs:
 
       - name: Publier si quelque chose a change
         run: |
-          if git diff --quiet -- items.json; then
+          FICHIERS="items.json items-all.json items-calc.json effects.json quests.json drops.json"
+          SUIVIS=""
+          for f in $FICHIERS; do [ -f "$f" ] && SUIVIS="$SUIVIS $f"; done
+          if git diff --quiet -- $SUIVIS; then
             echo "aucun changement"
           else
             git config user.name  "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add items.json
+            git add $SUIVIS
             git commit -m "Auto: item stats refreshed from eqlwiki"
             git push
           fi
