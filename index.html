@@ -1908,6 +1908,24 @@ window.eqShowNamed=function(key){
   if(!t) return true;
   t.classList.add('eqon');
   var c=t.querySelector('circle');
+  if(!c){
+    // 32 pastilles sur 238 n'ont pas de cercle : ce sont des etiquettes de texte seules.
+    // Sans halo, le clic ouvrait la carte sans que rien ne bouge. On cerne le texte.
+    // getBBox est ici en coordonnees LOCALES au groupe, et le halo est insere DANS ce
+    // meme groupe : les deux reperes coincident.
+    try{
+      var bb=t.getBBox();
+      if(bb.width>0){
+        var el=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+        el.setAttribute('cx',bb.x+bb.width/2);
+        el.setAttribute('cy',bb.y+bb.height/2);
+        el.setAttribute('rx',bb.width/2+7);
+        el.setAttribute('ry',bb.height/2+5);
+        el.setAttribute('class','eqhalo txt');
+        t.insertBefore(el,t.firstChild);
+      }
+    }catch(_e){}
+  }
   if(c){
     var halo=document.createElementNS('http://www.w3.org/2000/svg','circle');
     halo.setAttribute('cx',c.getAttribute('cx'));
@@ -2327,6 +2345,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
 .eqhalo{fill:none;stroke:#ff2fd6;stroke-width:2.5;transform-box:fill-box;transform-origin:center;
   animation:eqhalo 1.1s ease-out 4}
 @keyframes eqhalo{0%{transform:scale(1);opacity:.95}100%{transform:scale(3.6);opacity:0}}
+/* une etiquette de texte est large : un halo x3.6 sortirait de l'ecran */
+.eqhalo.txt{animation:eqhalotxt 1.1s ease-out 4}
+@keyframes eqhalotxt{0%{transform:scale(1);opacity:.95}100%{transform:scale(1.7);opacity:0}}
 .eqgo{cursor:pointer;border-bottom:1px dashed #ff8ae0}
 .eqgo:hover{color:#ff8ae0}
 
