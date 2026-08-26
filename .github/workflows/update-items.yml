@@ -39,11 +39,16 @@ jobs:
 
       # Le message de commit doit dire CE QUI a change : sinon l'historique GitHub est
       # une suite de lignes identiques et personne ne voit arriver les objets d'un patch.
+      # Le message de commit doit dire CE QUI a change : sinon l'historique GitHub est
+      # une suite de lignes identiques et personne ne voit arriver les objets d'un patch.
+      #
+      # PIEGE, paye le 26/08/2026 : ne rediriger vers $GITHUB_ENV que la ligne de variable.
+      # Tout le reste part sur stderr. Une redirection globale de stdout fait lire les lignes
+      # de detail comme des affectations et le job echoue sur « Invalid format ».
       - name: Resumer ce qui a change
-        id: resume
         run: |
-          python - <<'PY' >> "$GITHUB_ENV"
-          import json, subprocess
+          python - <<'PY'
+          import json, os, subprocess, sys
 
           def avant(chemin):
               try:
@@ -73,15 +78,21 @@ jobs:
               bouts.append("%d retires" % len(partis))
           resume = ", ".join(bouts) or "aucun objet touche"
 
-          # les trois premiers noms neufs dans le titre : c'est eux qu'on guette apres un patch
           titre = "Auto: " + resume
           if neufs:
-              titre += " — " + ", ".join(neufs[:3]) + ("…" if len(neufs) > 3 else "")
-          print("RESUME_ITEMS=" + titre.replace("\n", " ")[:180])
+              titre += " - " + ", ".join(neufs[:3]) + ("..." if len(neufs) > 3 else "")
+          # une seule ligne, sans saut, sans caractere qui casse le format cle=valeur
+          titre = " ".join(titre.split())[:180]
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as fh:
+              fh.write("RESUME_ITEMS=" + titre + "\n")
+
+          # le detail va dans le journal du job, jamais dans GITHUB_ENV
+          print(titre, file=sys.stderr)
           for n in neufs[:40]:
-              print("  nouveau :", n)
+              print("  nouveau :", n, file=sys.stderr)
           for n in bouges[:40]:
-              print("  modifie :", n)
+              print("  modifie :", n, file=sys.stderr)
           PY
 
       - name: Publier si quelque chose a change
