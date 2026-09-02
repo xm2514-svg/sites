@@ -1894,19 +1894,10 @@ var mv=document.getElementById('mv'),box=document.getElementById('mvbox'),cur=nu
 var lgbox=document.createElement('div');lgbox.id='mvlg';mv.appendChild(lgbox);
 function fit(){if(!cur)return;if(cur.dataset&&cur.dataset.vb0)cur.setAttribute('viewBox',cur.dataset.vb0);var vb=(cur.getAttribute('viewBox')||'0 0 1 1').split(/[ ,]+/).map(Number);var ratio=(vb[2]&&vb[3])?vb[2]/vb[3]:1;var aw=box.clientWidth-20, ah=box.clientHeight-20;w=Math.max(80,Math.min(aw,ah*ratio));cur.style.width=w+'px';box.scrollTop=0;box.scrollLeft=0;}
 function zoom(f){if(!cur)return;w=Math.max(200,Math.min(9000,w*f));cur.style.width=w+'px';}
-/* Ouverture : sur telephone, ajuster la carte a la largeur de l'ecran (~390 px) rend les
-   etiquettes illisibles — sur PC la meme carte s'ouvre a ~1900 px. On part donc zoome et
-   centre, et le bouton Fit reste disponible pour tout voir d'un coup. */
-function ouvre(){fit();
-  if(box.clientWidth<760&&cur){
-    var cible=Math.min(1100,w*3);
-    if(cible>w){w=cible;cur.style.width=w+'px';}
-    requestAnimationFrame(function(){
-      box.scrollLeft=Math.max(0,(box.scrollWidth-box.clientWidth)/2);
-      box.scrollTop=Math.max(0,(box.scrollHeight-box.clientHeight)/2);
-    });
-  }
-}
+/* Ouverture : la carte s'ouvre ENTIERE, comme en page. Le forcage a x3 pose le
+   18/08/2026 ouvrait toutes les cartes a ~1065 px sur un ecran de 375 : illisible,
+   et le pincement tombait sur une etiquette. Le zoom se fait a la demande. */
+function ouvre(){fit();}
 function show(svg){srcSvg=svg;var _b=document.getElementById('mvback'); if(_b) _b.style.display=window.__eqExterne?'':'none';window.__eqExterne=false;box.innerHTML='';cur=svg.cloneNode(true);cur.removeAttribute('style');
   if(svg.dataset&&svg.dataset.vb0){cur.dataset.vb0=svg.dataset.vb0;cur.setAttribute('viewBox',svg.dataset.vb0);}
   cur.classList.remove('mapz');box.appendChild(cur);
