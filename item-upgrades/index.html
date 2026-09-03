@@ -417,14 +417,15 @@ function liste(){
       else if(sk==='2H'){ if(!v.skill||v.skill.indexOf('2H')!==0) continue; }
       else if(v.skill!==sk) continue;
     }
-    if(q && n.toLowerCase().indexOf(q)<0) continue;
+    // on cherche aussi sur l'effet : « lifetap » doit sortir l'objet qui le proce
+      if(q && n.toLowerCase().indexOf(q)<0 && (!v.eff || v.eff.toLowerCase().indexOf(q)<0)) continue;
     l.push([n,v]);
   }
   // les objets du guide d'abord : ce sont ceux qu'on sait ou farmer
   l.sort(function(a,b){ return (b[1].g||0)-(a[1].g||0) || a[0].localeCompare(b[0]); });
   var s=document.getElementById('it');
   s.innerHTML=l.slice(0,400).map(function(x){
-    return '<option value="'+x[0].replace(/"/g,'&quot;')+'">'+x[0]+(x[1].g?' ★':'')+'</option>';
+    return '<option value="'+x[0].replace(/"/g,'&quot;')+'">'+x[0]+(x[1].g?' ★':'')+(x[1].eff?' — '+x[1].eff:'')+'</option>';
   }).join('')||'<option value="">'+T.rien+'</option>';
   var c=document.getElementById('cpt');
   if(c) c.textContent = l.length ?
