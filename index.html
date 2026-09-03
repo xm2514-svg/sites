@@ -245,7 +245,7 @@
   #mvlg .tip[data-tip]:hover::after{display:none}
   #mvlg .tip[data-tip]{position:relative}
   .tip[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:0;top:150%;z-index:60;white-space:normal;width:max-content;max-width:340px;background:#0d0b07;color:#f0d68a;border:1px solid #c8a83a;border-radius:6px;padding:5px 9px;font-size:12px;font-weight:400;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.65);pointer-events:none}
-@media(max-width:760px){body{font-size:17px;line-height:1.55}nav{font-size:14px}.wrap{padding:14px 14px 60px}table{font-size:15px}.zoomhint{font-size:14px}#kofiBtn,#langToggle,#kofi,#lang{font-size:13.5px}.mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}}.pv{color:#e8d44a;font-size:11px;font-weight:bold}</style>
+@media(max-width:760px){body{font-size:17px;line-height:1.55}nav{font-size:14px}.wrap{padding:14px 14px 60px}table{font-size:15px}.zoomhint{font-size:14px}#kofiBtn,#langToggle,#kofi,#lang{font-size:13.5px}.mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}}.pv{color:#e8d44a;font-size:11px;font-weight:bold}.kunark{color:#c86a4a;font-size:10.5px;font-weight:bold;border:1px solid #7a3f2c;border-radius:3px;padding:0 4px}</style>
 <style>/* convention de couleur des liens dans le corps du guide :
    jaune = un boss (fiche du named) · or = une zone (carte). Les liens sans style
    inline heritaient du contexte et se confondaient. */
@@ -2424,7 +2424,9 @@ box.addEventListener('touchend',function(e){if(e.touches.length===0){_tp=null;_t
     cache(); marque(); liseres();
   };
   // base des effets : fichier independant, 3 Ko aujourd'hui
-  fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
+  fetch('era.json',{cache:'no-cache'}).then(function(r){return r.json();})
+  .then(function(e){ window.__eqEra=e.items||{}; if(window.__eqRecherche) window.__eqRecherche(); }).catch(function(){});
+fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
     .then(function(e){ window.__eqEffets=e.effects||{}; liseres(); if(window.__eqRecherche) window.__eqRecherche(); }).catch(function(){});
   // base des usages : a quoi sert un objet sans stat (quete, recherche, craft).
   // 856 Ko depuis le rescrape du 12/08/2026 (8 315 objets contre 123) : on ne bloque
@@ -2660,7 +2662,7 @@ function fiche(n){ return base[n] || horsGuide[n]; }
         var _e=_m?_m[1].trim():'', _E=(window.__eqEffets||{})[_e], _q='';
         if(_E){ var _d=(_E.d||''), _n=_d.match(/(\d+)(?!.*\d)/); _q=' &middot; <span class="pv">'+_e+(_n?' '+_n[1]+' hp':'')+'</span>'; }
         return '<div class="r'+(hors?' hors':'')+'" role="option" tabindex="0" data-n="'+e+'">'+
-          '<div class="n"><span class="nn'+_c+'">'+e+'</span>'+(hors?' <span class="tag">not in guide</span>':'')+_q+'</div>'+
+          '<div class="n"><span class="nn'+_c+'">'+e+'</span>'+(hors?' <span class="tag">not in guide</span>':'')+((window.__eqEra||{})[n]==='kunark'?' <span class="kunark">Kunark &mdash; not in game yet</span>':'')+_q+'</div>'+
           '<div class="s">'+l1(fiche(n).s).replace(/</g,'&lt;')+'</div>'+
           '<div class="z">'+_z.replace(/</g,'&lt;')+'</div></div>';
       }).join('');

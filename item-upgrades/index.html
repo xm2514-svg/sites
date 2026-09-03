@@ -425,7 +425,7 @@ function liste(){
   l.sort(function(a,b){ return (b[1].g||0)-(a[1].g||0) || a[0].localeCompare(b[0]); });
   var s=document.getElementById('it');
   s.innerHTML=l.slice(0,400).map(function(x){
-    return '<option value="'+x[0].replace(/"/g,'&quot;')+'">'+x[0]+(x[1].g?' ★':'')+(x[1].eff?' — '+x[1].eff:'')+'</option>';
+    return '<option value="'+x[0].replace(/"/g,'&quot;')+'">'+x[0]+(x[1].g?' ★':'')+(x[1].eff?' — '+x[1].eff:'')+((window.__eqEra||{})[x[0]]==='kunark'?' [Kunark]':'')+'</option>';
   }).join('')||'<option value="">'+T.rien+'</option>';
   var c=document.getElementById('cpt');
   if(c) c.textContent = l.length ?
@@ -456,6 +456,7 @@ function choisi(){
 // Le CDN de GitHub Pages garde le JSON en cache bien plus longtemps que la page : le
 // 19/08 la page servait le nouveau code avec l'ancienne base, et le filtre affichait
 // « Fingers (4) ». Bumper cette date a chaque fois que items-calc.json change.
+fetch('https://xm2514-svg.github.io/sites/era.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(e){window.__eqEra=e.items||{}; var s=document.getElementById('it'); if(s&&s.options.length) liste();}).catch(function(){});
 fetch('https://xm2514-svg.github.io/sites/items-calc.json?v=20260819').then(function(r){return r.json();}).then(function(j){
   D=j.items; TOTAL=Object.keys(D).length;
   // 53 combinaisons dans la base pour 18 emplacements reels : on liste les emplacements,
