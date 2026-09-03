@@ -245,7 +245,7 @@
   #mvlg .tip[data-tip]:hover::after{display:none}
   #mvlg .tip[data-tip]{position:relative}
   .tip[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:0;top:150%;z-index:60;white-space:normal;width:max-content;max-width:340px;background:#0d0b07;color:#f0d68a;border:1px solid #c8a83a;border-radius:6px;padding:5px 9px;font-size:12px;font-weight:400;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.65);pointer-events:none}
-@media(max-width:760px){body{font-size:17px;line-height:1.55}nav{font-size:14px}.wrap{padding:14px 14px 60px}table{font-size:15px}.zoomhint{font-size:14px}#kofiBtn,#langToggle,#kofi,#lang{font-size:13.5px}.mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}}.pv{color:#e8d44a;font-size:11px;font-weight:bold}.kunark{color:#c86a4a;font-size:10.5px;font-weight:bold;border:1px solid #7a3f2c;border-radius:3px;padding:0 4px}.ukn{color:#8a8070;font-size:10.5px;border:1px solid #4a4436;border-radius:3px;padding:0 4px}</style>
+@media(max-width:760px){body{font-size:17px;line-height:1.55}nav{font-size:14px}.wrap{padding:14px 14px 60px}table{font-size:15px}.zoomhint{font-size:14px}#kofiBtn,#langToggle,#kofi,#lang{font-size:13.5px}.mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}}.pv{color:#e8d44a;font-size:11px;font-weight:bold}.kunark{color:#c86a4a;font-size:10.5px;font-weight:bold;border:1px solid #7a3f2c;border-radius:3px;padding:0 4px}.ukn{color:#8a8070;font-size:10.5px;border:1px solid #4a4436;border-radius:3px;padding:0 4px}.aideproc{padding:6px 9px;color:#a89566;font-size:11.5px;border-bottom:1px solid #3a3426}.aideproc b{color:#e8d44a}</style>
 <style>/* convention de couleur des liens dans le corps du guide :
    jaune = un boss (fiche du named) · or = une zone (carte). Les liens sans style
    inline heritaient du contexte et se confondaient. */
@@ -2576,7 +2576,7 @@ fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
 (function(){
   var nav=document.querySelector('nav'); if(!nav) return;
   var box=document.createElement('span'); box.id='eqfind';
-  box.innerHTML='<input type="search" placeholder="\u{1F50E} Find an item…" autocomplete="off" aria-label="Find an item"><div id="eqres" role="listbox"></div>';
+  box.innerHTML='<input type="search" placeholder="\u{1F50E} Item, or a proc: lifetap, haste, stun…" autocomplete="off" aria-label="Find an item or an effect"><div id="eqres" role="listbox"></div>';
   nav.appendChild(box);
   var inp=box.querySelector('input'), res=box.querySelector('#eqres'), data=null;
   // sous 760 px, le champ sort de la nav et se pose juste en dessous, pleine largeur
@@ -2611,6 +2611,14 @@ fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
     }
     var d=(data.items[nom]&&data.items[nom].d)||'';
     for(var z in ZONES){ if(d.indexOf(z)>=0){location.hash='#'+ZONES[z];return;} }
+  }
+  // Personne ne devine qu'on peut chercher par proc : on le dit au-dessus des resultats.
+  function aideProc(){
+    var lg=(document.documentElement.getAttribute('data-lang')||'en');
+    return lg==='fr' ? 'Cherche aussi par proc : tape <b>lifetap</b>, <b>haste</b>, <b>stun</b>\u2026 pour trouver l\'arme qui le porte.'
+         : lg==='de' ? 'Auch nach Procs suchen: tippe <b>lifetap</b>, <b>haste</b>, <b>stun</b>\u2026 und finde die Waffe, die ihn tr\u00e4gt.'
+         : lg==='es' ? 'Busca tambi\u00e9n por proc: escribe <b>lifetap</b>, <b>haste</b>, <b>stun</b>\u2026 y encuentra el arma que lo lleva.'
+         : 'Search by proc too: type <b>lifetap</b>, <b>haste</b>, <b>stun</b>\u2026 to find the weapon that carries it.';
   }
   function cherche(){
     if(!data) return;
@@ -2647,7 +2655,7 @@ function fiche(n){ return base[n] || horsGuide[n]; }
       res.innerHTML='<div class="vide">'+(tout? 'Nothing found in '+noms.length+' items.'
         : 'Loading the full item database\u2026')+'</div>';
     }else{
-      res.innerHTML=hits.map(function(n){
+      res.innerHTML='<div class="aideproc">'+aideProc()+'</div>'+hits.map(function(n){
         var e=n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
         var hors=!(n in base) && !zoneCartographiee(fiche(n));
         // meme calcul que liseres() : effet documente -> proc, objet de quete -> quete
