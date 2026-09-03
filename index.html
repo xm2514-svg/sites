@@ -2662,7 +2662,7 @@ function fiche(n){ return base[n] || horsGuide[n]; }
         var _e=_m?_m[1].trim():'', _E=(window.__eqEffets||{})[_e], _q='';
         if(_E){ var _d=(_E.d||''), _n=_d.match(/(\d+)(?!.*\d)/); _q=' &middot; <span class="pv">'+_e+(_n?' '+_n[1]+' hp':'')+'</span>'; }
         return '<div class="r'+(hors?' hors':'')+'" role="option" tabindex="0" data-n="'+e+'">'+
-          '<div class="n"><span class="nn'+_c+'">'+e+'</span>'+(hors?' <span class="tag">not in guide</span>':'')+(function(_e){return _e==='kunark'?' <span class="kunark">Kunark &mdash; not in game yet</span>':(_e==='unknown'?' <span class="ukn">era unknown</span>':'');})((window.__eqEra||{})[n])+_q+'</div>'+
+          '<div class="n"><span class="nn'+_c+'">'+e+'</span>'+(hors?' <span class="tag">not in guide</span>':'')+(function(_e){return _e==='kunark'?' <span class="kunark">not in game yet</span>':(_e==='unknown'?' <span class="ukn">era unknown</span>':'');})((window.__eqEra||{})[n])+_q+'</div>'+
           '<div class="s">'+l1(fiche(n).s).replace(/</g,'&lt;')+'</div>'+
           '<div class="z">'+_z.replace(/</g,'&lt;')+'</div></div>';
       }).join('');
