@@ -425,7 +425,7 @@ function liste(){
   l.sort(function(a,b){ return (b[1].g||0)-(a[1].g||0) || a[0].localeCompare(b[0]); });
   var s=document.getElementById('it');
   s.innerHTML=l.slice(0,400).map(function(x){
-    return '<option value="'+x[0].replace(/"/g,'&quot;')+'">'+x[0]+(x[1].g?' ★':'')+(x[1].eff?' — '+x[1].eff:'')+((window.__eqEra||{})[x[0]]==='kunark'?' [Kunark]':'')+'</option>';
+    return '<option value="'+x[0].replace(/"/g,'&quot;')+'">'+x[0]+(x[1].g?' ★':'')+(x[1].eff?' — '+x[1].eff:'')+(function(_e){return _e==='kunark'?' [Kunark]':(_e==='unknown'?' [?]':'');})((window.__eqEra||{})[x[0]])+'</option>';
   }).join('')||'<option value="">'+T.rien+'</option>';
   var c=document.getElementById('cpt');
   if(c) c.textContent = l.length ?
