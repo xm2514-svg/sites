@@ -2576,7 +2576,7 @@ fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
 (function(){
   var nav=document.querySelector('nav'); if(!nav) return;
   var box=document.createElement('span'); box.id='eqfind';
-  box.innerHTML='<input type="search" placeholder="\u{1F50E} Item, or a proc: lifetap, haste, stun…" autocomplete="off" aria-label="Find an item or an effect"><div id="eqres" role="listbox"></div>';
+  box.innerHTML='<input type="search" placeholder="\u{1F50E} Item, or a proc: lifetap, nuke, haste, heal…" autocomplete="off" aria-label="Find an item or an effect"><div id="eqres" role="listbox"></div>';
   nav.appendChild(box);
   var inp=box.querySelector('input'), res=box.querySelector('#eqres'), data=null;
   // sous 760 px, le champ sort de la nav et se pose juste en dessous, pleine largeur
@@ -2615,10 +2615,10 @@ fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
   // Personne ne devine qu'on peut chercher par proc : on le dit au-dessus des resultats.
   function aideProc(){
     var lg=(document.documentElement.getAttribute('data-lang')||'en');
-    return lg==='fr' ? 'Cherche aussi par proc : tape <b>lifetap</b>, <b>haste</b>, <b>stun</b>\u2026 pour trouver l\'arme qui le porte.'
-         : lg==='de' ? 'Auch nach Procs suchen: tippe <b>lifetap</b>, <b>haste</b>, <b>stun</b>\u2026 und finde die Waffe, die ihn tr\u00e4gt.'
-         : lg==='es' ? 'Busca tambi\u00e9n por proc: escribe <b>lifetap</b>, <b>haste</b>, <b>stun</b>\u2026 y encuentra el arma que lo lleva.'
-         : 'Search by proc too: type <b>lifetap</b>, <b>haste</b>, <b>stun</b>\u2026 to find the weapon that carries it.';
+    return lg==='fr' ? 'Cherche aussi par proc : tape <b>lifetap</b>, <b>nuke</b>, <b>haste</b>, <b>heal</b>\u2026 pour trouver l\'arme qui le porte.'
+         : lg==='de' ? 'Auch nach Procs suchen: tippe <b>lifetap</b>, <b>nuke</b>, <b>haste</b>, <b>heal</b>\u2026 und finde die Waffe, die ihn tr\u00e4gt.'
+         : lg==='es' ? 'Busca tambi\u00e9n por proc: escribe <b>lifetap</b>, <b>nuke</b>, <b>haste</b>, <b>heal</b>\u2026 y encuentra el arma que lo lleva.'
+         : 'Search by proc too: type <b>lifetap</b>, <b>nuke</b>, <b>haste</b>, <b>heal</b>\u2026 to find the weapon that carries it.';
   }
   function cherche(){
     if(!data) return;
@@ -2637,15 +2637,24 @@ function fiche(n){ return base[n] || horsGuide[n]; }
     // texte de l'effet lui-meme, et dans les quetes : taper « lifetap » doit sortir l'objet
     // qui le proce, pas seulement celui qui le porte dans son nom.
     function effetDe(o){ var m=/(?:Worn |Focus )?Effect:\s*([^(\n]+?)\s*(?:\(|$)/m.exec((o&&o.s)||''); return m?m[1].trim():''; }
+    // Le wiki n'ecrit jamais « nuke » : il ecrit « DD » ou « Decrease Hitpoints ». On traduit
+    // le vocabulaire du joueur vers celui de la base, sinon la recherche par proc ne sert qu'a
+    // ceux qui connaissent deja le nom exact de l'effet.
+    var SYN={nuke:'decrease hitpoints',dd:'decrease hitpoints',heal:'increase hitpoints',
+             heals:'increase hitpoints',lifetap:'siphon',tap:'siphon',ds:'damage shield',
+             mez:'mesmeri',mesmerize:'mesmeri',sow:'movement speed',speed:'movement speed',
+             port:'teleport',gate:'teleport',invis:'invisibility',regen:'regeneration'};
     function pate(n){
       var o=fiche(n), t=n+' '+src(o.d)+' '+((o&&o.s)||'');
       var e=effetDe(o), E=(window.__eqEffets||{})[e];
-      if(e) t+=' '+e+' '+((E&&E.d)||'');
+      // le detail de l'effet ET la liste de ses lignes : « Decrease Hitpoints by 42 » est la
+      if(e) t+=' '+e+' '+((E&&E.d)||'')+' '+((E&&E.e&&E.e.join(' '))||'');
       var u=(window.__eqUsages||{})[n];
       if(u&&u.q) t+=' '+u.q.join(' ');
       return t.toLowerCase();
     }
-    var hits=noms.filter(function(n){ return pate(n).indexOf(q)>=0; }).sort(function(a,b){
+    var qs=SYN[q]||q;
+    var hits=noms.filter(function(n){ var t=pate(n); return t.indexOf(q)>=0 || t.indexOf(qs)>=0; }).sort(function(a,b){
       var ga=(a in base)?0:1, gb=(b in base)?0:1;      // ceux du guide en tete
       if(ga!==gb) return ga-gb;
       var ia=a.toLowerCase().indexOf(q), ib=b.toLowerCase().indexOf(q);
