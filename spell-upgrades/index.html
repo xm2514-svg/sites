@@ -113,9 +113,13 @@ knowing about.
       <label for="cl">Class</label>
       <select id="cl"></select>
     </div>
+          <div>
+            <label for="ty">Type</label>
+            <select id="ty"></select>
+          </div>
     <div>
       <label for="q">Search</label>
-      <input type="search" id="q" placeholder="blizzard, odium, healing…" autocomplete="off">
+      <input type="search" id="q" placeholder="blizzard, or a type: nuke, heal, dot, lifetap…" autocomplete="off">
     </div>
   </div>
   <div style="margin-top:12px">
@@ -235,7 +239,7 @@ var T = Object.assign({
     WIZ:'Wizard',MAG:'Magician',ENC:'Enchanter',BST:'Beastlord',BER:'Berserker'},
   mana:'Mana', cast:'Cast', recovery:'Recovery', recast:'Recast', duree:'Duration',
   ticks:'ticks', motes:'motes total', brut:'unupgraded', rien:'no match',
-  toutclasse:'Every class', aucunestat:'No numeric stat.',
+  toutclasse:'Every class', touttype:'Every type', aucunestat:'No numeric stat.',
   effetsau:'Effects at level ',
   degatsrang:function(r){ return 'Damage carries the <b>+'+(6*r)+' %</b> of rank '+r+
     '. The window keeps showing the unranked figure, so this is read from the combat log.'; },
@@ -354,14 +358,20 @@ function affiche(){
   document.getElementById('effets').innerHTML=e;
 }
 
-function listeSorts(){
+var SYN={nuke:'nuke',dd:'nuke',heal:'heal',heals:'heal',soin:'heal',lifetap:'siphon',tap:'siphon',ds:'damage shield',mez:'controle',mesmerize:'controle',stun:'stun',sow:'movement',speed:'movement',port:'voyage',gate:'voyage',regen:'hot',dot:'dot'};
+  function listeSorts(){
   var cl=document.getElementById('cl').value,
-      q=document.getElementById('q').value.toLowerCase().trim(),
+      q=document.getElementById('q').value.toLowerCase().trim(), ty=document.getElementById('ty').value,
       lvl=+document.getElementById('lv').value||60, l=[];
   for(var id in D){
     var v=D[id];
     if(cl && !(v.c&&v.c[cl])) continue;
-    if(q && v.n.toLowerCase().indexOf(q)<0) continue;
+    if(ty && v.t!==ty) continue;
+      // le wiki n'ecrit pas « nuke » dans le nom : on cherche le type et la description,
+      // et on traduit le vocabulaire du joueur (lifetap -> siphon, ds -> damage shield).
+      if(q){ var qs=SYN[q]||q,
+             pate=(v.n+' '+(v.t||'')+' '+(TYPES[v.t]||'')+' '+(v.d||'')).toLowerCase();
+             if(pate.indexOf(q)<0 && pate.indexOf(qs)<0) continue; }
     var mini=99; for(var k in v.c) if(!cl||k===cl) mini=Math.min(mini,v.c[k]);
     if(mini>lvl) continue;
     l.push([id,v,mini]);
@@ -387,13 +397,18 @@ function choisi(){
 
 fetch('https://xm2514-svg.github.io/sites/spells.json').then(function(r){return r.json();}).then(function(j){
   D=j.spells;
-  var s=document.getElementById('cl');
+  var nbT={}; for(var _i in D){ var _t=D[_i].t; if(_t) nbT[_t]=(nbT[_t]||0)+1; }
+      var ORDRE_T=['nuke','dot','heal','hot','debuff','controle','buff','pet','voyage','utilitaire'];
+      document.getElementById('ty').innerHTML='<option value="">'+T.touttype+'</option>'+
+        ORDRE_T.filter(function(t){return nbT[t];}).map(function(t){
+          return '<option value="'+t+'">'+(TYPES[t]||t).replace(/^./,function(c){return c.toUpperCase();})+' ('+nbT[t]+')</option>';}).join('');
+      var s=document.getElementById('cl');
   s.innerHTML='<option value="">'+T.toutclasse+'</option>'+Object.keys(CLASSES).map(function(c){
     return '<option value="'+c+'">'+CLASSES[c]+'</option>';}).join('');
   s.value='SHM';
   listeSorts();
 });
-['cl','q','lv'].forEach(function(id){
+['cl','q','lv','ty'].forEach(function(id){
   document.getElementById(id).addEventListener('input',listeSorts);
 });
 document.getElementById('sp').addEventListener('change',choisi);
