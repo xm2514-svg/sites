@@ -2615,7 +2615,7 @@ fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
              "Undead Knight of Unrest":"Undead Knight","orc warlord":"orc warlord (in water)",
              "the froglok king":"Froglok King","Lower Guk Frenzied":"Frenzied Ghoul"};
   // "Sentinel" seul est trop courant pour etre cherche dans du texte libre
-  var HORS_TEXTE={"Sentinel":1};
+  var HORS_TEXTE={"Sentinel":1,"Innoruuk":1};  // "Innoruuk" est dans "Eye of Innoruuk", "Coin Depicting Innoruuk", "Disciple Symbol of Innoruuk", "Fuligan Soulstone of Innoruuk" : le lien du boss se posait dessus et tuait l'infobulle de l'objet (08/09/2026)
   function connus(){
     var s={};
     document.querySelectorAll('.np[data-named]').forEach(function(g){ s[g.getAttribute('data-named')]=1; });
