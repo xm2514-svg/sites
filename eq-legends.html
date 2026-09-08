@@ -2642,7 +2642,7 @@ fetch('effects.json',{cache:'no-cache'}).then(function(r){return r.json();})
   function lierTexte(){
     // comparaison insensible a la casse : le guide ecrit "the froglok king", la pastille "Froglok King"
     var s=connus(), corresp={}, k;
-    for(k in s) corresp[k.toLowerCase()]=k;
+    for(k in s) if(!HORS_TEXTE[k]) corresp[k.toLowerCase()]=k;
     for(k in ALIAS) if(s[ALIAS[k]] && !HORS_TEXTE[k]) corresp[k.toLowerCase()]=ALIAS[k];
     var cles=Object.keys(corresp);
     if(!cles.length) return;
